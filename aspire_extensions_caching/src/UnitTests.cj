@@ -6,55 +6,57 @@ import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
-// @Test
-// func 测试过期时间_滑动() {
-//     let cache = MemoryDistributedCache()
-//     //5s失效
-//     cache.setString("k1", "test", DistributedCacheEntryOptions(slidingExpiration: Duration.second * 5))
-//     //2s后发起访问
-//     sleep(Duration.second * 2)
-//     //重置计时器
-//     let value1 = cache.getString("k1")
-//     @Expect(value1.isSome(), true)
-//     sleep(Duration.second * 3)
-//     //3s之后在此读取
-//     let value2 = cache.getString("k1")
-//     @Expect(value2.isSome(), true)
-// }
+import aspire_extensions_options.*
 
-// @Test
-// func 测试过期时间_绝对时间() {
-//     let cache = MemoryDistributedCache()
-//     //5s失效
-//     cache.setString("k1", "test", DistributedCacheEntryOptions(absoluteExpiration: DateTime.now().addSeconds(5)))
-//     //2s后发起访问
-//     sleep(Duration.second * 2)
-//     let value1 = cache.getString("k1")
-//     @Expect(value1 == "test", true)
-//     sleep(Duration.second * 4)
-//     //4s之后在此读取
-//     let value2 = cache.getString("k1")
-//     @Expect(value2 == "test", false)
-// }
+@Test
+func 测试过期时间_滑动() {
+    let cache = MemoryDistributedCache(Options.create(DistributedCacheOptions()))
+    //5s失效
+    cache.setString("k1", "test", DistributedCacheEntryOptions(slidingExpiration: Duration.second * 5))
+    //2s后发起访问
+    sleep(Duration.second * 2)
+    //重置计时器
+    let value1 = cache.getString("k1")
+    @Expect(value1.isSome(), true)
+    sleep(Duration.second * 3)
+    //3s之后在此读取
+    let value2 = cache.getString("k1")
+    @Expect(value2.isSome(), true)
+}
 
-// @Test
-// func 测试过期时间_相对时间() {
-//     let cache = MemoryDistributedCache()
-//     //5s失效
-//     cache.setString("k1", "test", DistributedCacheEntryOptions(absoluteExpirationRelativeToNow: Duration.second * 5))
-//     //2s后发起访问
-//     sleep(Duration.second * 2)
-//     let value1 = cache.getString("k1")
-//     @Expect(value1 == "test", true)
-//     sleep(Duration.second * 4)
-//     //4s之后在此读取
-//     let value2 = cache.getString("k1")
-//     @Expect(value2.isSome(), false)
-// }
+@Test
+func 测试过期时间_绝对时间() {
+    let cache = MemoryDistributedCache(Options.create(DistributedCacheOptions()))
+    //5s失效
+    cache.setString("k1", "test", DistributedCacheEntryOptions(absoluteExpiration: DateTime.now().addSeconds(5)))
+    //2s后发起访问
+    sleep(Duration.second * 2)
+    let value1 = cache.getString("k1")
+    @Expect(value1 == "test", true)
+    sleep(Duration.second * 4)
+    //4s之后在此读取
+    let value2 = cache.getString("k1")
+    @Expect(value2 == "test", false)
+}
+
+@Test
+func 测试过期时间_相对时间() {
+    let cache = MemoryDistributedCache(Options.create(DistributedCacheOptions()))
+    //5s失效
+    cache.setString("k1", "test", DistributedCacheEntryOptions(absoluteExpirationRelativeToNow: Duration.second * 5))
+    //2s后发起访问
+    sleep(Duration.second * 2)
+    let value1 = cache.getString("k1")
+    @Expect(value1 == "test", true)
+    sleep(Duration.second * 4)
+    //4s之后在此读取
+    let value2 = cache.getString("k1")
+    @Expect(value2.isSome(), false)
+}
 
 @Test
 func 测试过自动销毁() {
-    let cache = MemoryDistributedCache(DistributedCacheOptions(Duration.second * 1))
+    let cache = MemoryDistributedCache(Options.create(DistributedCacheOptions(Duration.second * 1)))
     //5s失效
     cache.setString("k1", "test1", DistributedCacheEntryOptions(absoluteExpirationRelativeToNow: Duration.second * 5))
     cache.setString("k2", "test2", DistributedCacheEntryOptions(absoluteExpirationRelativeToNow: Duration.second * 7))

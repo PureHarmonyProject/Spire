@@ -5,15 +5,16 @@ import aspire_extensions_options.OptionsServiceCollectionExtensions
 import aspire_extensions_injection.*
 
 public interface DistributedCacheExtensions {
-    func addDistributedMemoryCache(): Unit {
-        addDistributedMemoryCache {_ =>}
+    func addDistributedMemoryCache(): ServiceCollection {
+        return addDistributedMemoryCache {_ =>}
     }
-    func addDistributedMemoryCache(configureOptions: (DistributedCacheOptions) -> Unit): Unit
+    func addDistributedMemoryCache(configureOptions: (DistributedCacheOptions) -> Unit): ServiceCollection
 }
 
-extend ServiceCollection {
-    public func addDistributedMemoryCache(configureOptions: (DistributedCacheOptions) -> Unit) {
+extend ServiceCollection <: DistributedCacheExtensions {
+    public func addDistributedMemoryCache(configureOptions: (DistributedCacheOptions) -> Unit): ServiceCollection {
         this.configure<DistributedCacheOptions>(configureOptions)
         this.tryAddSingleton<IDistributedCache, MemoryDistributedCache>()
+        return this
     }
 }

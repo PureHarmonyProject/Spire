@@ -12,11 +12,7 @@ class MemoryDistributedCache <: IDistributedCache {
     private let _options :DistributedCacheOptions
     private let _memory = ConcurrentHashMap<String, CacheEntry>()
 
-    init() {
-        this(Options.create<>)
-    }
-
-    init(options: IOptions<DistributedCacheOptions>) {
+    public init(options: IOptions<DistributedCacheOptions>) {
         _options = options.value
         _lastExpirationScan = DateTime.now()
     }
