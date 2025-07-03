@@ -55,7 +55,7 @@ func 测试过期时间_相对时间() {
 }
 
 @Test
-func 测试过自动销毁() {
+func 测试过期自动销毁() {
     let cache = MemoryDistributedCache(Options.create(DistributedCacheOptions(Duration.second * 1)))
     //5s失效
     cache.setString("k1", "test1", DistributedCacheEntryOptions(absoluteExpirationRelativeToNow: Duration.second * 5))
