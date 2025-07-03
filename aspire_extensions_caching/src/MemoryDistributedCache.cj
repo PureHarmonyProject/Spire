@@ -5,19 +5,25 @@ import std.sync.*
 import std.collection.*
 import std.collection.concurrent.*
 
+import aspire_extensions_options.*
+
 class MemoryDistributedCache <: IDistributedCache {
-    private let _lastExpirationScan: DateTime
-    private let _syncCounter = SyncCounter(0)
+    private var _lastExpirationScan: DateTime
     private let _options :DistributedCacheOptions
     private let _memory = ConcurrentHashMap<String, CacheEntry>()
 
-    init(options: DistributedCacheOptions) {
-        _options = options
+    init() {
+        this(Options.create<>)
+    }
+
+    init(options: IOptions<DistributedCacheOptions>) {
+        _options = options.value
+        _lastExpirationScan = DateTime.now()
     }
 
     public func get(key: String): ?Array<Byte> {
         refresh(key)
-        if (let Some(value) <- _memory.get(key)) {
+        if (let Some(value) <- _memory.get(key) && !value.isExpired()) {
             return value.data
         }
         return None
@@ -51,21 +57,45 @@ class MemoryDistributedCache <: IDistributedCache {
     扫描过期项
     */
     private func startScanForExpiredItemsIfNeeded() {
-        if (_options.expirationScanFrequency > DateTime.now() - _lastExpirationScan) {            
-            return
-        }
+        println("触发销毁线程")
         func scheduleTask() {
             spawn {
-                
+                //不考虑极端情况，不然会造成阻塞
+                if (!isStartScanForExpiredItems()) {            
+                    return
+                }
+                scanForExpiredItems()
             }
         }
         scheduleTask()
     }
 
     private func scanForExpiredItems() {
-        for (pattern in expression) {
-            
+        if (!isStartScanForExpiredItems()) {            
+            return
         }
+        _lastExpirationScan = DateTime.now()
+        for ((key, value) in getCacheEntries()) {
+           if (value.isExpired()) {
+                _memory.remove(key)
+                println("已自动移除：${key}")
+           }
+        }
+    }
+
+    private func isStartScanForExpiredItems() {
+        if (_options.expirationScanFrequency < DateTime.now() - _lastExpirationScan) {            
+            return true
+        }
+        return false
+    }
+
+    private func getCacheEntries() {
+        _memory |> collectArray
+    }
+
+    internal func getEntryCount() {
+        _memory.size
     }
 }
 
