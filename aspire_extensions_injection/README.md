@@ -58,8 +58,6 @@ let providerSelf = provder.getOrThrow<IServiceProvider>()
 
 * 解析多实现
 
-* 解析服务自身
-
 ``` cangjie
 let services = ServiceCollection()
 services.addSingleton<IDbConnection, MsSqlConnection>()
