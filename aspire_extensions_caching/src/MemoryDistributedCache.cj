@@ -54,12 +54,12 @@ class MemoryDistributedCache <: IDistributedCache {
     扫描过期项
     */
     private func startScanForExpiredItemsIfNeeded() {
+        if (!canStartScanForExpiredItems()) {            
+            return
+        }
         func scheduleTask() {
             spawn {
                 //不考虑极端情况，不然会造成阻塞
-                if (!canStartScanForExpiredItems()) {            
-                    return
-                }
                 scanForExpiredItems()
             }
         }
