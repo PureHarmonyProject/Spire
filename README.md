@@ -21,8 +21,6 @@ MIT License
 - 🔗 统一技术生态
 - 🌐 开源协作平台
 
-**推荐学习**：通过 [`aspire_identity_server`](https://gitcode.com/soulsoft/aspire/aspire_identity_server) 项目可深入掌握 ASP 核心组件的创新应用。
-
 ## 快速开始
 [入门指南](https://gitcode.com/soulsoft/aspire/tree/main/aspire_web_quickstart)
 
