@@ -38,6 +38,7 @@ class MemoryDistributedCache <: IDistributedCache {
                 if (value.isExpired()) {
                     entryView.value = None
                 }else {
+                    //滑动过期
                     value.lastAccessTime = DateTime.now()
                 }
             }

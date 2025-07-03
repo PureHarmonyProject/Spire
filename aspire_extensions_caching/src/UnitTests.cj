@@ -19,7 +19,7 @@ func 测试过期时间_滑动() {
     let value1 = cache.getString("k1")
     @Expect(value1.isSome(), true)
     sleep(Duration.second * 3)
-    //3s之后在此读取
+    //3s之后在次读取
     let value2 = cache.getString("k1")
     @Expect(value2.isSome(), true)
 }
@@ -34,7 +34,7 @@ func 测试过期时间_绝对时间() {
     let value1 = cache.getString("k1")
     @Expect(value1 == "test", true)
     sleep(Duration.second * 4)
-    //4s之后在此读取
+    //4s之后在次读取
     let value2 = cache.getString("k1")
     @Expect(value2 == "test", false)
 }
@@ -49,7 +49,7 @@ func 测试过期时间_相对时间() {
     let value1 = cache.getString("k1")
     @Expect(value1 == "test", true)
     sleep(Duration.second * 4)
-    //4s之后在此读取
+    //4s之后在次读取
     let value2 = cache.getString("k1")
     @Expect(value2.isSome(), false)
 }
