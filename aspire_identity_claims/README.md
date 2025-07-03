@@ -8,7 +8,7 @@ let claimsIdentity = ClaimsIdentity([Claim("sub", "1024"), Claim("name", "aspire
 
 ```
 
-## 创建身份证
+## 创建身份集
 
 ``` cangjie
 let claimsIdentity1 = ClaimsIdentity("basic", [Claim("sub", "1024"), Claim("name", "aspire")])
