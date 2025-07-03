@@ -26,9 +26,10 @@ class MemoryDistributedCache <: IDistributedCache {
     }
 
     public func set(key: String, value: Array<Byte>, options: DistributedCacheEntryOptions): Unit {
-         _memory.entryView(key) { entryView => 
+        _memory.entryView(key) { entryView => 
             entryView.value = CacheEntry(value, DateTime.now(), DateTime.now(), options)
         }
+        startScanForExpiredItemsIfNeeded()
     }
 
     public func refresh(key: String): Unit {
@@ -53,11 +54,10 @@ class MemoryDistributedCache <: IDistributedCache {
     扫描过期项
     */
     private func startScanForExpiredItemsIfNeeded() {
-        println("触发销毁线程")
         func scheduleTask() {
             spawn {
                 //不考虑极端情况，不然会造成阻塞
-                if (!isStartScanForExpiredItems()) {            
+                if (!canStartScanForExpiredItems()) {            
                     return
                 }
                 scanForExpiredItems()
@@ -67,20 +67,19 @@ class MemoryDistributedCache <: IDistributedCache {
     }
 
     private func scanForExpiredItems() {
-        if (!isStartScanForExpiredItems()) {            
+        if (!canStartScanForExpiredItems()) {            
             return
         }
         _lastExpirationScan = DateTime.now()
         for ((key, value) in getCacheEntries()) {
            if (value.isExpired()) {
                 _memory.remove(key)
-                println("已自动移除：${key}")
            }
         }
     }
 
-    private func isStartScanForExpiredItems() {
-        if (_options.expirationScanFrequency < DateTime.now() - _lastExpirationScan) {            
+    private func canStartScanForExpiredItems() {
+        if (_options.expirationScanFrequency < DateTime.now() - _lastExpirationScan && _memory.size > 0) {            
             return true
         }
         return false

@@ -11,6 +11,7 @@ import aspire_web_quickstart.controllers.*
 import aspire_web_quickstart.hostservices.*
 import aspire_web_quickstart.authentication.*
 import aspire_web_quickstart.infrastructure.*
+import aspire_extensions_caching.DistributedCacheExtensions
 
 main(args: Array<String>): Int64 {
     let builder = WebHost.createBuilder(args)
@@ -22,6 +23,9 @@ main(args: Array<String>): Int64 {
 
     //运行一个测试的后台服务
     //builder.services.addHelloHostedService()
+
+    //添加分布式缓存
+    builder.services.addDistributedMemoryCache()
 
     //将httpContext访问器注入容器
     builder.services.addHttpContextAccessor()

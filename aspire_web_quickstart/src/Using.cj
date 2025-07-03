@@ -10,6 +10,7 @@ internal import aspire_web_staticfiles.*
 internal import aspire_web_healthchecks.*
 internal import aspire_web_authorization.*
 internal import aspire_web_authentication.*
+internal import aspire_extensions_caching.*
 internal import aspire_extensions_options.*
 internal import aspire_extensions_logging.*
 internal import aspire_extensions_hosting.*

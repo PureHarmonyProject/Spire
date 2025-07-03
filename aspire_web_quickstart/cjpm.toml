@@ -24,6 +24,7 @@
   aspire_web_healthchecks = { path = "../aspire_web_healthchecks"}
   aspire_web_authorization = { path = "../aspire_web_authorization"}
   aspire_web_authentication = { path = "../aspire_web_authentication"}
+  aspire_extensions_caching = { path = "../aspire_extensions_caching"}
   aspire_extensions_hosting = { path = "../aspire_extensions_hosting"}
   aspire_extensions_logging = { path = "../aspire_extensions_logging"}
   aspire_extensions_options = { path = "../aspire_extensions_options"}
