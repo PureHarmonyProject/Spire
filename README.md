@@ -37,11 +37,14 @@ MIT License
 |                   | aspire_web_authentication             | 可选     | 基础认证中间件              |
 |                   | aspire_web_authentication_jwtbearer   | 可选     | JWT 认证方案                |
 | **基础设施**      | aspire_extensions_options             | 必需     | 配置选项管理                |
-|                   | aspire_extensions_configuration       | 可选     | 统一配置系统                |
+|                  | aspire_extensions_injection             | 必需     | 依赖注入                |
 |                   | aspire_extensions_hosting             | 可选     | 通用主机服务                |
-| **运维支持**      | aspire_web_healthchecks               | 可选     | 健康检查中间件              |
+|                   | aspire_extensions_caching            | 可选     | 分布式内存缓存                |
 |                   | aspire_extensions_healthchecks        | 可选     | 健康检查服务                |
+|                   | aspire_extensions_configuration       | 可选     | 统一配置系统                |
+| **运维支持**      | aspire_web_healthchecks               | 可选     | 健康检查中间件              |
 |                   | aspire_extensions_logging             | 可选     | 日志系统                    |
 | **身份管理**      | aspire_identity_server                | 可选     | OAuth2.0/OIDC 认证服务      |
+|                   | aspire_identity_claims               | 可选     | 身份声明                     |
 |                   | aspire_identity_tokens_jwt            | 可选     | JWT 令牌支持                |
 |                   | aspire_identity_protocols_oidc        | 可选     | OpenID Connect 协议实现     |
