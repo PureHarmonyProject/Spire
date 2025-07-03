@@ -23,6 +23,10 @@ tokenHandler.writeToken(jwtToken) |> println
 ``` cangjie
 let token = '...'
 
+//创建公钥
+let pem = RSAPublicKey.decodeFromPem(String.fromUtf8(readToEnd(File("rsa256_public_key.pem", OpenMode.Read))))
+let securityKey = RsaSecurityKey(publicKey: pem)
+
 //验证参数
 var parameters = TokenValidationParameters()
 parameters.issuerSigningKey = securityKey
