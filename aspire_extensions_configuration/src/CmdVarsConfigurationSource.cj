@@ -3,7 +3,7 @@ package aspire_extensions_configuration
 import std.process.*
 import std.collection.*
 
-class ArgVarsConfigurationProvider <: ConfigurationProvider {
+class CmdVarsConfigurationProvider <: ConfigurationProvider {
     private let _args: Array<String>
     
     init(args: Array<String>) {
@@ -23,7 +23,7 @@ class ArgVarsConfigurationProvider <: ConfigurationProvider {
     }
 }
 
-class ArgVarsConfigurationSource <: IConfigurationSource {
+class CmdVarsConfigurationSource <: IConfigurationSource {
     private let _args: Array<String>
    
     init(args: Array<String>) {
@@ -31,14 +31,14 @@ class ArgVarsConfigurationSource <: IConfigurationSource {
     }
 
     public func build(_: IConfigurationBuilder): IConfigurationProvider {
-        let provider = ArgVarsConfigurationProvider(_args)
+        let provider = CmdVarsConfigurationProvider(_args)
         return provider
     }
 }
 
 extend ConfigurationManager {
-    public func addArgVars(args: Array<String>): IConfigurationBuilder {
-        add(ArgVarsConfigurationSource(args))
+    public func addCmdVars(args: Array<String>): IConfigurationBuilder {
+        add(CmdVarsConfigurationSource(args))
         return this
     }
 }

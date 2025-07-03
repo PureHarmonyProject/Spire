@@ -31,8 +31,8 @@ class MemoryConfigurationSource <: IConfigurationSource {
 }
 
 extend ConfigurationManager {
-    public func addMemory(values: HashMap<String, String>): IConfigurationBuilder {
-        add(MemoryConfigurationSource(values))
+    public func addMemory(values: Collection<(String, String)>): IConfigurationBuilder {
+        add(MemoryConfigurationSource(HashMap<String, String>(values)))
         return this
     }
 }

@@ -2,6 +2,7 @@ package aspire_extensions_configuration
 
 
 import std.env.*
+import std.unicode.*
 import std.collection.*
 
 class EnvVarsConfigurationProvider <: ConfigurationProvider {
@@ -12,9 +13,9 @@ class EnvVarsConfigurationProvider <: ConfigurationProvider {
     }
 
     public override func load() {
-        let prefix = "${_prefix.toAsciiLower()}_"
+        let prefix = "${_prefix.toLower()}_"
         for ((key, value) in getVariables()) {
-            var name = key.toAsciiLower()
+            var name = key.toLower()
             if (!name.startsWith(prefix)) {
                 continue
             }

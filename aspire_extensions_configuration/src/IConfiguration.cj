@@ -18,8 +18,26 @@ public interface IConfiguration {
             if (TypeInfo.of<String>() == typeInfo) {
                 return value
             }
+            if (TypeInfo.of<Int32>() == typeInfo) {
+                return Int32.parse(value)
+            }
+            if (TypeInfo.of<UInt32>() == typeInfo) {
+                return UInt32.parse(value)
+            }
             if (TypeInfo.of<Int64>() == typeInfo) {
                 return Int64.parse(value)
+            }
+            if (TypeInfo.of<UInt64>() == typeInfo) {
+                return UInt64.parse(value)
+            }
+            if (TypeInfo.of<Float16>() == typeInfo) {
+                return Float32.parse(value)
+            }
+            if (TypeInfo.of<Float32>() == typeInfo) {
+                return Float32.parse(value)
+            }
+            if (TypeInfo.of<Float64>() == typeInfo) {
+                return Float64.parse(value)
             }
             if (TypeInfo.of<Rune>() == typeInfo) {
                 return value.toRuneArray().first.flatMap {f => f as Any}
