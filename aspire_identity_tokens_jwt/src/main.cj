@@ -11,10 +11,10 @@ import stdx.encoding.hex.*
 import aspire_identity_tokens.*
 
 main(): Int64 {
-    let securityKey = SymmetricSecurityKey("SECUZebfRscapBanPymcs5CZEJpEFjSISECUZebfRscapBanPymcs5CZEJpEFjSI".toArray())
+    //let securityKey = SymmetricSecurityKey("SECUZebfRscapBanPymcs5CZEJpEFjSISECUZebfRscapBanPymcs5CZEJpEFjSI".toArray())
     //println(String.fromUtf8(readToEnd(File("ec256-private.pem", OpenMode.Read))))
-    //let pem = ECDSAPrivateKey.decodeFromPem(String.fromUtf8(readToEnd(File("ec256-private.pem", OpenMode.Read))))
-    //let securityKey = ECDsaSecurityKey(privateKey: pem)
+    let pem = RSAPrivateKey.decodeFromPem(String.fromUtf8(readToEnd(File("ec256-private.pem", OpenMode.Read))))
+    let securityKey = RsaSecurityKey(privateKey: pem)
     let header = JwtHeader(SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256))
     let payload = JwtPayload(
         issuer: "aspire",
