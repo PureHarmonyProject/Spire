@@ -1,7 +1,6 @@
 package aspire_extensions_caching
 
-import aspire_extensions_injection
-import aspire_extensions_options.OptionsServiceCollectionExtensions
+import aspire_extensions_options.*
 import aspire_extensions_injection.*
 
 public interface DistributedCacheExtensions {
