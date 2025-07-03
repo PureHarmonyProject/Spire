@@ -11,7 +11,6 @@ logging.addConsole()
 let loggerFactory = logging.build()
 //1. 通过字符串的方式创建日志
 let logger1 = loggerFactory.createLogger("test1")
-logger1.info("hello cangjie!")
 
 //2. 通过类型完全限定名创建日志
 let logger2 = loggerFactory.createLogger<Object>()
