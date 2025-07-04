@@ -9,14 +9,14 @@ import std.unittest.testmacro.*
 import aspire_identity_tokens.*
 
 @Test
-func name() {
+func 基础测试() {
     let securityKey = SymmetricSecurityKey("SECUZebfRscapBanPymcs5CZEJpEFjSISECUZebfRscapBanPymcs5CZEJpEFjSI".toArray())
     let header = JwtHeader(SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256))
     let payload = JwtPayload(
         issuer: "aspire",
         audience: "cangjie",
         notBefore: DateTime.now(),
-        expires: DateTime.now(),
+        expires: DateTime.now().addMinutes(10),
         claims: [("sub", "1024")]
     )
     var jwtToken = JwtSecurityToken(header, payload)
@@ -26,9 +26,8 @@ func name() {
     //验证
     var parameters = TokenValidationParameters()
     parameters.issuerSigningKey = securityKey
-    parameters.validIssuer = "cangjie"
+    parameters.validIssuer = "aspire"
     parameters.validAudience = "cangjie"
-    parameters.requireExpirationTime = false
     let result = tokenHandler.validateToken(accessToken, parameters)
     if (result.isValid) {
         @Expect(result.identity.hasClaim("sub", "1024"))
