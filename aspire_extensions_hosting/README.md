@@ -2,83 +2,106 @@
 
 通用主机（Generic Host） 库，能够用来创建后台服务、控制台应用、Web 应用等，并提供了依赖注入、日志、配置管理、生命周期管理等功能。
 
-# dependencies
 
-[aspire_extensions_logging](https://gitcode.com/aspire/aspire_extensions_logging.git)  
-[aspire_extensions_options](https://gitcode.com/aspire/aspire_extensions_options.git)  
-[aspire_extensions_injection](https://gitcode.com/aspire/aspire_extensions_injection.git)  
-[aspire_extensions_configuration](https://gitcode.com/aspire/aspire_extensions_configuration.git)
+## 创建通用主机
 
-# quickstart
-
-由于hosting整合了日志，选项，注入，配置，因此你需要分别学习这些模块，每个模块下都有对应文档，这里不做演示。
-
-## BackgroundService
-使用后台服务可以用来执行windows程序，处理消息队列，定时服务等
 ``` cangjie
-package aspire_extensions_hosting
+import aspire_extensions_hosting.*
 
-import aspire_extensions_options.*
-
-main() {
-    let builder = Host.createBuilder()
-    builder.services.addTestHostedService({_=>})
-    builder.services.configure<TestHostedServiceOptions>{ configureOptions =>
-        configureOptions.delay = 10
-    }
-    let host = builder.build()
+main(args: Array<String>) {
+    let builder = Host.createBuilder(args)
+    let host = builder.build()    
     host.run()
     return 0
 }
 
-/**这是aspnetcore基本套路，注入、选项、扩展**/
-public interface TestHostedServiceExtensions {
-    func addTestHostedService(configure: (TestHostedServiceOptions) -> Unit): ServiceCollection
+```
+> 当然上面的代码啥也不干，只是启动一个主线程并阻塞    
+> `Host.createBuilder(args)`为我们整合了`依赖注入`、`配置管`、`IHostEnvironment`
+
+## 运行后台任务
+
+``` cangjie
+import aspire_extensions_hosting.*
+import aspire_extensions_logging.*
+import aspire_extensions_injection.*
+
+main(args: Array<String>) {
+    let builder = Host.createBuilder(args)
+    builder.services.addTestWork()
+    let host = builder.build()    
+    host.run()
+    return 0
 }
 
-extend ServiceCollection {
-    public func addTestHostedService(configure: (TestHostedServiceOptions) -> Unit): ServiceCollection {
-        this.addHostedService<TestHostedService>()
-        this.configure<TestHostedServiceOptions>(configure)
-        return this
+public class TestWorker <: BackgroundService {
+    private let _logger: ILogger
+
+    public init(logFactory: ILoggerFactory) {
+        _logger = logFactory.createLogger<TestWorker>()
     }
-}
 
-public class TestHostedServiceOptions {
-    public var delay = 1
-}
-
-public class TestHostedService <: BackgroundService {
-    private let _options: IOptions<TestHostedServiceOptions>
-
-    public init(options: IOptions<TestHostedServiceOptions>) {
-        _options = options
-    }
-
-    public func run() {
-        println("delay:${_options.value.delay}")
+    public func run(): Unit {
         while (!Thread.currentThread.hasPendingCancellation) {
-            println("do something ...")
-            sleep(Duration.second * _options.value.delay)
+            _logger.info("hello cangjie")
+            sleep(Duration.second * 3)
         }
     }
 }
 
+extend ServiceCollection{
+    public func addTestWork() {
+        this.addHostedService<TestWorker>()
+    }
+}
 ```
 
-## Lifetime
+> 这样就可以让通用主机去执行`TestWorker`    
+> `extend ServiceCollection`是可选的，但是是被推崇的
+
+## IHostEnvironment
+
+开发环境和测试环境可能注册服务的实现组件不一样。执行的逻辑获取也不一样。
 
 ``` cangjie
+import aspire_extensions_hosting.*
+import aspire_extensions_logging.*
+import aspire_extensions_injection.*
+
 main() {
-    let builder = Host.createBuilder(args)
-    let host = builder.build()
-    host.lifetime.onStarted{
-        //资源加载
+    let builder = Host.createBuilder("environment=Development")
+
+    //只有开发环境才注册TestWorker
+    if (builder.environment.isDevelopment()) {
+        builder.services.addTestWork()
     }
-    host.lifetime.onStopped{
-        //资源销毁
-    }
+    let host = builder.build()    
     host.run()
     return 0
 }
+
+public class TestWorker <: BackgroundService {
+    private let _logger: ILogger
+    private let _env: IHostEnvironment
+
+    public init(logFactory: ILoggerFactory, env: IHostEnvironment) {
+        _logger = logFactory.createLogger<TestWorker>()
+        _env = env
+    }
+
+    public func run(): Unit {
+        while (!Thread.currentThread.hasPendingCancellation) {
+            _logger.info("${_env.environmentName} hello cangjie")
+            sleep(Duration.second * 3)
+        }
+    }
+}
+
+extend ServiceCollection{
+    public func addTestWork() {
+        this.addHostedService<TestWorker>()
+    }
+}
 ```
+> 设置环境变量可以通过命令行参数，环境变量等方式
+
