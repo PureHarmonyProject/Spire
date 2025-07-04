@@ -74,6 +74,7 @@ class MemoryDistributedCache <: IDistributedCache {
                 }
             }
         }
+        //处理极端场景
         if (_isScanning.compareAndSwap(false, true)) {
             scheduleTask()
         }
