@@ -20,9 +20,9 @@ public class TestWorker <: BackgroundService {
     private let _logger: ILogger
     private let _env: IHostEnvironment
 
-    public init(logFactory: ILoggerFactory, env: IHostEnvironment) {
-        _logger = logFactory.createLogger<TestWorker>()
+    public init(env: IHostEnvironment, logFactory: ILoggerFactory) {
         _env = env
+        _logger = logFactory.createLogger<TestWorker>()
     }
 
     public func run(): Unit {
