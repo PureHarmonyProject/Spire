@@ -10,17 +10,17 @@ import aspire_identity_claims.*
 
 public class TokenValidationResult {
     private TokenValidationResult(
-        public let subject!: ClaimsPrincipal,
+        public let identity!: ClaimsIdentity,
         public let securityToken!: ?SecurityToken = None,
         public let exception!: ?Exception = None) {
     }
 
-    public static func success(subject: ClaimsPrincipal, securityToken: SecurityToken) {
-        TokenValidationResult(subject: subject, securityToken: securityToken)
+    public static func success(identity: ClaimsIdentity, securityToken: SecurityToken) {
+        TokenValidationResult(identity: identity, securityToken: securityToken)
     }
 
     public static func failed(exception: Exception) {
-        TokenValidationResult(subject: ClaimsPrincipal(), exception: exception)
+        TokenValidationResult(identity: ClaimsIdentity(), exception: exception)
     }
 
     public prop isValid: Bool {

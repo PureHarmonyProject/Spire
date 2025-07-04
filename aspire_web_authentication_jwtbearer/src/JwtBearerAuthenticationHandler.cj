@@ -29,8 +29,9 @@ public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAu
                 let properties = AuthenticationProperties()
                 if (this.options.saveToken) {
                     properties.storeTokens(AuthenticationToken("access_token", accessToken))
-                }   
-                let ticket = AuthenticationTicket(result.subject, JwtBearerAuthenticationDefaults.Scheme, properties)
+                }
+                let subject = ClaimsPrincipal(result.identity)   
+                let ticket = AuthenticationTicket(subject, JwtBearerAuthenticationDefaults.Scheme, properties)
                 return AuthenticateResult.success(ticket)
             }else {
                 AuthenticateResult.fail(result.exception.getOrThrow())

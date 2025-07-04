@@ -67,9 +67,8 @@ public class JwtSecurityTokenHandler <: SecurityTokenHandler {
             let securityToken = JwtSecurityToken(jwtHeader, jwtPayload)
             let identity = ClaimsIdentity(parameters.authenticationType)
             identity.addClaims(securityToken.payload.toClaims())
-            let subject = ClaimsPrincipal(identity)
-            validateSubject(subject, parameters)
-            return TokenValidationResult.success(subject, securityToken)
+            validateSubject(identity, parameters)
+            return TokenValidationResult.success(identity, securityToken)
         }catch (exception: Exception) {
             return TokenValidationResult.failed(exception)
         }
@@ -86,16 +85,16 @@ public class JwtSecurityTokenHandler <: SecurityTokenHandler {
         return None
     }
 
-    private func validateSubject(subject: ClaimsPrincipal, parameters: TokenValidationParameters) {
+    private func validateSubject(identity: ClaimsIdentity, parameters: TokenValidationParameters) {
        
         if (parameters.requireExpirationTime) {
-            if (let Some(notBefore) <- subject.findFirstValue(ClaimNames.NotBefore).flatMap{f => Int64.parse(f)}) {
+            if (let Some(notBefore) <- identity.findFirst(ClaimNames.NotBefore).flatMap{f => Int64.parse(f.value)}) {
                 if (DateTime.now() < DateTime.fromUnixTimeStamp(Duration.second * notBefore)) {
                     throw SecurityTokenValidationException("NotBefore validation failed.")
                 }
             }
 
-            let expTimestamp = subject.findFirstValue(ClaimNames.ExpirationTime).flatMap{f => Int64.parse(f)}
+            let expTimestamp = identity.findFirst(ClaimNames.ExpirationTime).flatMap{f => Int64.parse(f.value)}
             
             if (parameters.requireExpirationTime && expTimestamp.isNone()) {
                 throw SecurityTokenValidationException("NotBefore validation failed.")
@@ -115,7 +114,7 @@ public class JwtSecurityTokenHandler <: SecurityTokenHandler {
             if (let Some(issuer) <- parameters.validIssuer) {
                 issuers.add(issuer)
             }
-            let claims = subject.findAll(ClaimNames.Issuer) |> map{f => f.value}
+            let claims = identity.findAll(ClaimNames.Issuer) |> map{f => f.value}
             if (!claims.any{f => issuers.contains(f)}) {
                 throw SecurityTokenValidationException("Issuer validation failed. ")
             }
@@ -126,7 +125,7 @@ public class JwtSecurityTokenHandler <: SecurityTokenHandler {
             if (let Some(audience) <- parameters.validAudience) {
                 audiences.add(audience)
             }
-            let claims = subject.findAll(ClaimNames.Audience) |> map{f => f.value}
+            let claims = identity.findAll(ClaimNames.Audience) |> map{f => f.value}
             if (!claims.any{f => audiences.contains(f)}) {
                 throw SecurityTokenValidationException("Audience validation failed. ")
             }
