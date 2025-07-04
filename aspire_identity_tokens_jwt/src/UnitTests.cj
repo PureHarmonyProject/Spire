@@ -31,7 +31,7 @@ func name() {
     parameters.requireExpirationTime = false
     let result = tokenHandler.validateToken(accessToken, parameters)
     if (result.isValid) {
-        @Expect(result.subject.findFirstValue("sub"), "1024")
+        @Expect(result.identity.hasClaim("sub", "1024"))
     } else {
         @Expect(false)
     }

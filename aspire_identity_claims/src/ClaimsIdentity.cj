@@ -54,4 +54,28 @@ public class ClaimsIdentity {
     public func addClaims(claims: Collection<Claim>) {
         _claims.add(all: claims)
     }
+
+    public func findAll(predicate: (Claim) -> Bool) {
+        _claims |> filter(predicate)
+    }
+
+    public func findAll(name: String) {
+        _claims |> filter{f => f.name == name}
+    }
+
+    public func findFirst(predicate: (Claim) -> Bool) {
+        findAll(predicate) |> first
+    }
+
+    public func findFirst(name: String) {
+        findAll(name) |> first
+    }
+
+    public func hasClaim(predicate: (Claim) -> Bool) {
+        _claims |> any(predicate)
+    }
+
+    public func hasClaim(name: String, value: String) {
+        return hasClaim{f => f.name == name && f.value == value}
+    }
 }
