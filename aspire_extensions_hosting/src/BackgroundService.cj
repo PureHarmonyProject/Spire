@@ -21,8 +21,7 @@ public abstract class BackgroundService <: IHostedService & Resource {
 
     public func run(): Unit
 
-    public open func isClosed() {
-        
+    public open func isClosed() {        
         return true
     }
 

@@ -10,6 +10,18 @@ public interface IHostEnvironment {
     prop environmentName: String
     prop contentRootPath: String
     prop applicationName: String
+    func isEnvironment(name: String) {
+        environmentName == name
+    }
+    func IsStaging() {
+        isEnvironment(Environments.Staging)
+    }
+    func IsProduction() {
+        isEnvironment(Environments.Production)
+    }
+    func isDevelopment() {
+        isEnvironment(Environments.Development)
+    }
 }
 
 public class HostEnvironment <: IHostEnvironment {
