@@ -59,7 +59,7 @@ extend ServiceCollection{
 > 这样就可以让通用主机去执行`TestWorker`    
 > `extend ServiceCollection`是可选的，但是是被推崇的
 
-## IHostEnvironment
+## 环境变量
 
 开发环境和测试环境可能注册服务的实现组件不一样。执行的逻辑获取也不一样。
 
@@ -103,5 +103,6 @@ extend ServiceCollection{
     }
 }
 ```
-> 设置环境变量可以通过命令行参数，环境变量等方式
+> 1. 设置环境变量可以通过命令行参数，环境变量等方式    
+> 2. 如果是命令行参数 ./main environment=Development    
 
