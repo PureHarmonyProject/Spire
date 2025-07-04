@@ -15,6 +15,7 @@ import aspire_extensions_options.*
 
 class MemoryDistributedCache <: IDistributedCache {
     private var _lastExpirationScan: DateTime
+    private let _isScanning = AtomicBool(false)
     private let _options :DistributedCacheOptions
     private let _memory = ConcurrentHashMap<String, CacheEntry>()
 
@@ -64,19 +65,21 @@ class MemoryDistributedCache <: IDistributedCache {
         if (!canStartScanForExpiredItems()) {            
             return
         }
-        func scheduleTask() {
+        func scheduleTask() {            
             spawn {
-                //不考虑极端情况，不然会造成阻塞
-                scanForExpiredItems()
+                try {
+                    scanForExpiredItems()
+                }finally {
+                    _isScanning.swap(false)
+                }
             }
         }
-        scheduleTask()
+        if (_isScanning.compareAndSwap(false, true)) {
+            scheduleTask()
+        }
     }
 
-    private func scanForExpiredItems() {
-        if (!canStartScanForExpiredItems()) {            
-            return
-        }
+    private func scanForExpiredItems() {      
         _lastExpirationScan = DateTime.now()
         for ((key, value) in getCacheEntries()) {
            if (value.isExpired()) {
