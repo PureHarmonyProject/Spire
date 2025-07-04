@@ -70,7 +70,7 @@ class MemoryDistributedCache <: IDistributedCache {
                 try {
                     scanForExpiredItems()
                 }finally {
-                    _isScanning.swap(false)
+                    _isScanning.store(false)
                 }
             }
         }
