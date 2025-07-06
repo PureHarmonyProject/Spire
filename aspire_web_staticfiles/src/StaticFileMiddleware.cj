@@ -8,6 +8,7 @@ package aspire_web_staticfiles
 import std.io.*
 import std.fs.*
 import std.convert.*
+import aspire_extensions_options.*
 
 class StaticFileMiddleware <: IMiddleware {
     private let _options: StaticFileOptions
@@ -15,11 +16,11 @@ class StaticFileMiddleware <: IMiddleware {
     private let _environment: IWebHostEnvironment
     private let _contentTypeProvider: IContentTypeProvider
 
-    init(options: StaticFileOptions, environment: IWebHostEnvironment) {
-        _options = options
+    public init(options: IOptions<StaticFileOptions>, environment: IWebHostEnvironment) {
+        _options = options.value
         _environment = environment
-        _fileProvider = options.fileProvider ?? PhysicalFileProvider()
-        _contentTypeProvider = options.contentTypeProvider ?? ContentTypeProvider()
+        _fileProvider = _options.fileProvider ?? PhysicalFileProvider()
+        _contentTypeProvider = _options.contentTypeProvider ?? ContentTypeProvider()
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {

@@ -5,6 +5,7 @@
 // The modifications to this file by Soulsoft are licensed under the MIT license.
 package aspire_web_staticfiles
 
+import aspire_extensions_options.*
 import aspire_extensions_injection.*
 
 public interface StaticFileExtensions {
@@ -27,7 +28,6 @@ extend ApplicationBuilder <: StaticFileExtensions {
     }
 
     public func useStaticFiles(options: StaticFileOptions): Unit {
-        let environment = this.applicationServices.getOrThrow<IWebHostEnvironment>()
-        use(StaticFileMiddleware(options, environment))
+        use<StaticFileMiddleware>(Options.create(options))
     }
 }

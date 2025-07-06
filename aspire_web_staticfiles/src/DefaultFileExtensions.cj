@@ -6,6 +6,7 @@
 
 package aspire_web_staticfiles
 
+import aspire_extensions_options.*
 import aspire_extensions_injection.*
 
 public interface DefaultFileExtensions {
@@ -27,7 +28,6 @@ extend ApplicationBuilder <: DefaultFileExtensions {
     }
 
     public func useDefaultFiles(options: DefaultFilesOptions): Unit {
-        let environment = this.applicationServices.getOrThrow<IWebHostEnvironment>()
-        use(DefaultFileMiddleware(options, environment))
+        use<DefaultFileMiddleware>(Options.create(options))
     }
 }

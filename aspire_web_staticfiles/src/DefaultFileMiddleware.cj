@@ -7,16 +7,17 @@
 package aspire_web_staticfiles
 
 import std.fs.{exists, File}
+import aspire_extensions_options.*
 
 class DefaultFileMiddleware <: IMiddleware {
     private let _fileProvider: IFileProvider
     private let _options: DefaultFilesOptions
     private let _environment: IWebHostEnvironment
 
-    init(options: DefaultFilesOptions, environment: IWebHostEnvironment) {
-        _options = options
+    public init(options: IOptions<DefaultFilesOptions>, environment: IWebHostEnvironment) {
+        _options = options.value
         _environment = environment
-        _fileProvider = options.fileProvider ?? PhysicalFileProvider()
+        _fileProvider = _options.fileProvider ?? PhysicalFileProvider()
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
