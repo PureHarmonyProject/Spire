@@ -17,7 +17,7 @@ class StaticFileContent {
     public func serve(context: HttpContext) {
         let etagValue = calcEtagValue(fileInfo)
         if(isNotModified(context, etagValue)) {
-            context.response.status(HttpStatusCode.NotModified)
+            context.response.status(StatusCodes.NotModified)
         }else {
             context.response.addHeader("ETag", etagValue)
             context.response.addHeader("Content-Type", contentType)
