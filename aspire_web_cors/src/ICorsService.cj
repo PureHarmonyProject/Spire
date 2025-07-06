@@ -6,6 +6,9 @@
 
 package aspire_web_cors
 
+import aspire_web_http.*
+
 public interface ICorsService {
-    
+    func evaluatePolicy(context: HttpContext, policy: CorsPolicy): CorsResult
+    func applyResul(result: CorsResult, response: HttpResponse): Unit
 }

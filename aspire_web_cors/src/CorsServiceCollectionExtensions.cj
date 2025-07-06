@@ -21,8 +21,8 @@ public interface CorsServiceCollectionExtensions {
 extend ServiceCollection <: CorsServiceCollectionExtensions {
     public func addCors(configureOptions: (CorsOptions)-> Unit): ServiceCollection {
         this.configure<CorsOptions>(configureOptions)
-        this.tryAddTransient<ICorsService, CorsService>()
         this.tryAddTransient<ICorsPolicyProvider, CorsPolicyProvider>()
+        this.tryAddTransient<ICorsService, CorsService>{sp => CorsService(sp.getOrThrow<IOptions<CorsOptions>>())}
         return this
     }
 }

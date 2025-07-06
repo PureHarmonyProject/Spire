@@ -14,6 +14,7 @@ public class CorsPolicy {
     private var _supportsCredentials = false
     internal var isDefaultIsOriginAllowed = true
     private var _preflightMaxAge: ?Duration = None
+    private let _exposedHeaders = ArrayList<String>()
     private var _isOriginAllowed: ?(String) -> Bool = None
 
     public init() {
@@ -56,6 +57,12 @@ public class CorsPolicy {
         set(value) {
             _isOriginAllowed = value
             isDefaultIsOriginAllowed = false
+        }
+    }
+
+    public prop exposedHeaders: List<String> {
+        get() {
+            _exposedHeaders
         }
     }
 

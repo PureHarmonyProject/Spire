@@ -23,7 +23,7 @@ public class EndpointRoutingMiddleware <: IMiddleware {
             flag = RouteFlags.Ok
         }
         match (flag) {
-            case MethodNotAllowed => context.response.status(HttpStatusCode.MethodNotAllowed)
+            case MethodNotAllowed => context.response.status(StatusCodes.MethodNotAllowed)
             case _ => next()
         }
     }

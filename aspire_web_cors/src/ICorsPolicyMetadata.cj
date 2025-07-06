@@ -8,6 +8,6 @@ package aspire_web_cors
 
 import aspire_web_http.*
 
-public interface ICorsPolicyProvider {
-    func getPolicy(context: HttpContext, policyName: ?String): ?CorsPolicy
+public interface ICorsPolicyMetadata <: ICorsMetadata {
+    prop policy: CorsPolicy
 }

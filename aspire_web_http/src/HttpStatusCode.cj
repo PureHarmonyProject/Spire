@@ -6,7 +6,7 @@
 
 package aspire_web_http
 
-public struct HttpStatusCode {
+public struct StatusCodes {
     public static const Continue: UInt16 =                        100
     public static const SwitchingProtocols: UInt16 =             101
     public static const Processing: UInt16 =                      102

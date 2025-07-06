@@ -9,11 +9,28 @@ package aspire_web_cors
 import aspire_web_http.*
 
 public interface CorsMiddlewareExtensions {
-    func useCors(): Unit
+    func useCors(): ApplicationBuilder
+    func useCors(policyName: String): ApplicationBuilder
+    func useCors(configurePolicy: (CorsPolicyBuilder)->Unit): ApplicationBuilder
 }
 
 extend ApplicationBuilder <: CorsMiddlewareExtensions {
-    public func useCors(): Unit {
+    
+    public func useCors(): ApplicationBuilder {
         this.use<CorsMiddleware>()
+        return this
+    }
+
+    public func useCors(policyName: String): ApplicationBuilder {
+        this.use<CorsMiddleware>(policyName)
+        return this
+    }
+
+    public func useCors(configurePolicy: (CorsPolicyBuilder) -> Unit): ApplicationBuilder {
+        let policyBuilder = CorsPolicyBuilder()
+        configurePolicy(policyBuilder)
+        let policy = policyBuilder.build()
+        this.use<CorsMiddleware>(policy)
+        return this
     }
 }

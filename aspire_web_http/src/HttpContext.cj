@@ -6,11 +6,14 @@
 
 package aspire_web_http
 
+import std.collection.*
 import aspire_identity_claims.*
 import aspire_extensions_injection.*
 
 public abstract class HttpContext {
     
+    public prop items: Map<String, Any>
+
     public prop request: HttpRequest
     
     public prop response: HttpResponse

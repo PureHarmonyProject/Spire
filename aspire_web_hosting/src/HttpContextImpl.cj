@@ -3,6 +3,7 @@
 
 package aspire_web_hosting
 
+import std.collection.*
 import aspire_web_http.*
 import aspire_identity_claims.*
 import stdx.net.http.HttpContext as HttpContextBase
@@ -13,6 +14,7 @@ class HttpContextImpl <: HttpContext {
     private let _response: HttpResponseImpl
     private let _services: IServiceProvider
     private let _features: IFeatureCollection
+    private let _items = HashMap<String, Any>()
 
     init(context: HttpContextBase,services: IServiceProvider) {
         _user = ClaimsPrincipal()
@@ -20,6 +22,12 @@ class HttpContextImpl <: HttpContext {
         _response = HttpResponseImpl(context.responseBuilder)
         _features = FeatureCollection()
         _services = services
+    }
+
+    public prop items: Map<String, Any> {
+        get() {
+            _items
+        }
     }
 
     public prop request: HttpRequest {

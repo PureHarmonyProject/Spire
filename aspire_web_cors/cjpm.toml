@@ -13,5 +13,13 @@
 
 [dependencies]
   aspire_web_http = { path = "../aspire_web_http"}
+  aspire_web_routing = { path = "../aspire_web_routing"} 
   aspire_extensions_options = { path = "../aspire_extensions_options"} 
+  aspire_extensions_logging = { path = "../aspire_extensions_logging"} 
   aspire_extensions_injection = { path = "../aspire_extensions_injection"} 
+
+[target.x86_64-w64-mingw32.bin-dependencies]
+  path-option = ["${CANGJIE_STDX}"]
+
+[target.x86_64-unknown-linux-gnu.bin-dependencies]    
+  path-option = ["${CANGJIE_STDX}"]  

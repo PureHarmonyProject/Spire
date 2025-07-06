@@ -42,7 +42,7 @@ public abstract class ApplicationBuilder {
         }
     }
 
-    public func use<TMiddleware>(args: Array<String>): This where TMiddleware <: IMiddleware {
+    public func use<TMiddleware>(args: Array<Any>): This where TMiddleware <: IMiddleware {
         use(ActivatorUtilities.createInstance<TMiddleware>(applicationServices, args))
     }
 
