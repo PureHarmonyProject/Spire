@@ -122,9 +122,9 @@ public class Host <: IHost {
 
     private static func configureEnvironment(args: Array<String>): IHostEnvironment {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("asp")
+        configuration.addEnvVars("aspire")
         configuration.addCmdVars(args)
-        let environmentName = configuration["environment"] ?? "prod"
+        let environmentName = configuration["environment"] ?? Environments.Production
         let contentRootPath = configuration["contentRootPath"] ?? getWorkingDirectory().toString()
         let applicationName = configuration["applicationName"] ?? String.empty
         return HostEnvironment(environmentName, contentRootPath, applicationName)
@@ -132,7 +132,7 @@ public class Host <: IHost {
 
     private static func configureConfiguration(args: Array<String>, environment: IHostEnvironment) {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("cj")
+        configuration.addEnvVars("aspire")
         configuration.addCmdVars(args)
         configuration.addJsonFile("./appsettings.json", optional: true)
         configuration.addJsonFile("./appsettings.${environment.environmentName}.json", optional: true)

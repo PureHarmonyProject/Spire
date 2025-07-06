@@ -148,9 +148,9 @@ public class WebHost <: ApplicationBuilder & IHost {
 
     private static func configureEnvironment(args: Array<String>): IHostEnvironment {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("asp")
+        configuration.addEnvVars("aspire")
         configuration.addCmdVars(args)
-        let environmentName = configuration["environment"] ?? "prod"
+        let environmentName = configuration["environment"] ?? Environments.Production
         let contentRootPath = configuration["contentRootPath"] ?? getWorkingDirectory().toString()
         let applicationName = configuration["applicationName"] ?? String.empty
         return HostEnvironment(environmentName, contentRootPath, applicationName)
@@ -158,7 +158,7 @@ public class WebHost <: ApplicationBuilder & IHost {
 
     private static func configureConfiguration(args: Array<String>, environment: IHostEnvironment) {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("asp")
+        configuration.addEnvVars("aspire")
         configuration.addCmdVars(args)
         configuration.addJsonFile("./appsettings.json", optional: true)
         configuration.addJsonFile("./appsettings.${environment.environmentName}.json", optional: true)
@@ -173,7 +173,7 @@ public class WebHost <: ApplicationBuilder & IHost {
 
     private func logging(urls: Array<String>) {
         let loggerFactory = _services.getOrThrow<ILoggerFactory>()
-        let logger = loggerFactory.createLogger("asp.hosting.lifetime")
+        let logger = loggerFactory.createLogger("aspire.hosting.lifetime")
         for (pattern in urls) {
             logger.info("Now listening on: ${pattern}")
         }
