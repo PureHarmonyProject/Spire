@@ -18,7 +18,7 @@ public class ServiceProvider <: IServiceProvider {
     private let _services: ServiceCollection
     private let _options: ServiceProviderOptions
     private let _resources = ArrayList<Resource>()
-    private let _instances = HashMap<SerivceCacheKey, Object>()
+    private let _instances = HashMap<ServiceCacheKey, Object>()
 
     init(services: ServiceCollection, options: ServiceProviderOptions, root!: ?ServiceProvider = None) {
         _root = root
@@ -74,7 +74,7 @@ public class ServiceProvider <: IServiceProvider {
         if (descriptor.lifetime.isSingleton() && let Some(root) <- _root) {
             return root.resolve(descriptor, engine)
         }
-        let cacheKey = SerivceCacheKey(identifier, slot)
+        let cacheKey = ServiceCacheKey(identifier, slot)
         let instance = tryGetInstance(cacheKey, descriptor, engine)
         return instance
     }
@@ -82,7 +82,7 @@ public class ServiceProvider <: IServiceProvider {
     /*
     尝试从缓存获取
      */
-    private func tryGetInstance(cacheKey: SerivceCacheKey, descriptor: ServiceDescriptor, engine: IServiceProvider) {
+    private func tryGetInstance(cacheKey: ServiceCacheKey, descriptor: ServiceDescriptor, engine: IServiceProvider) {
         //如果是瞬时的那么立即创建并返回
         if (descriptor.lifetime.isTransient()) {
             let instance = createInstance(descriptor, engine)

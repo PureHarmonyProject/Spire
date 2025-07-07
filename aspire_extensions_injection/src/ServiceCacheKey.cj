@@ -8,7 +8,7 @@ package aspire_extensions_injection
 
 import std.reflect.*
 
-struct SerivceCacheKey <: Hashable & Equatable<SerivceCacheKey> {
+struct ServiceCacheKey <: Hashable & Equatable<ServiceCacheKey> {
     private let _slot: Int64
     private let _identifier: ServiceIdentifier
 
@@ -17,7 +17,7 @@ struct SerivceCacheKey <: Hashable & Equatable<SerivceCacheKey> {
         _slot = slot
     }
 
-    public operator func ==(rhs: SerivceCacheKey): Bool {
+    public operator func ==(rhs: ServiceCacheKey): Bool {
         if (_identifier != rhs._identifier) {
             return false
         }
