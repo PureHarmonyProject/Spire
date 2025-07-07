@@ -34,6 +34,7 @@
 |                | aspire_web_routing                  | 必需   | 路由与终结点管理        |
 |                | aspire_web_hosting                  | 必需   | Web 主机服务            |
 | **Web 中间件** | aspire_web_mvc                      | 可选   | MVC 功能支持            |
+|                | aspire_web_cors              | 可选   | 跨域中间件          |
 |                | aspire_web_staticfiles              | 可选   | 静态文件中间件          |
 |                | aspire_web_healthchecks             | 可选   | 健康检查中间件          |
 | **身份认证**   | aspire_web_authorization            | 可选   | 授权中间件              |
@@ -46,7 +47,7 @@
 |                | aspire_extensions_healthchecks      | 可选   | 健康检查服务            |
 |                | aspire_extensions_configuration     | 可选   | 统一配置系统            |
 |                | aspire_extensions_logging           | 可选   | 日志系统                |
-| **身份管理**   | aspire_identity_server              | 可选   | OAuth2.0/OIDC 认证服务  |
+| **认证设施**   | aspire_identity_server              | 可选   | OAuth2.0/OIDC 认证服务  |
 |                | aspire_identity_claims              | 可选   | 身份声明                |
 |                | aspire_identity_tokens_jwt          | 可选   | JWT 令牌支持            |
 |                | aspire_identity_protocols_oidc      | 可选   | OpenID Connect 协议实现 |
