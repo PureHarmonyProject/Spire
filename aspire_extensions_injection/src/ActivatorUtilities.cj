@@ -6,6 +6,7 @@
 
 package aspire_extensions_injection
 
+import std.sort.*
 import std.reflect.*
 import std.collection.*
 
@@ -20,8 +21,20 @@ public class ActivatorUtilities {
 
     public static func createInstance(serviceProvider: IServiceProvider, typeInfo: TypeInfo, args: Array<Any>): Object {
         if (let classTypeInfo: ClassTypeInfo <- typeInfo) {
-            for ((index, constructor) in classTypeInfo.constructors |> enumerate) {
-                let isFinal = index + 1 == classTypeInfo.constructors.size
+            let constructors = classTypeInfo.constructors |> collectArray
+            if (constructors.size > 1) {
+                sort(constructors, by: {x, y =>
+                    if ( x.parameters.size > y.parameters.size) {
+                        Ordering.LT
+                    } else if ( x.parameters.size < y.parameters.size) {
+                        Ordering.GT
+                    } else {
+                        Ordering.EQ
+                    }
+                })
+            }
+            for ((index, constructor) in constructors |> enumerate) {
+                let isFinal = index + 1 == constructors.size
                 if (let Some(instance) <- apply(constructor, serviceProvider, isFinal, args)) {
                     return instance
                 }
