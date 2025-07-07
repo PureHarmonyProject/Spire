@@ -15,6 +15,7 @@
 [dependencies]
   aspire_web_mvc = { path = "../aspire_web_mvc"}
   aspire_web_http = { path = "../aspire_web_http"}
+  aspire_web_cors = { path = "../aspire_web_cors"}
   aspire_web_routing = { path = "../aspire_web_routing"}
   aspire_web_hosting = { path = "../aspire_web_hosting"}
   aspire_identity_claims = { path = "../aspire_identity_claims"}

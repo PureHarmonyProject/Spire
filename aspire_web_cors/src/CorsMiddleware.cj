@@ -58,7 +58,7 @@ public class CorsMiddleware <: IMiddleware {
 
         var corsPolicy = _policy
         var policName = _policName 
-
+        
         if (let Some(corsPolicyMetadata) <- corsMetadata.flatMap{f => f as ICorsPolicyMetadata}) {
             policName = None
             corsPolicy = corsPolicyMetadata.policy

@@ -1,3 +1,9 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// This code has been modified and is maintained by the Soulsoft organization.
+// The modifications to this file by Soulsoft are licensed under the MIT license.
+
 package aspire_web_cors
 
 import std.collection.*
@@ -36,7 +42,37 @@ class CorsService <: ICorsService{
     }
     
     public func applyResul(result: CorsResult, response: HttpResponse): Unit {
+        if (!result.isOriginAllowed) {
+            return
+        }
 
+        if (let Some(allowedOrigin) <- result.allowedOrigin) {
+            response.addHeader(HeaderNames.AccessControlAllowOrigin, allowedOrigin)
+        }
+
+        if (result.supportsCredentials) {
+            response.addHeader(HeaderNames.AccessControlAllowCredentials, "true")
+        }
+
+        if (result.isPreflightRequest) {
+            for (pattern in result.allowedHeaders) {
+                response.addHeader(HeaderNames.AccessControlAllowHeaders, pattern)
+            }
+            for (pattern in result.allowedMethods) {
+                response.addHeader(HeaderNames.AccessControlAllowMethods, pattern)
+            }
+            if (let Some(preflightMaxAge) <- result.preflightMaxAge) {
+                response.addHeader(HeaderNames.AccessControlMaxAge, preflightMaxAge.toSeconds().toString())
+            }
+        } else {
+            for (pattern in result.allowedExposedHeaders) {
+                response.addHeader(HeaderNames.AccessControlExposeHeaders, pattern)
+            }
+        }
+
+        if (result.varyByOrigin) {
+            response.addHeader(HeaderNames.Vary, "Origin")
+        }
     }
     
     private func isOriginAllowed(policy: CorsPolicy, origin: String) {

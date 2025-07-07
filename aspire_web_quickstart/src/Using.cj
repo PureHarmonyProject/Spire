@@ -1,6 +1,7 @@
 package aspire_web_quickstart
 
 internal import aspire_web_mvc.*
+internal import aspire_web_cors.*
 internal import aspire_web_http.*
 internal import aspire_web_routing.*
 internal import aspire_web_hosting.*
@@ -8,6 +9,7 @@ internal import aspire_identity_tokens.*
 internal import aspire_identity_claims.*
 internal import aspire_web_staticfiles.*
 internal import aspire_web_healthchecks.*
+internal import aspire_extensions_caching.*
 internal import aspire_web_authorization.*
 internal import aspire_web_authentication.*
 internal import aspire_extensions_caching.*

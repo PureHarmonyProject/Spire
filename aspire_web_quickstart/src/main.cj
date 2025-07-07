@@ -6,12 +6,12 @@ import std.random.*
 import std.reflect.*
 import std.collection.*
 //asp
+
 import aspire_web_quickstart.services.*
 import aspire_web_quickstart.controllers.*
 import aspire_web_quickstart.hostservices.*
 import aspire_web_quickstart.authentication.*
 import aspire_web_quickstart.infrastructure.*
-import aspire_extensions_caching.DistributedCacheExtensions
 
 main(args: Array<String>): Int64 {
     let builder = WebHost.createBuilder(args)
@@ -66,16 +66,25 @@ main(args: Array<String>): Int64 {
         }
 
     //注册健康检查项
-    builder.services.addHealthChecks()
-        .addCheck("self") {
-            //模拟随机不健康效果
-            let random = Random()
-            if (random.nextInt32(10) % 2 == 0) {
-                HealthCheckResult.healthy()
-            } else {
-                HealthCheckResult.unhealthy()
-            }
+    builder.services.addHealthChecks().addCheck("self") {
+        //模拟随机不健康效果
+        let random = Random()
+        if (random.nextInt32(10) % 2 == 0) {
+            HealthCheckResult.healthy()
+        } else {
+            HealthCheckResult.unhealthy()
         }
+    }
+
+    //配置跨域策略
+    builder.services.addCors{ configureOptions => 
+        //创建一个跨域策略
+        configureOptions.addPolicy("dev") {configurePolicy => 
+            configurePolicy.allowAnyHeader()
+            configurePolicy.allowAnyMethod()
+            configurePolicy.allowAnyOrigin()
+        }
+    }
 
     //==============请求管道==================    
     let host = builder.build()
@@ -99,6 +108,9 @@ main(args: Array<String>): Int64 {
         configureOptions.serveUnknownFileTypes = true
         configureOptions.defaultContentType = "application/octet-stream"
     }
+
+    //使用跨域支持
+    host.useCors("dev")
 
     //使用身份认证
     host.useAuthentication()

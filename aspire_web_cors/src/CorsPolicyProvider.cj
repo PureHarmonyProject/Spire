@@ -1,3 +1,9 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// This code has been modified and is maintained by the Soulsoft organization.
+// The modifications to this file by Soulsoft are licensed under the MIT license.
+
 package aspire_web_cors
 
 import aspire_web_http.*
@@ -10,7 +16,7 @@ class CorsPolicyProvider <: ICorsPolicyProvider {
         _options = options.value
     }
 
-    public func getPolicy(context: HttpContext, policyName: ?String): ?CorsPolicy {
+    public func getPolicy(_: HttpContext, policyName: ?String): ?CorsPolicy {
         let name = policyName ?? _options.defaultPolicyName
 
         if (let Some(policy) <- _options.policyMap.get(name)) {
