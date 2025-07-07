@@ -1,0 +1,25 @@
+
+[package]
+  cjc-version = "1.0.0"
+  compile-option = ""
+  description = "nothing here"
+  link-option = ""
+  name = "spire_web_mvc"
+  output-type = "static"
+  override-compile-option = ""
+  src-dir = ""
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+
+[dependencies]
+  spire_web_http = { path = "../spire_web_http"}
+  spire_web_routing = { path = "../spire_web_routing"}
+  spire_extensions_options = { path = "../spire_extensions_options"}
+  spire_extensions_injection = { path = "../spire_extensions_injection"}  
+
+[target.x86_64-w64-mingw32.bin-dependencies]
+  path-option = ["${CANGJIE_STDX}"]
+
+[target.x86_64-unknown-linux-gnu.bin-dependencies]    
+  path-option = ["${CANGJIE_STDX}"]

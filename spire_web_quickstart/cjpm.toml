@@ -1,0 +1,41 @@
+
+[package]
+  cjc-version = "1.0.0"
+  compile-option = ""
+  description = "nothing here"
+  link-option = ""
+  name = "spire_web_quickstart"
+  output-type = "executable"
+  override-compile-option = ""
+  src-dir = ""
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+
+[dependencies]
+  spire_web_mvc = { path = "../spire_web_mvc"}
+  spire_web_http = { path = "../spire_web_http"}
+  spire_web_cors = { path = "../spire_web_cors"}
+  spire_web_routing = { path = "../spire_web_routing"}
+  spire_web_hosting = { path = "../spire_web_hosting"}
+  spire_identity_claims = { path = "../spire_identity_claims"}
+  spire_identity_tokens = { path = "../spire_identity_tokens"}
+  spire_identity_tokens_jwt = { path = "../spire_identity_tokens_jwt"}
+  spire_web_staticfiles = { path = "../spire_web_staticfiles"}
+  spire_web_healthchecks = { path = "../spire_web_healthchecks"}
+  spire_web_authorization = { path = "../spire_web_authorization"}
+  spire_web_authentication = { path = "../spire_web_authentication"}
+  spire_extensions_caching = { path = "../spire_extensions_caching"}
+  spire_extensions_hosting = { path = "../spire_extensions_hosting"}
+  spire_extensions_logging = { path = "../spire_extensions_logging"}
+  spire_extensions_options = { path = "../spire_extensions_options"}
+  spire_extensions_injection = { path = "../spire_extensions_injection"}
+  spire_extensions_healthchecks = { path = "../spire_extensions_healthchecks"}
+  spire_extensions_configuration = { path = "../spire_extensions_configuration"}
+  spire_web_authentication_jwtbearer = { path = "../spire_web_authentication_jwtbearer"}
+
+[target.x86_64-w64-mingw32.bin-dependencies]
+  path-option = ["${CANGJIE_STDX}"]
+
+[target.x86_64-unknown-linux-gnu.bin-dependencies]    
+  path-option = ["${CANGJIE_STDX}"]

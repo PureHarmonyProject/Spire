@@ -1,0 +1,20 @@
+
+[package]
+  cjc-version = "1.0.0"
+  compile-option = ""
+  description = "nothing here"
+  link-option = ""
+  name = "spire_extensions_hosting"
+  output-type = "static"
+  override-compile-option = ""
+  src-dir = ""
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+  
+[dependencies]
+  spire_extensions_logging = { path = "../spire_extensions_logging"}
+  spire_extensions_options = { path = "../spire_extensions_options"}
+  spire_extensions_injection = { path = "../spire_extensions_injection"}
+  spire_extensions_configuration = { path = "../spire_extensions_configuration"}
+  spire_extensions_logging_configuration = { path = "../spire_extensions_logging_configuration"}  

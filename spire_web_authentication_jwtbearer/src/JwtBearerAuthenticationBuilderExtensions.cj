@@ -1,0 +1,49 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// This code has been modified and is maintained by the Soulsoft organization.
+// The modifications to this file by Soulsoft are licensed under the MIT license.
+
+package spire_web_authentication_jwtbearer
+
+import spire_identity_protocols.*
+import spire_web_authentication.*
+import spire_extensions_options.*
+import spire_extensions_injection.*
+import spire_identity_protocols_oidc.*
+
+public interface JwtBearerAuthenticationBuilderExtensions {
+    func addJwtBearer(authenticateScheme: String, displayName: Option<String>, configureOptions: (JwtBearerAuthenticationOptions) -> Unit): AuthenticationBuilder
+
+    func addJwtBearer(authenticateScheme: String, configureOptions: (JwtBearerAuthenticationOptions) -> Unit): AuthenticationBuilder {
+        addJwtBearer(authenticateScheme, None, configureOptions)
+    }
+
+    func addJwtBearer(configureOptions: (JwtBearerAuthenticationOptions) -> Unit): AuthenticationBuilder {
+        addJwtBearer(JwtBearerAuthenticationDefaults.Scheme, None, configureOptions)
+    }
+}
+
+extend AuthenticationBuilder <: JwtBearerAuthenticationBuilderExtensions {
+    public func addJwtBearer(authenticateScheme: String, displayName: Option<String>, configureOptions: (JwtBearerAuthenticationOptions) -> Unit): AuthenticationBuilder {
+        services.configureAfter<JwtBearerAuthenticationOptions>{configureOptions =>
+            if (configureOptions.configurationManager.isNone()) {
+                if (let Some(configuration) <- configureOptions.configuration) {
+                    configureOptions.configurationManager = StaticConfigurationManager<OpenIdConnectConfiguration>(configuration)
+                }else {
+                    let address: String = if (!configureOptions.metadataAddress.isEmpty()) {
+                        configureOptions.metadataAddress
+                    }else if(let Some(authority) <- configureOptions.authority) {
+                        "${authority}/.well-known/openid-configuration"
+                    }else {
+                        throw NoneValueException("Please configure either 'authority' or 'metadataAddress'.")
+                    }
+                    let documentRetriever = HttpDocumentRetriever(requireHttps: configureOptions.requireHttpsMetadata)
+                    let configurationRetriever = OpenIdConnectConfigurationRetriever()
+                    configureOptions.configurationManager = ConfigurationManager<OpenIdConnectConfiguration>(address, documentRetriever, configurationRetriever)
+                }
+            }
+        }
+        this.addScheme<JwtBearerAuthenticationOptions, JwtBearerAuthenticationHandler>(authenticateScheme, displayName, configureOptions)
+    }
+}

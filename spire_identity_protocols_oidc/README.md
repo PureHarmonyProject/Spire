@@ -1,0 +1,3 @@
+# spire_identity_protocols_oidc
+
+提供oidc协议扩展

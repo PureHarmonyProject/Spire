@@ -1,0 +1,16 @@
+[package]
+  cjc-version = "1.0.0"
+  name = "spire_extensions_caching"
+  description = "nothing here"
+  version = "1.0.0"
+  target-dir = ""
+  src-dir = ""
+  output-type = "static"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  spire_extensions_options = { path = "../spire_extensions_options"}
+  spire_extensions_injection = { path = "../spire_extensions_injection"}

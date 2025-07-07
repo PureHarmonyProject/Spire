@@ -1,0 +1,5 @@
+package spire_identity_server.models
+
+public class RefreshToken {
+    
+}

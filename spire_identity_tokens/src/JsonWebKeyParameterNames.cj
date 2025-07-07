@@ -1,0 +1,33 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// This code has been modified and is maintained by the Soulsoft organization.
+// The modifications to this file by Soulsoft are licensed under the MIT license.
+
+package spire_identity_tokens
+
+public class JsonWebKeyParameterNames {
+    public static let alg = "alg"
+    public static let crv = "crv"
+    public static let d = "d"
+    public static let dp = "dp"
+    public static let dq = "dq"
+    public static let e = "e"
+    public static let k = "k"
+    public static let keyOps = "key_ops"
+    public static let keys = "keys"
+    public static let kid = "kid"
+    public static let kty = "kty"
+    public static let n = "n"
+    public static let oth = "oth"
+    public static let p = "p"
+    public static let q = "q"
+    public static let qi = "qi"
+    public static let use = "use"
+    public static let x = "x"
+    public static let x5c = "x5c"
+    public static let x5t = "x5t"
+    public static let x5tS256 = "x5t#S256"
+    public static let x5u = "x5u"
+    public static let y = "y"
+}

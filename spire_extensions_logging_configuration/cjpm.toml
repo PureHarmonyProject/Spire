@@ -1,0 +1,16 @@
+[package]
+  cjc-version = "1.0.0"
+  name = "spire_extensions_logging_configuration"
+  description = "nothing here"
+  version = "1.0.0"
+  target-dir = ""
+  src-dir = ""
+  output-type = "static"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  spire_extensions_logging = { path = "../spire_extensions_logging"}
+  spire_extensions_configuration = { path = "../spire_extensions_configuration"}

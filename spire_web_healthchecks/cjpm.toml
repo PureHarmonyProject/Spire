@@ -1,0 +1,18 @@
+
+[package]
+  cjc-version = "1.0.0"
+  compile-option = ""
+  description = "nothing here"
+  link-option = ""
+  name = "spire_web_healthchecks"
+  output-type = "static"
+  override-compile-option = ""
+  src-dir = ""
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+  
+[dependencies]
+  spire_web_http = { path = "../spire_web_http"}
+  spire_extensions_injection = { path = "../spire_extensions_injection"}
+  spire_extensions_healthchecks = { path = "../spire_extensions_healthchecks"}  
