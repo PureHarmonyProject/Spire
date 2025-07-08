@@ -28,7 +28,8 @@ public class ServiceProvider <: IServiceProvider {
 
     public func createScope(): IServiceScope {
         //永远通过根容器来创建作用域
-        return ServiceScope(ServiceProvider(_services, _options, root: this))
+        let root = _root ?? this
+        return ServiceScope(ServiceProvider(_services, _options, root: root))
     }
 
     public func getOrDefault(serviceType: TypeInfo): ?Object {
