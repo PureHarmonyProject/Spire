@@ -78,7 +78,7 @@ public class ServiceCollection <: List<ServiceDescriptor> {
 
     public prop last: ?ServiceDescriptor {
         get() {
-            _items.first
+            _items.last
         }
     }
 
