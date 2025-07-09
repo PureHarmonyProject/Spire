@@ -11,7 +11,8 @@ import std.reflect.*
 import std.collection.*
 import std.collection.concurrent.*
 
-public class ServiceProvider <: IServiceProvider {
+public class ServiceProvider <: IServiceProvider & Resource {
+    private var _isClosed = false
     private let _root: ?ServiceProvider
     private let _services: ServiceCollection
     private let _options: ServiceProviderOptions
@@ -136,6 +137,23 @@ public class ServiceProvider <: IServiceProvider {
         get() {
             _root.isNone()
         }
+    }
+
+    public func isClosed() {
+        _isClosed
+    }
+
+    public func close() {
+        for (pattern in _resources) {
+            if (pattern.isClosed()) {
+                continue
+            }
+            try {
+                pattern.close()
+            } catch (_: Exception) {
+            }
+        }
+        _isClosed = true
     }
 
     ~init() {
