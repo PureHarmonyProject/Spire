@@ -9,16 +9,14 @@ package spire_extensions_injection
 import std.sync.*
 import std.reflect.*
 import std.collection.*
-
-let SUPPER_SERVICE_PROVIDER_TYPE = TypeInfo.of<IServiceProvider>()
+import std.collection.concurrent.*
 
 public class ServiceProvider <: IServiceProvider {
-    private let _lock = Mutex()
     private let _root: ?ServiceProvider
     private let _services: ServiceCollection
     private let _options: ServiceProviderOptions
-    private let _resources = ArrayList<Resource>()
-    private let _instances = HashMap<ServiceCacheKey, Object>()
+    private let _resources = ConcurrentLinkedQueue<Resource>()
+    private let _instances = ConcurrentHashMap<ServiceCacheKey, Object>()
 
     init(services: ServiceCollection, options: ServiceProviderOptions, root!: ?ServiceProvider = None) {
         _root = root
@@ -28,12 +26,14 @@ public class ServiceProvider <: IServiceProvider {
 
     public func createScope(): IServiceScope {
         //永远通过根容器来创建作用域
-        return ServiceScope(ServiceProvider(_services, _options, root: this))
+        let root = _root ?? this
+        return ServiceScope(ServiceProvider(_services, _options, root: root))
     }
 
     public func getOrDefault(serviceType: TypeInfo): ?Object {
         //解析容器本身，返回this
-        if(serviceType == SUPPER_SERVICE_PROVIDER_TYPE || serviceType.isSubtypeOf(SUPPER_SERVICE_PROVIDER_TYPE)){
+        let providerType = TypeInfo.of<IServiceProvider>()
+        if(serviceType == providerType || serviceType.isSubtypeOf(providerType)){
             return getServiceProviderEngine() as Object
         }
         if (let Some(descriptor) <- _services.findLast(serviceType)) {   
@@ -69,7 +69,7 @@ public class ServiceProvider <: IServiceProvider {
     internal func resolve(descriptor: ServiceDescriptor, engine: IServiceProvider, slot!: Int64 = 0): Object {
         let identifier = ServiceIdentifier.fromDescriptor(descriptor)
         if (!descriptor.lifetime.isSingleton() && isRoot && _options.validateScopes) {
-            throw Exception("Cannot resolve non-singleton service from the root container.")
+            throw UnsupportedException("Cannot resolve non-singleton service from the root container.")
         }
         if (descriptor.lifetime.isSingleton() && let Some(root) <- _root) {
             return root.resolve(descriptor, engine)
@@ -82,47 +82,42 @@ public class ServiceProvider <: IServiceProvider {
     /*
     尝试从缓存获取
      */
-    private func tryGetInstance(cacheKey: ServiceCacheKey, descriptor: ServiceDescriptor, engine: IServiceProvider) {
+    private func tryGetInstance(cacheKey: ServiceCacheKey, descriptor: ServiceDescriptor, engine: IServiceProvider): Object {
         //如果是瞬时的那么立即创建并返回
         if (descriptor.lifetime.isTransient()) {
             let instance = createInstance(descriptor, engine)
-            tryAddResource(instance)
             return instance
         }
+       
         //如果容器中存在缓存，那么立即返回
         if (_instances.contains(cacheKey)) {
             return _instances[cacheKey]
         }
-        synchronized(_lock) {
-            if (_instances.contains(cacheKey)) {
-                return _instances[cacheKey]
-            } else {
-                let instance = createInstance(descriptor, engine)
-                _instances.add(cacheKey, instance)
-                tryAddResource(instance)
-                return instance
+
+        return _instances.entryView(cacheKey) { entry =>
+            if (entry.value.isNone()) {
+                entry.value = createInstance(descriptor, engine)
             }
-        }
+        }.getOrThrow()
     }
-    /*
-    直接创建
-     */
+   
     private func createInstance(descriptor: ServiceDescriptor, serviceProvider: IServiceProvider): Object {
-        if (let Some(implementationFactory) <- descriptor.implementationFactory.flatMap {f => f as (IServiceProvider) -> Object}) {
-            return implementationFactory(serviceProvider)
-        } else if (let Some(instance) <- descriptor.implementationInstance) {
-            return instance
+        let instance = if (let Some(implementationFactory) <- descriptor.implementationFactory.flatMap {f => f as (IServiceProvider) -> Object}) {
+            implementationFactory(serviceProvider)
+        } else if (let Some(obj) <- descriptor.implementationInstance) {
+            obj
         } else if (let Some(implementationType) <- descriptor.implementationType) {
-            return ActivatorUtilities.createInstance(serviceProvider, implementationType)
+            ActivatorUtilities.createInstance(serviceProvider, implementationType)
         } else {
             throw UnsupportedException("Unable to create an instance for the service descriptor. The descriptor lacks a valid implementation factory, instance, or type. Please ensure that at least one of these is provided.")
         }
-    }
 
-    private func tryAddResource(instance: Object) {
-        if (let resource: Resource <- instance) {
+        //保存需释放的资源
+        if(let resource: Resource <- instance) {
             _resources.add(resource)
         }
+
+        return instance
     }
 
     internal prop services: ServiceCollection {
@@ -131,9 +126,9 @@ public class ServiceProvider <: IServiceProvider {
         }
     }
 
-    internal prop resources: Array<Resource> {
+    internal prop resources: Collection<Resource> {
         get() {
-            _resources |> collectArray
+            _resources
         }
     }
 

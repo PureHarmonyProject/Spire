@@ -1,9 +1,11 @@
-package spire_extensions_injection
+package spire_extensions_injection.unittests
 
 import std.random.*
 import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
+
+import spire_extensions_injection.*
 
 class DbContext {
     public DbContext(public let connection: IDbConnection) {
@@ -157,6 +159,19 @@ func 测试解析生命周期_单例6() {
 }
 
 @Test
+func 测试单列一定是通过根容器释放() {
+    let services = ServiceCollection()
+    services.addSingleton<IDbConnection, MySqlConnection>()
+    let root = services.build()
+    try (scope = root.createScope()){
+        _ = scope.services.getOrThrow<IDbConnection>()
+        @Expect((scope.services as ServiceProvider).getOrThrow().resources.size, 0)
+    }
+    
+    @Expect((root as ServiceProvider).getOrThrow().resources.size, 1)
+}
+
+@Test
 func 测试解析生命周期_作用域1() {
     let services = ServiceCollection()
     services.addScoped<IDbConnection, MySqlConnection>()
@@ -182,6 +197,20 @@ func 测试解析生命周期_作用域1() {
 }
 
 @Test
+func 测试解析生命周期_作用域是否释放() {
+    let services = ServiceCollection()
+    services.addScoped<IDbConnection, MySqlConnection>()
+    let root = services.build()
+
+    var connection:? IDbConnection =  None
+    try (scope1 = root.createScope()) {
+        connection = scope1.services.getOrThrow<IDbConnection>()
+    }
+    @Expect(connection.isSome(), true)
+    @Expect(connection.getOrThrow().isClosed(), true)
+}
+
+@Test
 func 测试解析生命周期_瞬时1() {
     let services = ServiceCollection()
     services.addTransient<IDbConnection, MySqlConnection>()
@@ -202,9 +231,22 @@ func 测试解析生命周期_瞬时1() {
     }
 
     @Expect(refEq((connection1.getOrThrow() as Object).getOrThrow(), (connection3.getOrThrow() as Object).getOrThrow()), false)
-    @Expect(connection1.getOrThrow().isClosed(), true)
-    @Expect(connection2.getOrThrow().isClosed(), true)
 }
+
+@Test
+func 测试解析生命周期_瞬时是否释放() {
+    let services = ServiceCollection()
+    services.addTransient<IDbConnection, MySqlConnection>()
+    let root = services.build()
+
+    var connection:? IDbConnection =  None
+    try (scope1 = root.createScope()) {
+        connection = scope1.services.getOrThrow<IDbConnection>()
+    }
+    @Expect(connection.isSome(), true)
+    @Expect(connection.getOrThrow().isClosed(), true)
+}
+
 
 @Test
 func 测试解析容器不存在的服务并注入额外参数() {
@@ -244,11 +286,10 @@ func 测试并发解析1000线程次() {
     services.addSingleton<IDbConnection, MsSqlConnection>()
     let root = services.build()
     let default :IDbConnection = MySqlConnection()
-    let tasks = ArrayList<Future<IDbConnection>>()
+    let tasks = ArrayList<Future<IDbConnection>>(1024)
     for (_ in 1..1001) {
         let task = spawn {
             return root.getOrThrow<IDbConnection>()
-            //default
         }
         tasks.add(task)
     }

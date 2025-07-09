@@ -15,7 +15,7 @@ public interface IServiceScope <: Resource {
 
 class ServiceScope <: IServiceScope  {
     private var _isClosed = false
-    private let _services: ServiceProvider
+    private let _services :ServiceProvider
 
     init(services: ServiceProvider) {
         _services = services
@@ -38,7 +38,7 @@ class ServiceScope <: IServiceScope  {
         for (pattern in _services.resources) {
             try {
                 pattern.close()
-            }catch (_:Exception) {
+            } catch (_ :Exception) {
                 
             }
         }
