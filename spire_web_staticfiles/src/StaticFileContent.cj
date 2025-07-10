@@ -6,6 +6,7 @@
 
 package spire_web_staticfiles
 
+import std.time.*
 import std.convert.*
 import std.collection.*
 
@@ -15,12 +16,12 @@ class StaticFileContent {
     }
 
     public func serve(context: HttpContext) {
-        let etagValue = calcEtagValue(fileInfo)
-        if(isNotModified(context, etagValue)) {
+        let etag = calcEtagValue(fileInfo)
+        if(isNotModified(context, etag)) {
+            applyResponseHeaders(context, etag)
             context.response.status(StatusCodes.NotModified)
         }else {
-            context.response.addHeader("ETag", etagValue)
-            context.response.addHeader("Content-Type", contentType)
+            applyResponseHeaders(context, etag)
             context.response.write(fileInfo.createReadStream())
         }
     }
@@ -31,6 +32,12 @@ class StaticFileContent {
             return true
         }
         return false
+    }
+
+    private func applyResponseHeaders(context: HttpContext, etagValue: String) {
+        context.response.addHeader(HeaderNames.ETag, etagValue)
+        context.response.addHeader(HeaderNames.ContentType, contentType)
+        context.response.addHeader(HeaderNames.LastModified, fileInfo.lastModified.inUTC().format(DateTimeFormat.RFC1123))
     }
 
     private func calcEtagValue(fileInfo: IFileInfo) {
