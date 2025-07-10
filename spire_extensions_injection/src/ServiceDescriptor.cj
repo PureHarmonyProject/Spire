@@ -18,7 +18,7 @@ public class ServiceDescriptor {
     private let _implementationFactory: ?(IServiceProvider) -> Object
     private let _lifetime: ServiceLifetime
 
-    init(serviceType: TypeInfo, instance: Any) {
+    public init(serviceType: TypeInfo, instance: Any) {
         _serviceType = serviceType
         _implementationType = None
         _implementationFactory = None
@@ -26,7 +26,7 @@ public class ServiceDescriptor {
         _lifetime = ServiceLifetime.Singleton
     }
 
-    init(serviceType: TypeInfo, factory: (IServiceProvider) -> Object, lifetime: ServiceLifetime) {
+    public init(serviceType: TypeInfo, factory: (IServiceProvider) -> Object, lifetime: ServiceLifetime) {
         _serviceType = serviceType
         _implementationType = None
         _implementationFactory = factory
@@ -34,7 +34,7 @@ public class ServiceDescriptor {
         _lifetime = lifetime
     }
 
-    init(serviceType: TypeInfo, implementationType: TypeInfo, lifetime: ServiceLifetime) {
+    public init(serviceType: TypeInfo, implementationType: TypeInfo, lifetime: ServiceLifetime) {
         if (!implementationType.isSubtypeOf(serviceType)) {
             UnsupportedException(
                 "The implementation type '${implementationType}' is not a subtype of the service type '${serviceType}'. "
