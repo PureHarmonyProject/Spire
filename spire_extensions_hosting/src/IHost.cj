@@ -123,7 +123,7 @@ public class Host <: IHost {
     private static func configureEnvironment(args: Array<String>): IHostEnvironment {
         let configuration = ConfigurationManager()
         configuration.addEnvVars("spire")
-        configuration.addCmdVars(args)
+        configuration.addCmdArgs(args)
         let environmentName = configuration["environment"] ?? Environments.Production
         let contentRootPath = configuration["contentRootPath"] ?? getWorkingDirectory().toString()
         let applicationName = configuration["applicationName"] ?? String.empty
@@ -133,7 +133,7 @@ public class Host <: IHost {
     private static func configureConfiguration(args: Array<String>, environment: IHostEnvironment) {
         let configuration = ConfigurationManager()
         configuration.addEnvVars("spire")
-        configuration.addCmdVars(args)
+        configuration.addCmdArgs(args)
         configuration.addJsonFile("./appsettings.json", optional: true)
         configuration.addJsonFile("./appsettings.${environment.environmentName}.json", optional: true)
         return configuration
