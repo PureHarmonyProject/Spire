@@ -6,8 +6,17 @@
 
 package spire_web_cors
 
-import spire_web_http.*
+@Annotation[target: [MemberFunction, Type]]
+public class EnableCors <: IEnableCors {
+    private let _policyName: ?String
 
-public interface IDisableCorsAttribute <: ICorsMetadata{
-    
+    public const init(policyName: ?String) {
+        _policyName = policyName
+    }
+
+    public prop policyName: ?String {
+        get() {
+            _policyName
+        }
+    }
 }

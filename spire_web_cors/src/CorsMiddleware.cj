@@ -44,7 +44,7 @@ public class CorsMiddleware <: IMiddleware {
 
         let corsMetadata = endpoint.flatMap{f => f.metadata.getMetadata<ICorsMetadata>()}
 
-        if (corsMetadata.flatMap{f => f is IDisableCorsAttribute} == true) {
+        if (corsMetadata.flatMap{f => f is IDisableCors} == true) {
             let isOptionsRequest = HttpMethods.isOptions(context.request.method)
 
             let isCorsPreflightRequest = isOptionsRequest && context.request.headers.get("Access-Control-Request-Method").size > 0
@@ -62,7 +62,7 @@ public class CorsMiddleware <: IMiddleware {
         if (let Some(corsPolicyMetadata) <- corsMetadata.flatMap{f => f as ICorsPolicyMetadata}) {
             policName = None
             corsPolicy = corsPolicyMetadata.policy
-        } else if(let Some(enableCorsAttribute) <- corsMetadata.flatMap{f => f as IEnableCorsAttribute} && enableCorsAttribute.policyName.isSome()) {
+        } else if(let Some(enableCorsAttribute) <- corsMetadata.flatMap{f => f as IEnableCors} && enableCorsAttribute.policyName.isSome()) {
             policName = enableCorsAttribute.policyName
             corsPolicy = None
         }

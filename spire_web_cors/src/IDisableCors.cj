@@ -8,6 +8,6 @@ package spire_web_cors
 
 import spire_web_http.*
 
-public interface IEnableCorsAttribute <: ICorsMetadata {
-    prop policyName: ?String
+public interface IDisableCors <: ICorsMetadata {
+    
 }
