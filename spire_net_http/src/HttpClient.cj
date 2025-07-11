@@ -166,7 +166,7 @@ public class HttpClient <: Resource {
             })
         }
         var app = handle
-        var index = middlewares.size - 1;
+        var index = middlewares.size - 1
         while (index >= 0) {
             let middleware = middlewares[index]
             app = middleware(app)

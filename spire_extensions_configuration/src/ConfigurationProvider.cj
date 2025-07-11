@@ -33,7 +33,7 @@ public abstract class ConfigurationProvider <: IConfigurationProvider {
         if (let Some(parentPath) <- parentPath) {
             for (pattern in data.keys()) {
                 if (pattern.size > parentPath.size && pattern.startsWith(parentPath) && pattern[parentPath.size..parentPath.size + 1] == ":") {
-                    results.add(segment(pattern, parentPath.size + 1));   
+                    results.add(segment(pattern, parentPath.size + 1))
                 }
             }
         } else {

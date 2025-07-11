@@ -52,6 +52,6 @@ public class LoggerFilterRule <: ToString {
     }
 
     public func toString() {
-        return "providerName: '${providerName}', categoryName: '${categoryName}', logLevel: '${logLevel}', filter: '${filter.isNone()}'";
+        return "providerName: '${providerName}', categoryName: '${categoryName}', logLevel: '${logLevel}', filter: '${filter.isNone()}'"
     }
 }

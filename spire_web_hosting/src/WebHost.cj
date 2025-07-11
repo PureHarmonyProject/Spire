@@ -78,7 +78,7 @@ public class WebHost <: ApplicationBuilder & IHost {
         }
     }
 
-    public func use(middleware:(RequestDelegate)->RequestDelegate) {
+    public func use(middleware :(RequestDelegate) -> RequestDelegate) {
         _middlewares.add(middleware)
         return this
     }
@@ -127,10 +127,10 @@ public class WebHost <: ApplicationBuilder & IHost {
     }
 
     public func build(): RequestDelegate {
-        var app: RequestDelegate = {
-            context => context.response.status(404)
+        var app: RequestDelegate = { context => 
+            context.response.status(404)
         }
-        var index = _middlewares.size - 1;
+        var index = _middlewares.size - 1
         while (index >= 0) {
             let middleware = _middlewares[index]
             app = middleware(app)

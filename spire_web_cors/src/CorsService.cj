@@ -34,9 +34,9 @@ class CorsService <: ICorsService{
         corsResult.isOriginAllowed = isOriginAllowed(policy, (origin ?? String.empty))
 
         if (isPreflightRequest) {
-            evaluatePreflightRequest(context, policy, corsResult);
+            evaluatePreflightRequest(context, policy, corsResult)
         }else {
-            evaluateRequest(context, policy, corsResult);
+            evaluateRequest(context, policy, corsResult)
         }
         return corsResult
     }

@@ -23,6 +23,6 @@ extend AsnWriter {
         } else {
             0x00
         }
-        _offset++;
+        _offset++
     }
 }

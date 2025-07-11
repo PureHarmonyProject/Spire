@@ -10,7 +10,7 @@ import std.reflect.TypeInfo
 
 class LoggerRuleSelector {
     
-    private static let _wildcardChar = '*';
+    private static let _wildcardChar = '*'
 
     public static func select(options: LoggerFilterOptions, providerName: String, categoryName: String) {
         var filter: ?LoggerFilter = None
@@ -38,7 +38,7 @@ class LoggerRuleSelector {
         if (let Some(category) <- rule.categoryName) {
             let wildcardIndex = category.indexOf(_wildcardChar)
             if (wildcardIndex != None && category.indexOf(_wildcardChar, (wildcardIndex ?? -1) + 1) != None) {
-                throw UnsupportedException("More Than One '${_wildcardChar}'");
+                throw UnsupportedException("More Than One '${_wildcardChar}'")
             }
             var prefix = category.toAsciiLower()
             var suffix = String.empty
@@ -48,7 +48,7 @@ class LoggerRuleSelector {
             }
             let categoryNameAsciiLower = categoryName.toAsciiLower()
             if (!categoryNameAsciiLower.startsWith(prefix) || !categoryNameAsciiLower.endsWith(suffix)) {
-                return false;
+                return false
             }
         } 
        
@@ -64,11 +64,11 @@ class LoggerRuleSelector {
 
         if (!current.isNone() && (let Some(category) <- current.getOrThrow().categoryName)) {
             if (rule.categoryName.isNone()) {
-                return false;
+                return false
             }
 
             if (category.size > rule.categoryName.getOrThrow().size) {
-                return false;
+                return false
             }
         }
         return true

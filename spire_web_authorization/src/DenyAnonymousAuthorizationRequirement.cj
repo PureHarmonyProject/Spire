@@ -15,7 +15,7 @@ public class DenyAnonymousAuthorizationRequirement
         var user = context.user
         var isAuthenticated = user.identies |> any {i => i.isAuthenticated}
         if (isAuthenticated) {
-            context.succeed(requirement);
+            context.succeed(requirement)
         }
     }
 
