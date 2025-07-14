@@ -9,20 +9,18 @@ package spire_web_routing
 import std.collection.*
 
 public class EndpointRoutingMiddleware <: IMiddleware {
-    private let _matcher: IRouter
+    private let _matcher: IMatcher
 
-    init(matcher: IRouter) {
+    init(matcher: IMatcher) {
         _matcher = matcher
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
-        var flag = RouteFlags.Notfound
-        if (context.getEndpoint().isNone()) {
-            flag = _matcher.apply(context)
-        } else {
-            flag = RouteFlags.Ok
+        if (context.getEndpoint().isSome()) {
+            next()
+            return
         }
-        match (flag) {
+        match (_matcher.invoke(context)) {
             case MethodNotAllowed => context.response.status(StatusCodes.MethodNotAllowed)
             case _ => next()
         }

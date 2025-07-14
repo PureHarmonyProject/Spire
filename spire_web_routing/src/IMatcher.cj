@@ -8,6 +8,6 @@ package spire_web_routing
 
 import spire_web_http.*
 
-public interface IRouter {
-    func apply(context: HttpContext): RouteFlags
+public interface IMatcher {
+    func invoke(context: HttpContext): RouteFlags
 }

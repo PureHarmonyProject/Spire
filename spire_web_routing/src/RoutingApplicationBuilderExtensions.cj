@@ -37,7 +37,7 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
         if (this.properties.contains(endpointRoutingMiddlewareKey)) {
             return
         }
-        let matcher = this.applicationServices.getOrThrow<IRouter>()
+        let matcher = this.applicationServices.getOrThrow<IMatcher>()
         use(EndpointRoutingMiddleware(matcher))
         this.properties[endpointRoutingMiddlewareKey] = true
     }
@@ -56,7 +56,7 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
     //项目启动过程检测是否注册路由所需的服务
     private func checkRequiredServices() {
        try(scope = this.applicationServices.createScope()) {
-            if (scope.services.getOrDefault<RoutingMetrics>().isNone()) {
+            if (scope.services.getOrDefault<RoutingMarkerService>().isNone()) {
                 throw Exception("Unable to find the required services. Please add all the required services by calling 'IServiceCollection.addRouting' in the application startup code.")
             }
        }

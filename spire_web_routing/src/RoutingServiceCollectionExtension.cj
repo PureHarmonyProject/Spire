@@ -20,9 +20,9 @@ extend ServiceCollection <: RoutingServiceCollectionExtension {
     public func addRouting(configureOptions: (RouteOptions) -> Unit): Unit {
         this.configure(configureOptions)
 
-        this.tryAddSingleton(RoutingMetrics())
+        this.tryAddSingleton(RoutingMarkerService())
 
-        this.tryAddSingleton<IRouter, Route>()
+        this.tryAddSingleton<IMatcher, DfaMatcher>()
 
         this.tryAddSingleton<EndpointDataSource, CompositeEndpointDataSource> {
             sp => CompositeEndpointDataSource(sp.getOrThrow<IOptions<RouteOptions>>())

@@ -9,19 +9,32 @@ package spire_web_routing
 import std.collection.*
 
 public interface IHttpMethodMetadata {
+    prop acceptCorsPreflight: Bool
     prop httpMethods: ReadOnlyList<String>
 }
 
 public class HttpMethodMetadata <: IHttpMethodMetadata {
+    private let _acceptCorsPreflight: Bool
     private let _httpMethods: ArrayList<String>
 
     public init(httpMethods: Array<String>) {
+        this(httpMethods, false)
+    }
+
+    public init(httpMethods: Array<String>, acceptCorsPreflight: Bool) {
         _httpMethods = ArrayList(httpMethods)
+        _acceptCorsPreflight = acceptCorsPreflight
     }
 
     public prop httpMethods: ReadOnlyList<String> {
         get() {
             _httpMethods
+        }
+    }
+
+    public prop acceptCorsPreflight: Bool {
+        get() {
+            _acceptCorsPreflight
         }
     }
 }

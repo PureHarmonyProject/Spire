@@ -6,6 +6,6 @@
 
 package spire_web_routing
 
-class RoutingMetrics {
+class RoutingMarkerService {
     
 }

@@ -11,14 +11,14 @@ import std.collection.*
 import spire_web_http.*
 import spire_extensions_options.*
 
-class Route <: IRouter {
+class DfaMatcher <: IMatcher {
     private var _dataSource: EndpointDataSource
 
     public init(dataSource: EndpointDataSource) {
         _dataSource = dataSource
     }
 
-    public func apply(context: HttpContext): RouteFlags {
+    public func invoke(context: HttpContext): RouteFlags {
         let request = RoutePattern.parse(context.request.path.value)
         let routeValues = context.request.routeValues
         var flag = RouteFlags.Notfound
@@ -58,11 +58,20 @@ class Route <: IRouter {
     }
 
     private func isAllowedRequestMethod(context: HttpContext, endpoint: Endpoint) {
-        if (let Some(httpMetadata) <- endpoint.metadata.getMetadata<IHttpMethodMetadata>()) {
-            if (httpMetadata.httpMethods |> any {method => context.request.method.equalsIgnoreAsciiCase(method)}) {
-                return true
-            }
+        let (httpMethods, _) = getHttpMethods(endpoint)
+        if (httpMethods |> any {method => context.request.method.equalsIgnoreAsciiCase(method)}) {
+            return true
+        }else if(httpMethods.size == 0) {
+            return true
         }
         return false
+    }
+
+    private func getHttpMethods(endpoint: Endpoint): (Collection<String>, Bool) {
+        if (let Some(httpMethodMetadata) <- endpoint.metadata.getMetadata<IHttpMethodMetadata>()) {
+            return (httpMethodMetadata.httpMethods, httpMethodMetadata.acceptCorsPreflight)
+        }else {
+            return ([], false)
+        }
     }
 }
