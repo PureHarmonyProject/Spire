@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests.service_resolver
+package spire_extensions_injection.unittests.service_provider
 
 import std.random.*
 import std.collection.*

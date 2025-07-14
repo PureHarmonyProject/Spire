@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests.lifecycle
+package spire_extensions_injection.unittests.lifetime
 
 import std.random.*
 import std.collection.*
