@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests.lifecycletests
+package spire_extensions_injection.unittests.lifecycle
 
 import std.random.*
 import std.collection.*
@@ -9,19 +9,18 @@ import std.reflect.*
 import spire_extensions_injection.*
 import spire_extensions_injection.unittests.*
 
-// ============ 作用域生命周期测试 ============
+// ============ 瞬时生命周期测试 ============
 
 /**
- * 测试作用域服务的生命周期管理
+ * 测试瞬时服务的生命周期管理
  * 验证：
- * 1. 同一作用域内多次获取返回同一实例
- * 2. 不同作用域返回不同实例
- * 3. 作用域结束时资源被正确释放
+ * 1. 每次获取都返回新实例
+ * 2. 作用域结束时实例被正确释放
  */
 @Test
-func 测试解析生命周期_作用域1() {
+func 测试解析生命周期_瞬时1() {
     let services = ServiceCollection()
-    services.addScoped<IDbConnection, MySqlConnection>()
+    services.addTransient<IDbConnection, MySqlConnection>()
     let root = services.build()
 
     var connection1: ?IDbConnection = None
@@ -31,7 +30,7 @@ func 测试解析生命周期_作用域1() {
     try (scope1 = root.createScope()) {
         connection1 = scope1.services.getOrThrow<IDbConnection>()
         connection2 = scope1.services.getOrThrow<IDbConnection>()
-        @Expect(refEq((connection1.getOrThrow() as Object).getOrThrow(), (connection2.getOrThrow() as Object).getOrThrow()), true)
+        @Expect(refEq((connection1.getOrThrow() as Object).getOrThrow(), (connection2.getOrThrow() as Object).getOrThrow()), false)
     }
 
     try (scope2 = root.createScope()) {
