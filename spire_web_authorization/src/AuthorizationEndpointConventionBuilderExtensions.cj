@@ -59,9 +59,9 @@ extend EndpointConventionBuilder <: IAuthorizationEndpointConventionBuilderExten
         this.add {
             endpointBuilder =>
             if (!(endpointBuilder.metadata |> any {meta => meta is IAuthorizeData})) {
-                endpointBuilder.metadata.add(Authorize());
+                endpointBuilder.metadata.add(Authorize())
             }
-            endpointBuilder.metadata.add(policy);
+            endpointBuilder.metadata.add(policy)
         }
     }
 

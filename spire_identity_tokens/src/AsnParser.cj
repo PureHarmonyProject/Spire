@@ -68,7 +68,7 @@ public class AsnParser {
 
         let numBytes = first & 0x7F
         if (numBytes == 0 || numBytes > 4) {
-            throw IllegalFormatException("Invalid ASN.1 length encoding.");
+            throw IllegalFormatException("Invalid ASN.1 length encoding.")
         }
 
         var length = 0

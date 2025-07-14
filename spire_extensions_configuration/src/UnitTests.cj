@@ -53,7 +53,7 @@ func 测试配置读取_环境变量() {
 @Test
 func 测试配置读取_命令行参数() {
     let configuration = ConfigurationManager()
-        .addCmdVars("host-name=www.soulsoft.com")
+        .addCmdArgs("host-name=www.soulsoft.com")
         .build()
 
     @Expect(configuration.getValue<String>("hostName").getOrThrow(), "www.soulsoft.com")

@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests
+package spire_extensions_injection.unittests.BasicTests
 
 import std.random.*
 import std.collection.*
@@ -48,7 +48,7 @@ class MySqlConnection <: IDbConnection {
     }
 }
 
-class MsSqlConnection <: IDbConnection {
+private class MsSqlConnection <: IDbConnection {
     private let _id: String
     private var _isClosed = false
 

@@ -5,7 +5,7 @@ package spire_extensions_configuration
 import std.process.*
 import std.collection.*
 
-class CmdVarsConfigurationProvider <: ConfigurationProvider {
+class CmdArgsConfigurationProvider <: ConfigurationProvider {
     private let _args: Array<String>
     
     init(args: Array<String>) {
@@ -25,7 +25,7 @@ class CmdVarsConfigurationProvider <: ConfigurationProvider {
     }
 }
 
-class CmdVarsConfigurationSource <: IConfigurationSource {
+class CmdArgsConfigurationSource <: IConfigurationSource {
     private let _args: Array<String>
    
     init(args: Array<String>) {
@@ -33,14 +33,14 @@ class CmdVarsConfigurationSource <: IConfigurationSource {
     }
 
     public func build(_: IConfigurationBuilder): IConfigurationProvider {
-        let provider = CmdVarsConfigurationProvider(_args)
+        let provider = CmdArgsConfigurationProvider(_args)
         return provider
     }
 }
 
 extend ConfigurationManager {
-    public func addCmdVars(args: Array<String>): IConfigurationBuilder {
-        add(CmdVarsConfigurationSource(args))
+    public func addCmdArgs(args: Array<String>): IConfigurationBuilder {
+        add(CmdArgsConfigurationSource(args))
         return this
     }
 }
