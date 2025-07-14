@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests.ActivatorTests
+package spire_extensions_injection.unittests.activatortests
 
 import std.random.*
 import std.collection.*

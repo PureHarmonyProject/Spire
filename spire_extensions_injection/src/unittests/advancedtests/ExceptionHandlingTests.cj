@@ -1,4 +1,4 @@
-package spire_extensions_injection.unittests.AdvancedTests
+package spire_extensions_injection.unittests.advancedtests
 
 import std.random.*
 import std.collection.*
