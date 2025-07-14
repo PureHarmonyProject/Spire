@@ -6,7 +6,7 @@ package spire_web_hosting
 import std.convert.*
 import std.collection.*
 import stdx.encoding.url.*
-import stdx.log.LogLevel as ServerLogLevel
+import stdx.log.LogLevel as StdLogLevel
 import stdx.net.http.HttpContext as HttpContextBase
 import stdx.net.http.{FuncHandler, ServerBuilder, HttpRequestDistributor, HttpRequestHandler}
 
@@ -30,7 +30,7 @@ public class HttpServer {
             builder.onShutdown(pattern)
         }
         let server = builder.build()
-        server.logger.level = ServerLogLevel.OFF
+        server.logger.level = StdLogLevel.OFF
         server.serve()
     }
 
@@ -41,32 +41,44 @@ public class HttpServer {
 }
 
 class DefaultHttpRequestDistributor <: HttpRequestDistributor {
-    private let _handler: RequestDelegate
+    private let _app: RequestDelegate
     private let _services: IServiceProvider
 
-    init(handler: RequestDelegate, services: IServiceProvider) {
-        _handler = handler
+    init(app: RequestDelegate, services: IServiceProvider) {
+        _app = app
         _services = services
     }
 
     public func register(_: String, _: HttpRequestHandler): Unit {
+
     }
 
     public func register(_: String, _: (HttpContextBase) -> Unit): Unit {
+
     }
 
     public func distribute(_: String) {
+        let logger = _services.getOrThrow<ILoggerFactory>().createLogger("spire.hosting.lifetime")
         return FuncHandler { context => 
-            //创建请求作用域子容器
             try (requestScope = _services.createScope()) {  
                 let contextImpl = HttpContextImpl(context, requestScope.services)
-                //init context accessor
-                if (let Some(contextAccessor) <- contextImpl.services.getOrDefault<IHttpContextAccessor>()) {
-                    if (let internalContextAccessor: HttpContextAccessor <- contextAccessor) {
-                        internalContextAccessor.setup(contextImpl)
-                    }
+                try {
+                    setHttpContextAccessor(contextImpl)
+                    _app(contextImpl)
+                } catch (ex: Exception) {
+                    contextImpl.response.write("Internal Server Error")
+                    contextImpl.response.status(StatusCodes.InternalServerError)
+                    contextImpl.response.addHeader(HeaderNames.ContentType, "text/plain; charset=utf-8")
+                    logger.error(ex, ex.message)
                 }
-                _handler(contextImpl)
+            }
+        }
+    }
+
+    private func setHttpContextAccessor(context: HttpContextImpl): Unit {
+        if (let Some(contextAccessor) <- context.services.getOrDefault<IHttpContextAccessor>()) {
+            if (let internalContextAccessor: HttpContextAccessor <- contextAccessor) {
+                internalContextAccessor.setup(context)
             }
         }
     }
