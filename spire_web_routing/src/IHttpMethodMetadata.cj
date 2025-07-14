@@ -17,11 +17,11 @@ public class HttpMethodMetadata <: IHttpMethodMetadata {
     private let _acceptCorsPreflight: Bool
     private let _httpMethods: ArrayList<String>
 
-    public init(httpMethods: Array<String>) {
+    public init(httpMethods: Collection<String>) {
         this(httpMethods, false)
     }
 
-    public init(httpMethods: Array<String>, acceptCorsPreflight: Bool) {
+    public init(httpMethods: Collection<String>, acceptCorsPreflight: Bool) {
         _httpMethods = ArrayList(httpMethods)
         _acceptCorsPreflight = acceptCorsPreflight
     }

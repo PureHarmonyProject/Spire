@@ -61,7 +61,7 @@ class DfaMatcher <: IMatcher {
         let (httpMethods, _) = getHttpMethods(endpoint)
         if (httpMethods |> any {method => context.request.method.equalsIgnoreAsciiCase(method)}) {
             return true
-        }else if(httpMethods.size == 0) {
+        } else if (httpMethods.size == 0) {
             return true
         }
         return false
@@ -70,7 +70,7 @@ class DfaMatcher <: IMatcher {
     private func getHttpMethods(endpoint: Endpoint): (Collection<String>, Bool) {
         if (let Some(httpMethodMetadata) <- endpoint.metadata.getMetadata<IHttpMethodMetadata>()) {
             return (httpMethodMetadata.httpMethods, httpMethodMetadata.acceptCorsPreflight)
-        }else {
+        } else {
             return ([], false)
         }
     }

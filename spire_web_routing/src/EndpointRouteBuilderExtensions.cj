@@ -8,46 +8,44 @@ package spire_web_routing
 
 import std.collection.*
 
+private let GetVerb = [HttpMethods.Get]
+private let PostVerb = [HttpMethods.Post]
+private let PutVerb = [HttpMethods.Put]
+private let DeleteVerb = [HttpMethods.Delete]
+private let PatchVerb = [HttpMethods.Patch]
+
 extend EndpointRouteBuilder {
     public func mapGet(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.get)
+        mapMethods(pattern, delegate, GetVerb)
     }
 
     public func mapPut(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.put)
-    }
-
-    public func mapHead(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.head)
+        mapMethods(pattern, delegate, PutVerb)
     }
 
     public func mapPatch(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.patch)
-    }
-
-    public func mapTrace(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.trace)
+        mapMethods(pattern, delegate, PatchVerb)
     }
 
     public func mapPost(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.post)
+        mapMethods(pattern, delegate, PostVerb)
     }
 
     public func mapDelete(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.delete)
+        mapMethods(pattern, delegate, DeleteVerb)
     }
 
-    public func mapOptions(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.options)
+    public func map(pattern: String, delegate: RequestDelegate) {
+        return map(pattern, delegate, [])
     }
 
-    public func mapConnect(pattern: String, delegate: RequestDelegate) {
-        mapMethods(pattern, delegate, HttpMethods.connect)
+    private func mapMethods(routePattern: String, delegate: RequestDelegate, httpMethods: Collection<String>) {
+        return map(routePattern, delegate, httpMethods)
     }
-
-    private func mapMethods(routePattern: String, delegate: RequestDelegate, method: String) {
+   
+    private func map(routePattern: String, delegate: RequestDelegate, httpMethods: Collection<String>) {
         let dataSource = getOrAddRouteEndpointDataSource()
-        return dataSource.addRequestDelegate(routePattern, delegate, method)
+        return dataSource.addRequestDelegate(routePattern, delegate, httpMethods)
     }
 
     private func getOrAddRouteEndpointDataSource() {

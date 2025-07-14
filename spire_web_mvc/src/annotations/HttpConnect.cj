@@ -5,10 +5,10 @@ import spire_web_http.*
 @Annotation[target: [MemberFunction]]
 public class HttpConnect <: HttpMethod {
     public const init() {
-        super(HttpMethods.connect, String.empty)
+        super(HttpMethods.Connect, String.empty)
     }
 
     public const init(template: String) {
-        super(HttpMethods.connect, template)
+        super(HttpMethods.Connect, template)
     }
 }

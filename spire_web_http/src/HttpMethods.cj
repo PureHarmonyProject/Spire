@@ -7,42 +7,42 @@
 package spire_web_http
 
 public struct HttpMethods {
-    public static const get = "get"
-    public static const put = "put"
-    public static const post = "post"
-    public static const head = "head"
-    public static const patch = "patch"
-    public static const trace = "trace"
-    public static const delete = "delete"
-    public static const connect = "connect"
-    public static const options = "options"
+    public static const Get = "get"
+    public static const Put = "put"
+    public static const Post = "post"
+    public static const Head = "head"
+    public static const Patch = "patch"
+    public static const Trace = "trace"
+    public static const Delete = "delete"
+    public static const Connect = "connect"
+    public static const Options = "options"
 
     public static func isGet(method: String) {
-        return equals(get, method)
+        return equals(Get, method)
     }
     public static func isPut(method: String) {
-        return equals(put, method)
+        return equals(Put, method)
     }
     public static func isPost(method: String) {
-        return equals(post, method)
+        return equals(Post, method)
     }
     public static func isHead(method: String) {
-        return equals(head, method)
+        return equals(Head, method)
     }
     public static func isPatch(method: String) {
-        return equals(patch, method)
+        return equals(Patch, method)
     }
     public static func isTrace(method: String) {
-        return equals(trace, method)
+        return equals(Trace, method)
     }
     public static func isDelete(method: String) {
-        return equals(delete, method)
+        return equals(Delete, method)
     }
     public static func isConnect(method: String) {
-        return equals(connect, method)
+        return equals(Connect, method)
     }
     public static func isOptions(method: String) {
-        return equals(options, method)
+        return equals(Options, method)
     }
 
     private static func equals(left: String, right: String) {
