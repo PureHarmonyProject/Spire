@@ -24,8 +24,8 @@ public class WeatherForecastController <: Controller {
             date: DateTime.now().addDays(i), 
             temperatureC: rand.nextInt64(), 
             summary: summaries[rand.nextInt64(summaries.size)])} |> collectArrayList
-        return json(list)
-        //return json(WeatherForecast(date: DateTime.now(), summary: summaries[rand.nextInt64(summaries.size)]) )
+        //return json(list)
+        return json(WeatherForecast(date: DateTime.now(), summary: summaries[rand.nextInt64(summaries.size)]) )
     }
 }
 
