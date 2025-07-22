@@ -16,7 +16,7 @@ public class CorsMiddleware <: IMiddleware {
     private var _policName: ?String = None
     private let _corsService: ICorsService
     private var _policyProvider: ?ICorsPolicyProvider = None
-    private static let corsMiddlewareWithEndpointInvokedValue = Object()
+    private static let corsMiddlewareWithEndpointInvokedValue = ()
     
     public init(corsService: ICorsService, loggerFactory: ILoggerFactory) {
         _corsService = corsService
@@ -40,6 +40,10 @@ public class CorsMiddleware <: IMiddleware {
 
         if (endpoint.isSome()) {
             context.items["__CorsMiddlewareWithEndpointInvoked"] = corsMiddlewareWithEndpointInvokedValue
+        }
+
+        if (context.request.headers.getFirst(HeaderNames.Origin).isNone()) {
+            return next()
         }
 
         let corsMetadata = endpoint.flatMap{f => f.metadata.getMetadata<ICorsMetadata>()}
@@ -72,7 +76,7 @@ public class CorsMiddleware <: IMiddleware {
             corsPolicy = corsPolicyProvider.getPolicy(context, policName)
         }
 
-        return evaluateAndApplyPolicy(context, next,corsPolicy)
+        return evaluateAndApplyPolicy(context, next, corsPolicy)
     }
 
     private func evaluateAndApplyPolicy(context: HttpContext, next: () -> Unit, corsPolicy: ?CorsPolicy) {

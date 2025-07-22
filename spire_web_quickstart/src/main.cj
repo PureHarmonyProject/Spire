@@ -164,7 +164,7 @@ main(args: Array<String>): Int64 {
         .requireAuthorization("default")
 
         //无须授权
-        endpoints.mapGet("hello") { context =>
+        endpoints.mapPost("hello") { context =>
             context.response.write("hello:spire")
         }
 
