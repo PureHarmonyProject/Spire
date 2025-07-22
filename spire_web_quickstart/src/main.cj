@@ -5,34 +5,11 @@ import std.time.*
 import std.random.*
 import std.reflect.*
 import std.collection.*
-//spire_web_quickstart
-import spire_web_quickstart.services.*
 import spire_web_quickstart.controllers.*
 import spire_web_quickstart.hostservices.*
 import spire_web_quickstart.authentication.*
 import spire_web_quickstart.infrastructure.*
 //framework
-import spire_web_mvc.*
-import spire_web_cors.*
-import spire_web_http.*
-import spire_web_routing.*
-import spire_web_hosting.*
-import spire_identity_tokens.*
-import spire_identity_claims.*
-import spire_web_staticfiles.*
-import spire_web_healthchecks.*
-import spire_extensions_caching.*
-import spire_web_authorization.*
-import spire_web_authentication.*
-import spire_extensions_caching.*
-import spire_extensions_options.*
-import spire_extensions_logging.*
-import spire_extensions_hosting.*
-import spire_identity_tokens_jwt.*
-import spire_extensions_injection.*
-import spire_extensions_healthchecks.*
-import spire_extensions_configuration.*
-import spire_web_authentication_jwtbearer.*
 
 main(args: Array<String>): Int64 {
     let builder = WebHost.createBuilder(args)
@@ -40,7 +17,7 @@ main(args: Array<String>): Int64 {
 
     builder.services.addControllers()
         //由于目前没法实现自动扫描，因此需要手动注册
-        .addApplicationPart("default", TypeInfo.of<EntityController>())
+        .addApplicationPart("default", TypeInfo.of<WeatherForecastController>())
 
     //运行一个测试的后台服务
     //builder.services.addHelloHostedService()
@@ -50,9 +27,6 @@ main(args: Array<String>): Int64 {
 
     //将httpContext访问器注入容器
     builder.services.addHttpContextAccessor()
-
-    //注册一个自定义请求服务
-    builder.services.addTransient<EntityService, EntityService>()
 
     //注册资源所有者验证器
     builder.services.addTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>()
@@ -170,7 +144,7 @@ main(args: Array<String>): Int64 {
 
         endpoints.mapControllers()
             //所有的action需要授权
-            .requireAuthorization("default")
+            //.requireAuthorization("default")
     }
     host.run()
     return 0
