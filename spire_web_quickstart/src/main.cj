@@ -144,7 +144,7 @@ main(args: Array<String>): Int64 {
 
         endpoints.mapControllers()
             //所有的action需要授权
-            //.requireAuthorization("default")
+            .requireAuthorization("default")
     }
     host.run()
     return 0

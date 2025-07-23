@@ -17,13 +17,14 @@ public class WeatherForecastController <: Controller {
         "Scorching"]
    
     @HttpGet
+    @AllowAnonymous
     public func get() {
         let rand = Random()
        
-        let list = 1..6 |> map{i => WeatherForecast(
-            date: DateTime.now().addDays(i), 
-            temperatureC: rand.nextInt64(), 
-            summary: summaries[rand.nextInt64(summaries.size)])} |> collectArrayList
+        // let list = 1..6 |> map{i => WeatherForecast(
+        //     date: DateTime.now().addDays(i), 
+        //     temperatureC: rand.nextInt64(), 
+        //     summary: summaries[rand.nextInt64(summaries.size)])} |> collectArrayList
         //return json(list)
         return json(WeatherForecast(date: DateTime.now(), summary: summaries[rand.nextInt64(summaries.size)]) )
     }

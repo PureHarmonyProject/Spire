@@ -9,7 +9,7 @@ public class ControllerActionDescriptor {
     private let _controllerName: String
     private let _controllerType: TypeInfo
     private let _actionFunction: InstanceFunctionInfo
-    private let _endpointMetadata = ArrayList<Object>()
+    private let _endpointMetadata = ArrayList<Any>()
 
     public init(actionName: String, controllerName: String, controllerType: TypeInfo, actionFunction: InstanceFunctionInfo) {
         _actionName = actionName
@@ -42,7 +42,7 @@ public class ControllerActionDescriptor {
         }
     }
 
-    public prop endpointMetadata: List<Object> {
+    public prop endpointMetadata: List<Any> {
         get() {
             _endpointMetadata
         }

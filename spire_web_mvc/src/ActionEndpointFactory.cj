@@ -19,11 +19,11 @@ class ActionEndpointFactory {
         _controllerFactory = controllerFactory
     }
 
-    public func addEndpoints(endpoints: List<Endpoint>, action: ControllerActionDescriptor,
+    public func addEndpoints(endpoints: List<Endpoint>, actionDescriptor: ControllerActionDescriptor,
         conventions: ArrayList<(EndpointBuilder) -> Unit>) {
-        let default = action.controllerType.annotations |> filterMap {f => f as IRouteTemplateProvider} |>
+        let default = actionDescriptor.controllerType.annotations |> filterMap {f => f as IRouteTemplateProvider} |>
             filterMap {f => f.template} |> first
-        let templates = action.actionFunction.annotations |> filterMap {f => f as IRouteTemplateProvider} |>
+        let templates = actionDescriptor.actionFunction.annotations |> filterMap {f => f as IRouteTemplateProvider} |>
             filterMap {f => f.template}
         for (pattern in templates) {
             let template: ?String = if (pattern.startsWith('/')) {
@@ -35,10 +35,10 @@ class ActionEndpointFactory {
             }
             //create endpoints
             if (let Some(template) <- template) {
-                let routePattern = createRoutePattern(template, action)
-                let builder = createEndpointBuilder(routePattern, action)
+                let routePattern = createRoutePattern(template, actionDescriptor)
+                let builder = createEndpointBuilder(routePattern, actionDescriptor)
                 configureEndpointBuilder(builder, conventions)
-                configureEndpointMetadata(builder, action)
+                configureEndpointMetadata(builder, actionDescriptor)
                 endpoints.add(builder.build())
             }
         }
@@ -61,13 +61,14 @@ class ActionEndpointFactory {
         for (convention in conventions) {
             convention(builder)
         }
+        builder.metadata
         return builder
     }
 
-    private func configureEndpointMetadata(builder: RouteEndpointBuilder, action: ControllerActionDescriptor) {
-        builder.metadata.add(action)
-        builder.metadata.add(action.endpointMetadata)
-        for (pattern in action.endpointMetadata) {
+    private func configureEndpointMetadata(builder: RouteEndpointBuilder, actionDescriptor: ControllerActionDescriptor) {
+        builder.metadata.add(actionDescriptor)
+        builder.metadata.add(all: actionDescriptor.endpointMetadata)
+        for (pattern in actionDescriptor.endpointMetadata) {
             if (let httpMethodMetadata: IActionHttpMethodProvider <- pattern) {
                 builder.metadata.add(HttpMethodMetadata(httpMethodMetadata.httpMethods))
             }
