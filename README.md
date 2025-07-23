@@ -24,7 +24,7 @@
 
 ## 快速开始
 
-[入门指南](https://gitcode.com/soulsoft/spire/tree/main/spire_web_quickstart)
+[项目文档](https://docs.cangjie-spire.com)
 
 ## 功能模块
 
