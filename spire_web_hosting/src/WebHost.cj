@@ -48,18 +48,19 @@ public class WebHost <: ApplicationBuilder & IHost {
         startHostedServices()
         _lifetime.started()
         let server = HttpServer(build(), _services)
-        let task = spawn { server.listen(urls) }
-        atExit{
+        let task = spawn {server.listen(urls)}
+        atExit {
             stop()
         }
         _counter.waitUntilZero()
         return
     }
 
-    public func stop() {        
+    public func stop() {
         _lifetime.stopping()
         stopHostedServices()
         _lifetime.stopped()
+        closeResources()
         _counter.dec()
     }
 
@@ -78,7 +79,16 @@ public class WebHost <: ApplicationBuilder & IHost {
         }
     }
 
-    public func use(middleware :(RequestDelegate) -> RequestDelegate) {
+    private func closeResources() {
+        if (let resource: Resource <- _services) {
+            try {
+                resource.close()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    public func use(middleware: (RequestDelegate) -> RequestDelegate) {
         _middlewares.add(middleware)
         return this
     }
@@ -113,7 +123,6 @@ public class WebHost <: ApplicationBuilder & IHost {
         }
     }
 
-
     public prop environment: IHostEnvironment {
         get() {
             _environment
@@ -127,8 +136,8 @@ public class WebHost <: ApplicationBuilder & IHost {
     }
 
     public func build(): RequestDelegate {
-        var app: RequestDelegate = { context => 
-            context.response.status(404)
+        var app: RequestDelegate = {
+            context => context.response.status(404)
         }
         var index = _middlewares.size - 1
         while (index >= 0) {
@@ -138,7 +147,7 @@ public class WebHost <: ApplicationBuilder & IHost {
         }
         return app
     }
-    
+
     public static func createBuilder(args: Array<String>) {
         let environment = configureEnvironment(args)
         let configuration = configureConfiguration(args, environment)

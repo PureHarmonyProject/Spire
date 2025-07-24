@@ -59,6 +59,7 @@ public class Host <: IHost {
         _lifetime.stopping()
         stopHostedServices()
         _lifetime.stopped()
+        closeResources()
         _counter.dec()
     }
 
@@ -72,6 +73,15 @@ public class Host <: IHost {
         for (pattern in _hostedServices) {
             try {
                 pattern.stop()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    private func closeResources() {
+        if (let resource: Resource <- _services) {
+            try {
+                resource.close()
             } catch (_: Exception) {
             }
         }
