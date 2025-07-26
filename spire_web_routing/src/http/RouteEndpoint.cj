@@ -4,14 +4,16 @@
 // This code has been modified and is maintained by the Soulsoft organization.
 // The modifications to this file by Soulsoft are licensed under the MIT license.
 
-package spire_web_routing
+package spire_web_routing.http
 
+import spire_web_http.*
 import std.collection.*
+import spire_web_routing.patterns.*
 
 public class RouteEndpoint <: Endpoint {
     private let _routePattern: RoutePattern
 
-    init(routePattern: RoutePattern, delegate: RequestDelegate, metadata: EndpointMetadataCollection, displayName: ?String) {
+    public init(routePattern: RoutePattern, delegate: RequestDelegate, metadata: EndpointMetadataCollection, displayName: ?String) {
         super(delegate, metadata, displayName)
         _routePattern = routePattern
     }

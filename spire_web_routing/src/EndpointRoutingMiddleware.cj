@@ -6,23 +6,39 @@
 
 package spire_web_routing
 
+import std.sync.*
 import std.collection.*
+import spire_web_routing.matching.Matcher
 
 public class EndpointRoutingMiddleware <: IMiddleware {
-    private let _matcher: IMatcher
+    private let _lock = Mutex()
+    private var _matcher: ?Matcher = None
+    private let _matcherFactory: Future<Matcher>
 
-    init(matcher: IMatcher) {
-        _matcher = matcher
+    init(matcherFactory: Future<Matcher>) {
+        _matcherFactory = matcherFactory
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
         if (context.getEndpoint().isSome()) {
             next()
-            return
+        } else {
+            initializationCore()
+            let matcher = _matcher.getOrThrow()
+            matcher.invoke(context)
         }
-        match (_matcher.invoke(context)) {
-            case MethodNotAllowed => context.response.status(StatusCodes.MethodNotAllowed)
-            case _ => next()
+    }
+
+    private func initializationCore() {
+        if (let Some(matcher) <- _matcher) {
+            return matcher
+        }
+
+        synchronized(_lock) {
+            if (let Some(matcher) <- _matcher) {
+                return matcher
+            }
+            _matcher = _matcherFactory.get()
         }
     }
 }
