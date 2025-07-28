@@ -41,7 +41,6 @@ public class EndpointRoutingMiddleware <: IMiddleware {
             }
 
             let matcher = _matcherFactory.get()
-            matcher.debuggerToString() |> println
             _matcher = matcher
             return matcher
         }

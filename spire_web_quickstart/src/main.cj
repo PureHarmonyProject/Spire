@@ -11,7 +11,10 @@ main() {
         endpoints.mapGet("/home/index"){ context => 
             context.response.write("hello1")
         }
-        endpoints.mapGet("/home/{action}"){ context => 
+        endpoints.mapGet("/home/{*action}"){ context => 
+            if (let Some(routeValues) <- context.request.routeValues) {
+                println(routeValues["action"])
+            }
             context.response.write("hello2")
         }
     }

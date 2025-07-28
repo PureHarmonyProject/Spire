@@ -9,18 +9,34 @@ public class DfaMatcher <: Matcher {
     }
 
     public func invoke(context: HttpContext) {
+        let path = PathSegment.parse(context.request.path.value)
         //查找候选集
-        let candidates = findCandidateSet(context)
+        let candidates = findCandidateSet(context, path)
         //筛选最终的候选结果
-        endpointSelector.select(context, CandidateSet(candidates))
+        let candidateStates = ArrayList<CandidateState>()
+        for (candidate in candidates) {
+            var routeValues: ?RouteValues = None
+            if (candidate.captures.size > 0 || candidate.catchAll.isSome()) {
+                routeValues = RouteValues()
+            }
+            for ((name, segmentIndex) in candidate.captures) {
+                routeValues?.add(name, path.segments[segmentIndex])
+            }
+            if (let Some((name, segmentIndex)) <- candidate.catchAll) {
+                let values = path.segments[segmentIndex..]
+                routeValues?.add(name, String.join(values, delimiter: '/'))
+            }
+            candidateStates.add(CandidateState(candidate.endpoint, candidate.score, routeValues))
+        }
+        //选举
+        endpointSelector.select(context, CandidateSet(candidateStates.toArray()))
     }
 
-    private func findCandidateSet(context: HttpContext) {
-        let path = context.request.path.value
+    private func findCandidateSet(context: HttpContext, path: PathSegment) {
         var destination = 0
        
         //1. 使用路径跳转
-        for (segment in path.split('/', removeEmpty: true)) {
+        for (segment in path.segments) {
             destination = states[destination].pathTransitions.getDestination(segment)
         }
 
@@ -31,8 +47,6 @@ public class DfaMatcher <: Matcher {
 
         //3. 得到最终状态
         let state = states[destination]
-        state.debuggerToString()
-        println("${path}: ${state.debuggerToString()}")
         return state.candidates
     }
 

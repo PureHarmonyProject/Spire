@@ -85,21 +85,20 @@ public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
 
     private func createRejectionEndpoint(allHttpMethods: Collection<String>): RejectionEndpoint {
         let allow = String.join(allHttpMethods |> collectArray, delimiter: ', ')
-        return RejectionEndpoint {
-            context =>
-            context.response.status(StatusCodes.MethodNotAllowed)
+        return RejectionEndpoint { context =>
             context.response.addHeader(HeaderNames.Allow, allow)
+            context.response.status(StatusCodes.MethodNotAllowed)
         }
     }
 }
 
 private class RejectionEndpoint <: Endpoint {
     init(delegate: RequestDelegate) {
-        super(delegate, EndpointMetadataCollection.empty, None)
+        super(delegate, EndpointMetadataCollection.empty, "405 HTTP Method Not Supported")
     }
 }
 
-private struct EdgeState <: IEdgeState & ToString & Equatable<EdgeState> {
+private struct EdgeState <: IEdgeState & Equatable<EdgeState> {
     EdgeState(let httpMethod: String) {
     }
 

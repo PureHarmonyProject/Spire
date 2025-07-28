@@ -13,6 +13,7 @@ public class DfaMatcherBuilder {
     private var _stateCount = 1
     private let _endpointSelector: EndpointSelector
     private let _endpoints = ArrayList<RouteEndpoint>()
+    private let _captures = ArrayList<ParameterCaptureInfo>()
     private let _nodeBuilders: ReadOnlyList<INodeBuilderPolicy>
 
     init(endpointSelector: EndpointSelector, nodeBuilders: ReadOnlyList<INodeBuilderPolicy>) {
@@ -112,7 +113,8 @@ public class DfaMatcherBuilder {
         }
 
         //构建策略分支集合
-        let policyEntries: ?ArrayList<PolicyJumpTableEdge> = if (let Some(policyEdges) <- node.policyEdges && policyEdges.size > 0) {
+        let policyEntries: ?ArrayList<PolicyJumpTableEdge> = if (let Some(policyEdges) <- node.policyEdges &&
+            policyEdges.size > 0) {
             let entries = ArrayList<PolicyJumpTableEdge>(policyEdges.size)
             for ((i, (key, value)) in policyEdges |> enumerate) {
                 entries.add(PolicyJumpTableEdge(key, transition(value)))
@@ -127,8 +129,8 @@ public class DfaMatcherBuilder {
 
         //生成当前状态
         let pathJumpTable = JumpTableBuilder.build(currentDefaultDestination, currentExitDestination, pathEntries) //路径跳转表
-        let policyJumpTable =  buildPolicyJumpTable(currentExitDestination, node.nodeBuilder, policyEntries)
-        states[currentStateIndex] = DfaState(pathJumpTable, policyJumpTable , candidates)
+        let policyJumpTable = buildPolicyJumpTable(currentExitDestination, node.nodeBuilder, policyEntries)
+        states[currentStateIndex] = DfaState(pathJumpTable, policyJumpTable, candidates)
         return currentStateIndex
     }
 
@@ -189,7 +191,8 @@ public class DfaMatcherBuilder {
         }
     }
 
-    private func buildPolicyJumpTable(exitDestination: Int64, nodeBuilder: ?INodeBuilderPolicy, policyEntries: ?ArrayList<PolicyJumpTableEdge>): ?PolicyJumpTable {
+    private func buildPolicyJumpTable(exitDestination: Int64, nodeBuilder: ?INodeBuilderPolicy,
+        policyEntries: ?ArrayList<PolicyJumpTableEdge>): ?PolicyJumpTable {
         if (let Some(policyEntries) <- policyEntries && let Some(nodeBuilder) <- nodeBuilder) {
             return nodeBuilder.buildJumpTable(exitDestination, policyEntries)
         }
@@ -211,7 +214,22 @@ public class DfaMatcherBuilder {
     }
 
     private func createCandidate(endpoint: Endpoint, score: Int64): Candidate {
-        return Candidate(endpoint, score)
+        _captures.clear()
+        if (let routeEndpoint: RouteEndpoint <- endpoint) {
+            var catchAll: ?ParameterCaptureInfo = None
+            for ((i, segment) in routeEndpoint.routePattern.pathSegments |> enumerate) {
+                if (let Parameter(name, kind) <- segment) {
+                    if (kind.isCatchAll) {  
+                        catchAll = (name, i)
+                    }else {
+                        _captures.add((name, i))
+                    }
+                }
+            }
+            return Candidate(endpoint, score, _captures.toArray(), catchAll)
+        } else {
+            return Candidate(endpoint, score, [], None)
+        }
     }
 }
 
