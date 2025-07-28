@@ -7,14 +7,13 @@
 package spire_extensions_logging
 
 import std.sync.*
-import std.console.Console
-import std.reflect.TypeInfo
+import std.reflect.*
 import std.collection.*
+import std.collection.concurrent.*
 
 public class LoggerFactory <: ILoggerFactory{
-    private let _lock = Mutex()
     private let _options: LoggerFilterOptions
-    private let _loggers = HashMap<String, ILogger>()
+    private let _loggers = ConcurrentHashMap<String, ILogger>()
     private let _providers: Collection<ILoggerProvider>
 
     internal init(providers: Collection<ILoggerProvider>, options: LoggerFilterOptions) {
@@ -26,13 +25,14 @@ public class LoggerFactory <: ILoggerFactory{
         if (_loggers.contains(categoryName)) {
             return _loggers[categoryName]
         }
-        synchronized(_lock) {
-            if (_loggers.contains(categoryName)) {
-                return _loggers[categoryName]
-            }
-            let loggers = createLoggers(categoryName)
-            return Logger(loggers)
-        }
+        
+        return _loggers.entryView(categoryName) { view =>
+           if (view.value.isNone()) {
+                let loggers = createLoggers(categoryName)
+                view.value =  Logger(loggers)
+           }
+        }.getOrThrow()
+       
     }
 
     private func createLoggers(categoryName: String) {       
