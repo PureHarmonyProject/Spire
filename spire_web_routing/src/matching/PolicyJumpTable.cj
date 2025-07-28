@@ -11,12 +11,3 @@ public abstract class PolicyJumpTable {
         ClassTypeInfo.of(this).qualifiedName
     }
 }
-
-class ExistPolicyJumpTable <: PolicyJumpTable {
-    ExistPolicyJumpTable(let exitDestination: Int64) {
-    }
-
-    public func getDestination(_: HttpContext): Int64 {
-        return exitDestination
-    }
-}

@@ -10,7 +10,7 @@ public interface INodeBuilderPolicy {
     func appliesToEndpoints(endpoints: ReadOnlyList<Endpoint>): Bool
 
     /*
-    生成分支
+    生成策略分支路径
      */
     func getEdges(endpoints: ReadOnlyList<Endpoint>): ReadOnlyList<PolicyNodeEdge>
 

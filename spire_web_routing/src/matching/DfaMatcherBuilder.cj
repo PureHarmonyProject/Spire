@@ -11,10 +11,12 @@ let EMPTY_ENDPOINT_LIST = ArrayList<Endpoint>()
 public class DfaMatcherBuilder {
     private var _stateIndex = 0
     private var _stateCount = 1
+    private let _endpointSelector: EndpointSelector
     private let _endpoints = ArrayList<RouteEndpoint>()
     private let _nodeBuilders: ReadOnlyList<INodeBuilderPolicy>
 
-    init(nodeBuilders: ReadOnlyList<INodeBuilderPolicy>) {
+    init(endpointSelector: EndpointSelector, nodeBuilders: ReadOnlyList<INodeBuilderPolicy>) {
+        _endpointSelector = endpointSelector
         _nodeBuilders = nodeBuilders
     }
 
@@ -26,15 +28,17 @@ public class DfaMatcherBuilder {
         let root = buildDfaTree()
 
         //构建状态机
+        _stateCount = 1
         root.visit {
             _ => _stateCount++
         }
+        _stateIndex = 0
         let exitDestination = _stateCount - 1
         //默认全部设置为退出状态
-        let repeatState = DfaState(JumpTableBuilder.build(exitDestination, exitDestination, None), None)
-        let states = Array<DfaState>(_stateCount, repeat: repeatState)
+        let exitState = DfaState(JumpTableBuilder.build(exitDestination, exitDestination, None), None)
+        let states = Array<DfaState>(_stateCount, repeat: exitState)
         addNode(root, exitDestination, states)
-        return DfaMatcher(states)
+        return DfaMatcher(_endpointSelector, states)
     }
 
     private func buildDfaTree() {
@@ -77,7 +81,7 @@ public class DfaMatcherBuilder {
         }
 
         // 路径跳转项
-        let pathEntries = if (let Some(literals) <- node.literals && literals.size > 0) {
+        let pathEntries = if (let Some(literals) <- node.literals) {
             let entries = Array<(String, Int64)>(literals.size, repeat: (String.empty, 0))
 
             //生成跳转项
@@ -93,6 +97,7 @@ public class DfaMatcherBuilder {
         // 只有catchall参数时，默认和退出都跳到该分支
         if (let Some(parameters) <- node.parameters && let Some(catchAll) <- node.catchAll && refEq(parameters, catchAll)) {
             currentDefaultDestination = transition(parameters)
+            currentExitDestination = currentDefaultDestination
         } else if (let Some(parameters) <- node.parameters && let Some(catchAll) <- node.catchAll) {
             //当catchall参数和parameters参数都存在，但是不相等
             currentDefaultDestination = transition(parameters)
@@ -108,11 +113,11 @@ public class DfaMatcherBuilder {
 
         //构建策略分支集合
         let policyEntries: ?ArrayList<PolicyJumpTableEdge> = if (let Some(policyEdges) <- node.policyEdges && policyEdges.size > 0) {
-            let policyEntries = ArrayList<PolicyJumpTableEdge>(policyEdges.size)
+            let entries = ArrayList<PolicyJumpTableEdge>(policyEdges.size)
             for ((i, (key, value)) in policyEdges |> enumerate) {
-                policyEntries[i] = PolicyJumpTableEdge(key, transition(value))
+                entries.add(PolicyJumpTableEdge(key, transition(value)))
             }
-            policyEntries
+            entries
         } else {
             None
         }
@@ -129,7 +134,7 @@ public class DfaMatcherBuilder {
 
     private func applyPolicies(node: DfaNode): Unit {
         //跳过非终端节点
-        if (node.matches?.size == 0) {
+        if ((node.matches?.size ?? 0) == 0) {
             return
         }
 
@@ -149,7 +154,7 @@ public class DfaMatcherBuilder {
                 ArrayList<DfaNode>()
             }
 
-            //处理当前工作项
+            //使用当前策略构建器，处理当前工作项
             for (parent in work) {
                 if (!nodeBuilder.appliesToEndpoints(parent.matches ?? ArrayList<Endpoint>())) {
                     //节点构建器不适用于当前节点，交由下一个节点构建器处理
@@ -162,7 +167,7 @@ public class DfaMatcherBuilder {
                 let edges = nodeBuilder.getEdges(parent.matches ?? EMPTY_ENDPOINT_LIST)
                 for (edge in edges) {
                     //新建节点
-                    let next = DfaNode(label: "${parent.label} ${edge.state}", pathDepth: parent.pathDepth - 1)
+                    let next = DfaNode(label: "${parent.label} ${edge.state}")
 
                     if (edge.endpoints.size > 0) {
                         next.addMatches(edge.endpoints)
@@ -178,6 +183,7 @@ public class DfaMatcherBuilder {
                 parent.matches?.clear()
             }
 
+            //切换到下一层
             previousWork = work
             work = nextWork
         }
@@ -185,19 +191,20 @@ public class DfaMatcherBuilder {
 
     private func buildPolicyJumpTable(exitDestination: Int64, nodeBuilder: ?INodeBuilderPolicy, policyEntries: ?ArrayList<PolicyJumpTableEdge>): ?PolicyJumpTable {
         if (let Some(policyEntries) <- policyEntries && let Some(nodeBuilder) <- nodeBuilder) {
-            nodeBuilder.buildJumpTable(exitDestination, policyEntries)
+            return nodeBuilder.buildJumpTable(exitDestination, policyEntries)
         }
         return None
     }
 
     private func createCandidates(endpoints: ?ArrayList<Endpoint>): Array<Candidate> {
         if (let Some(endpoints) <- endpoints) {
-            let candiates = ArrayList<Candidate>(endpoints.size)
-
+            let candidates = ArrayList<Candidate>(endpoints.size)
+            var score = 0
             for (endpoint in endpoints) {
-                candiates.add(createCandidate(endpoint, 1))
+                candidates.add(createCandidate(endpoint, score))
+                score++
             }
-            candiates |> collectArray
+            return candidates |> collectArray
         } else {
             return []
         }

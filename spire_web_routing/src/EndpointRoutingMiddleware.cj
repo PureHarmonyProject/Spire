@@ -20,15 +20,16 @@ public class EndpointRoutingMiddleware <: IMiddleware {
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
-        if (context.getEndpoint().isSome()) {
-            next()
-        } else {
-            initializationCore()
-            let matcher = _matcher.getOrThrow()
+        if (context.getEndpoint().isNone()) {
+            let matcher = initializationCore()
             matcher.invoke(context)
-        }
+        } 
+        next()
     }
 
+    /*
+    应用启动阶段阻塞完成状态机构建
+    */
     private func initializationCore() {
         if (let Some(matcher) <- _matcher) {
             return matcher
@@ -38,7 +39,11 @@ public class EndpointRoutingMiddleware <: IMiddleware {
             if (let Some(matcher) <- _matcher) {
                 return matcher
             }
-            _matcher = _matcherFactory.get()
+
+            let matcher = _matcherFactory.get()
+            matcher.debuggerToString() |> println
+            _matcher = matcher
+            return matcher
         }
     }
 }

@@ -43,7 +43,7 @@ public class OpenApiMiddleware <: IMiddleware {
         sb.append("<body>")
         for (pattern in _dataSource.endpoints |> filterMap {f => f as RouteEndpoint}) {
             let methods = pattern.metadata |> filterMap{f => f as IHttpMethodMetadata} |> flatMap{f => f.httpMethods} |> collectArray
-            sb.append("<a href='${pattern.routePattern}'>${methods}${pattern.routePattern}</a><br/>")
+            sb.append("<a href='${pattern.routePattern.rawText}'>${methods}${pattern.routePattern.rawText}</a><br/>")
         }
         sb.append("</body>")
         sb.append("</html>")

@@ -13,10 +13,15 @@ public class DfaMatcherFactory <: MatcherFactory {
 
     public func createMatcher(dataSource: EndpointDataSource): Matcher {
         let policies = _services.getAll<INodeBuilderPolicy>() |> collectArrayList
-        let builder = DfaMatcherBuilder(policies)
+        let endpointSelector = _services.getOrThrow<EndpointSelector>()
+        
+        //创建dfa构建器
+        let builder = DfaMatcherBuilder(endpointSelector, policies)
+
+        //添加终结点
         for (endpoint in dataSource.endpoints |> filterMap {f => f as RouteEndpoint}) {
             builder.addEndpoint(endpoint)
         }
-        return DfaMatcherBuilder(policies).build()
+        return builder.build()
     }
 }

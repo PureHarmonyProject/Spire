@@ -66,11 +66,12 @@ class DictionaryJumpTable <: JumpTable {
     }
     
     protected func debuggerToString(): String {
-        let sb = StringBuilder()
+        let entries = ArrayList<String>()
         for ((path, index) in _entries) {
-            sb.append('{"${path}": ${index}}')
+            entries.add('{"${path}": ${index}}')
         }
-        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "entries": ${sb}}'
+        let entriesJson = String.join(entries |> collectArray, delimiter: ', ')
+        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "entries": ${entriesJson}}'
     }
 }
 

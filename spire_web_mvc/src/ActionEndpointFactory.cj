@@ -6,6 +6,7 @@ import spire_web_routing.*
 import spire_web_mvc.bindings.*
 import spire_web_mvc.controllers.*
 import spire_extensions_injection.*
+import spire_web_routing.patterns.*
 import spire_web_mvc.abstractions.*
 
 class ActionEndpointFactory {

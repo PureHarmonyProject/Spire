@@ -17,7 +17,7 @@ public interface RoutingServiceCollectionExtension {
 
 extend ServiceCollection <: RoutingServiceCollectionExtension {
     public func addRouting(): Unit {
-        addRouting({_ =>})
+        addRouting({_ => })
     }
 
     public func addRouting(configureOptions: (RouteOptions) -> Unit): Unit {
@@ -25,6 +25,7 @@ extend ServiceCollection <: RoutingServiceCollectionExtension {
 
         this.tryAddSingleton(RoutingMarkerService())
        
+        this.tryAddSingleton<EndpointSelector, DefaultEndpointSelector>()
         this.tryAddEnumerable(ServiceDescriptor.singleton<INodeBuilderPolicy, HttpMethodMatcherPolicy>())
        
         this.tryAddSingleton<MatcherFactory, DfaMatcherFactory>()

@@ -4,8 +4,8 @@ import std.collection.*
 import spire_web_http.*
 import spire_web_routing.http.*
 
-let ANY_METHOD = '*'
-let ANY_METHOD_LIST = ArrayList<String>([ANY_METHOD])
+let ANY_HTTP_METHOD = '*'
+let ANY_HTTP_METHOD_LIST = ArrayList<String>([ANY_HTTP_METHOD])
 
 public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
     /*
@@ -13,7 +13,7 @@ public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
      */
     public func appliesToEndpoints(endpoints: ReadOnlyList<Endpoint>): Bool {
         for (endpoint in endpoints) {
-            if (endpoint.metadata.getMetadata<IHttpMethodMetadata>().isSome()) {
+            if (endpoint.metadata.getMetadata<IHttpMethodMetadata>().flatMap {f => f.httpMethods.size > 0} == true) {
                 return true
             }
         }
@@ -30,17 +30,29 @@ public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
         //计算出所有的请求方式
         for (endpoint in endpoints) {
             let httpMethods = getHttpMethods(endpoint)
-            allHttpMethods.add(all: httpMethods)
             for (httpMethod in httpMethods) {
-                edges.add(EdgeState(httpMethod), ArrayList<Endpoint>())
+                let state = EdgeState(httpMethod)
+                if (!edges.contains(state)) {
+                    edges.add(EdgeState(httpMethod), ArrayList<Endpoint>())
+                }
+                if (!httpMethod.equalsIgnoreAsciiCase(ANY_HTTP_METHOD) && !allHttpMethods.contains(httpMethod)) {
+                    allHttpMethods.add(httpMethod)
+                }
             }
         }
 
-        //计算匹配项
+        //计算匹配的终结点
         for (endpoint in endpoints) {
             for (httpMethod in getHttpMethods(endpoint)) {
                 edges[EdgeState(httpMethod)].add(endpoint)
             }
+        }
+
+        //添加一个支持任意method，返回405的分支作为默认分支，使得便于开发调试
+        let anyEdgeState = EdgeState(ANY_HTTP_METHOD)
+        if (!edges.contains(anyEdgeState)) {
+            let endpoint = createRejectionEndpoint(allHttpMethods)
+            edges[anyEdgeState] = ArrayList<Endpoint>([endpoint])
         }
 
         let policyNodeEdges = ArrayList<PolicyNodeEdge>(edges.size)
@@ -68,7 +80,22 @@ public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
     }
 
     private func getHttpMethods(endpoint: Endpoint) {
-        endpoint.metadata.getMetadata<IHttpMethodMetadata>().flatMap {f => f.httpMethods} ?? ANY_METHOD_LIST
+        endpoint.metadata.getMetadata<IHttpMethodMetadata>().flatMap {f => f.httpMethods} ?? ANY_HTTP_METHOD_LIST
+    }
+
+    private func createRejectionEndpoint(allHttpMethods: Collection<String>): RejectionEndpoint {
+        let allow = String.join(allHttpMethods |> collectArray, delimiter: ', ')
+        return RejectionEndpoint {
+            context =>
+            context.response.status(StatusCodes.MethodNotAllowed)
+            context.response.addHeader(HeaderNames.Allow, allow)
+        }
+    }
+}
+
+private class RejectionEndpoint <: Endpoint {
+    init(delegate: RequestDelegate) {
+        super(delegate, EndpointMetadataCollection.empty, None)
     }
 }
 
@@ -82,7 +109,7 @@ private struct EdgeState <: IEdgeState & ToString & Equatable<EdgeState> {
 
     public operator func ==(that: IEdgeState) {
         if (let that: EdgeState <- that) {
-            this == that
+            return this == that
         } else {
             return false
         }
@@ -99,25 +126,29 @@ private struct EdgeState <: IEdgeState & ToString & Equatable<EdgeState> {
 
 private class HttpMethodDictionaryPolicyJumpTable <: PolicyJumpTable {
     private let _exitDestination: Int64
-    private let _entries: HashMap<String, Int64>
+    private let _entries: ReadOnlyMap<String, Int64>
 
     init(exitDestination: Int64, entries: ReadOnlyMap<String, Int64>) {
         _exitDestination = exitDestination
-        _entries = HashMap<String, Int64>(entries)
+        _entries = entries
     }
 
     public func getDestination(context: HttpContext): Int64 {
-        if (let Some(destination) <- _entries.get(context.request.method)) {
+        if (let Some(destination) <- _entries.get(context.request.method.toAsciiLower())) {
+            return destination
+        }
+        if (let Some(destination) <- _entries.get(ANY_HTTP_METHOD)) {
             return destination
         }
         return _exitDestination
     }
 
     public func debuggerToString(): String {
-        let sb = StringBuilder()
+        let entries = ArrayList<String>()
         for ((state, index) in _entries) {
-            sb.append('{"${state}": ${index}}')
+            entries.add('{\"${state}\": ${index}}')
         }
-        return '{"exit": ${_exitDestination}, "entries": ${sb}}'
+        let entriesJson = String.join(entries |> collectArray, delimiter: ', ')
+        return '{\"exit\": ${_exitDestination}, \"entries\": [${entriesJson}]}'
     }
 }

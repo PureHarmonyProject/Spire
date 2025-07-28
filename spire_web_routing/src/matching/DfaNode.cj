@@ -13,7 +13,7 @@ class DfaNode {
     private var _literals: ?HashMap<String, DfaNode> = None
     private var _policyEdges: ?HashMap<IEdgeState, DfaNode> = None
 
-    init(label!: String, pathDepth!: Int64, catchAll!: ?DfaNode = None, parameters!: ?DfaNode = None) {
+    init(label!: String, pathDepth!: Int64 = -1, catchAll!: ?DfaNode = None, parameters!: ?DfaNode = None) {
         _label = label
         _catchAll = catchAll
         _pathDepth = pathDepth
@@ -124,6 +124,12 @@ class DfaNode {
         //!refEq(this, catchAll)是为了防止递归
         if (let Some(catchAll) <- _catchAll && !refEq(this, catchAll)) {
             catchAll.visit(visitor)
+        }
+
+        if (let Some(policyEdges) <- _policyEdges && !refEq(this, policyEdges)) {
+            for ((_, dege) in policyEdges) {
+                dege.visit(visitor)
+            }
         }
 
         visitor(this)
