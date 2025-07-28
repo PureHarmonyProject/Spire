@@ -4,7 +4,7 @@ import std.collection.*
 import spire_web_http.*
 import spire_web_routing.http.*
 
-public class DfaMatcher <: Matcher {
+protected class DfaMatcher <: Matcher {
     DfaMatcher(let endpointSelector: EndpointSelector, let states: Array<DfaState>) {
     }
 

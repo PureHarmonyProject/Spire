@@ -8,7 +8,7 @@ package spire_web_routing
 
 import std.collection.*
 
-public class RouteHandlerBuilder <: EndpointConventionBuilder {
+class RouteHandlerBuilder <: EndpointConventionBuilder {
     private let _conventions: ArrayList<(EndpointBuilder) -> Unit>
 
     init(conventions: ArrayList<(EndpointBuilder) -> Unit>) {

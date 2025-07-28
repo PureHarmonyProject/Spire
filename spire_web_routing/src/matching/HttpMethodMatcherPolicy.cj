@@ -7,7 +7,7 @@ import spire_web_routing.http.*
 let ANY_HTTP_METHOD = '*'
 let ANY_HTTP_METHOD_LIST = ArrayList<String>([ANY_HTTP_METHOD])
 
-public class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
+protected class HttpMethodMatcherPolicy <: INodeBuilderPolicy {
     /*
     评估该策略是否适用于给定的端点列表
      */

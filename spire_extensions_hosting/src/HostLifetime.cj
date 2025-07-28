@@ -1,0 +1,54 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// This code has been modified and is maintained by the Soulsoft organization.
+// The modifications to this file by Soulsoft are licensed under the MIT license.
+
+package spire_extensions_hosting
+
+import std.collection.*
+
+public class HostLifetime <: IHostLifetime {
+    private let _startedEvents = ArrayList<() -> Unit>()
+    private let _stoppedEvents = ArrayList<() -> Unit>()
+    private let _stoppingEvents = ArrayList<() -> Unit>()
+
+    public func onStarted(callback: () -> Unit) {
+        _startedEvents.add(callback)
+    }
+
+    public func onStopped(callback: () -> Unit) {
+        _stoppedEvents.add(callback)
+    }
+
+    public func onStopping(callback: () -> Unit) {
+        _stoppingEvents.add(callback)
+    }
+
+    public func started() {
+        for (pattern in _startedEvents) {
+            try {
+                pattern()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    public func stopped() {
+        for (pattern in _stoppedEvents) {
+            try {
+                pattern()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    public func stopping() {
+        for (pattern in _stoppingEvents) {
+            try {
+                pattern()
+            } catch (_: Exception) {
+            }
+        }
+    }
+}

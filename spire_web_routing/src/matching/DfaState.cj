@@ -2,7 +2,7 @@ package spire_web_routing.matching
 
 import std.collection.*
 
-public struct DfaState {
+struct DfaState {
     DfaState(let pathTransitions: JumpTable, let policyTransitions: ?PolicyJumpTable, let candidates: Array<Candidate>) {
     }
 

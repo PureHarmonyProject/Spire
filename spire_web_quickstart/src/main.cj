@@ -1,5 +1,7 @@
 package spire_web_quickstart
 
+import spire_web_routing.matching.*
+
 main() {
     let builder = WebHost.createBuilder()
     

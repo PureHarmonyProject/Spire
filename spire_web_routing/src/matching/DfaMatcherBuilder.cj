@@ -8,7 +8,7 @@ import spire_web_routing.patterns.*
 
 let EMPTY_ENDPOINT_LIST = ArrayList<Endpoint>()
 
-public class DfaMatcherBuilder {
+protected class DfaMatcherBuilder {
     private var _stateIndex = 0
     private var _stateCount = 1
     private let _endpointSelector: EndpointSelector

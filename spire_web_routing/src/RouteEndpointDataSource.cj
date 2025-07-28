@@ -9,7 +9,7 @@ package spire_web_routing
 import std.collection.*
 import spire_web_routing.patterns.*
 
-public class RouteEndpointDataSource <: EndpointDataSource {
+class RouteEndpointDataSource <: EndpointDataSource {
     private let _services: IServiceProvider
     private var _endpoints: ?ArrayList<Endpoint> = None
     private let _routeEntries = ArrayList<RouteEntry>()

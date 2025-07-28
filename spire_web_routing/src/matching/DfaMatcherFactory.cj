@@ -4,7 +4,7 @@ import std.collection.*
 import spire_web_routing.http.*
 import spire_extensions_injection.*
 
-public class DfaMatcherFactory <: MatcherFactory {
+protected class DfaMatcherFactory <: MatcherFactory {
     private let _services: IServiceProvider
 
     public init(services: IServiceProvider) {
