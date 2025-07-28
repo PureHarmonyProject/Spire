@@ -1,8 +1,9 @@
-package spire_extensions_options
+package spire_extensions_options.unittest
 
 import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
+import spire_extensions_options.*
 import spire_extensions_injection.*
 
 class TestOptions {

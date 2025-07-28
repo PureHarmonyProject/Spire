@@ -6,13 +6,17 @@
 
 package spire_extensions_options
 
-class ConfigureOptions<TOptions> <: IConfigureOptions<TOptions> where TOptions <: Object {
+public class ConfigureNamedOptions<TOptions> <: IConfigureNamedOptions<TOptions> where TOptions <: Object {
     private let _name: String
     private let _configure: (TOptions) -> Unit
 
     init(name: String, configure: (TOptions) -> Unit) {
         _name = name
         _configure = configure
+    }
+
+    public func configure(options: TOptions) {
+        configure(Options.defaultName, options)
     }
 
     public func configure(name: String, options: TOptions) {

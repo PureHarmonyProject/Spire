@@ -18,21 +18,18 @@ public interface OptionsServiceCollectionExtensions {
 
 extend ServiceCollection <: OptionsServiceCollectionExtensions {
     public func addOptions<TOptions>() where TOptions <: Object {
-        tryAddSingleton<IOptions<TOptions>, UnnamedOptionsManager<TOptions>>{sp => 
-            let optionsFactory = sp.getOrThrow<IOptionsFactory<TOptions>>()
-            return UnnamedOptionsManager<TOptions>(optionsFactory)
-        }
+        tryAddSingleton<IOptions<TOptions>, UnnamedOptionsManager<TOptions>>()
         
-        tryAddSingleton<IOptionsMonitor<TOptions>, OptionsMonitor<TOptions>>{sp =>
-            let optionsFactory = sp.getOrThrow<IOptionsFactory<TOptions>>()
-            return OptionsMonitor(optionsFactory)
-        }
+        tryAddSingleton<IOptionsMonitor<TOptions>, OptionsMonitor<TOptions>>()
 
         tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>>{sp => 
             let configures = sp.getAll<IConfigureOptions<TOptions>>()
             let configureAfters = sp.getAll<IConfigureAfterOptions<TOptions>>()
             return OptionsFactory<TOptions>(configures, configureAfters)
         }
+
+        tryAddSingleton<IOptionsMonitorCache<TOptions>, OptionsCache<TOptions>>()
+
         return OptionsBuilder<TOptions>()
     }
 
@@ -48,7 +45,7 @@ extend ServiceCollection <: OptionsServiceCollectionExtensions {
 
     public func configure<TOptions>(name: String, configureOptions: (TOptions) -> Unit) where TOptions <: Object {
         addOptions<TOptions>()
-        addSingleton<IConfigureOptions<TOptions>, ConfigureOptions<TOptions>>(ConfigureOptions<TOptions>(name, configureOptions))
+        addSingleton<IConfigureOptions<TOptions>, ConfigureNamedOptions<TOptions>>(ConfigureNamedOptions<TOptions>(name, configureOptions))
         return this
     }
 

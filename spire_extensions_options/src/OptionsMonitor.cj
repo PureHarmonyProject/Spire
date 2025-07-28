@@ -7,14 +7,18 @@
 package spire_extensions_options
 
 class OptionsMonitor<TOptions> <: IOptionsMonitor<TOptions> where TOptions <: Object {
+    private let _cache: IOptionsMonitorCache<TOptions> 
     private let _optionsFactory: IOptionsFactory<TOptions>
 
-    public init(optionsFactory: IOptionsFactory<TOptions>) {
+    public init(cache: IOptionsMonitorCache<TOptions> ,optionsFactory: IOptionsFactory<TOptions>) {
+        _cache = cache
         _optionsFactory = optionsFactory
     }
 
     public func get(name: String): TOptions {
-        _optionsFactory.create(name)
+        return _cache.getOrAdd(name){
+            _optionsFactory.create(name)
+        }
     }
 
     public prop currentValue: TOptions {

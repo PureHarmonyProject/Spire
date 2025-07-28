@@ -20,8 +20,9 @@ public class EndpointRoutingMiddleware <: IMiddleware {
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
+        initializationCore()
         if (context.getEndpoint().isNone()) {
-            let matcher = initializationCore()
+            let matcher = _matcher.getOrThrow()
             matcher.invoke(context)
         } 
         next()
@@ -37,12 +38,10 @@ public class EndpointRoutingMiddleware <: IMiddleware {
 
         synchronized(_lock) {
             if (let Some(matcher) <- _matcher) {
-                return matcher
             }
 
             let matcher = _matcherFactory.get()
             _matcher = matcher
-            return matcher
         }
     }
 }
