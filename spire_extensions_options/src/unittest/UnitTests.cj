@@ -37,6 +37,26 @@ func 测试选项是否单列以及委托是否只执行一次() {
 }
 
 @Test
+func 测试选项是否单列以及委托是否只执行一次_并发() {
+    let counter = ArrayList<Int64>()
+    let services = ServiceCollection()
+    services.configure<TestOptions>{configureOptions =>
+        configureOptions.version = 1
+        counter.add(1)
+    }
+    let provider = services.build()
+    let tasks = ArrayList<Future<TestOptions>>()
+    for (_ in 1..101) {
+        let options = provider.getOrThrow<IOptions<TestOptions>>()
+        _ = options.value
+    }
+    for (pattern in tasks) {
+        pattern.get()
+    }
+    @Expect(counter.size == 1, true)
+}
+
+@Test
 func 测试命名选项和非命名选项是否干扰() {
     let services = ServiceCollection()
     
