@@ -9,7 +9,7 @@ package spire_web_routing
 import std.sync.*
 import std.collection.*
 
-class CompositeEndpointDataSource <: EndpointDataSource {
+public class CompositeEndpointDataSource <: EndpointDataSource {
     private let _lock = Mutex()
     private let _options: RouteOptions
     private var _endpoints: ?ReadOnlyList<Endpoint> = None

@@ -6,6 +6,9 @@
 
 package spire_web_routing
 
+import std.collection.*
+import spire_web_routing.matching.*
+
 public interface RoutingServiceCollectionExtension {
     func addRouting(): Unit
 
@@ -14,15 +17,18 @@ public interface RoutingServiceCollectionExtension {
 
 extend ServiceCollection <: RoutingServiceCollectionExtension {
     public func addRouting(): Unit {
-        addRouting({_ =>})
+        addRouting({_ => })
     }
 
     public func addRouting(configureOptions: (RouteOptions) -> Unit): Unit {
         this.configure(configureOptions)
 
         this.tryAddSingleton(RoutingMarkerService())
-
-        this.tryAddSingleton<IMatcher, DfaMatcher>()
+       
+        this.tryAddSingleton<EndpointSelector, DefaultEndpointSelector>()
+        this.tryAddEnumerable(ServiceDescriptor.singleton<INodeBuilderPolicy, HttpMethodMatcherPolicy>())
+       
+        this.tryAddSingleton<MatcherFactory, DfaMatcherFactory>()
 
         this.tryAddSingleton<EndpointDataSource, CompositeEndpointDataSource> {
             sp => CompositeEndpointDataSource(sp.getOrThrow<IOptions<RouteOptions>>())

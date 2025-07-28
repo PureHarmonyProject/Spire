@@ -7,6 +7,7 @@
 package spire_web_routing
 
 import std.collection.*
+import spire_web_routing.patterns.*
 
 public class RouteEndpointDataSource <: EndpointDataSource {
     private let _services: IServiceProvider

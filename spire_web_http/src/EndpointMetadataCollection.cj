@@ -9,6 +9,8 @@ package spire_web_http
 import std.reflect.*
 import std.collection.*
 
+private let EMPTY = EndpointMetadataCollection()
+
 public class EndpointMetadataCollection <: ReadOnlyList<Any> {
     private let _metadata = ArrayList<Any>()
 
@@ -35,6 +37,12 @@ public class EndpointMetadataCollection <: ReadOnlyList<Any> {
     public prop last: ?Any {
         get() {
             _metadata.first
+        }
+    }
+
+    public static prop empty: EndpointMetadataCollection{
+        get() {
+            EMPTY
         }
     }
 
