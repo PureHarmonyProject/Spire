@@ -31,6 +31,6 @@ public abstract class HttpRequest {
     public prop trailers: HttpHeaders
     public prop version: Protocol
     public prop writeTimeout: ?Duration
-    public mut prop routeValues: RouteValues
+    public mut prop routeValues: ?RouteValues
     public func getDisplayUrl(): String
 }

@@ -10,7 +10,7 @@ import stdx.net.http.HttpRequest as HttpRequestBase
 
 public class HttpRequestImpl <: HttpRequest {
     private let _request: HttpRequestBase
-    private var _routeValues = RouteValues()
+    private var _routeValues: ?RouteValues = None
 
     init(request: HttpRequestBase) {
         _request = request
@@ -123,7 +123,7 @@ public class HttpRequestImpl <: HttpRequest {
         }
     }
 
-    public mut prop routeValues: RouteValues {
+    public mut prop routeValues: ?RouteValues {
         get() {
             _routeValues
         }

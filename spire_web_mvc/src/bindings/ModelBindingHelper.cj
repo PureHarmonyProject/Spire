@@ -34,18 +34,20 @@ public abstract class ModelBindingHelper {
         throw ModelBindingException("${parameterInfo}:binding fait")
     }
 
-    public static func deserization(parameterInfo: ParameterInfo, routeValues: RouteValues) {
-        if (let classTypeInfo: ClassTypeInfo <- parameterInfo.typeInfo) {
-            let dms = DataModelStruct()
-            for (pattern in classTypeInfo.instanceVariables) {
-                if (let Some(value) <- routeValues.get(pattern.name)) {
-                    addDataModelField(dms, pattern.name, value, pattern.typeInfo)
+    public static func deserization(parameterInfo: ParameterInfo, routeValues: ?RouteValues) {
+        if (let Some(routeValues) <- routeValues) {
+            if (let classTypeInfo: ClassTypeInfo <- parameterInfo.typeInfo) {
+                let dms = DataModelStruct()
+                for (pattern in classTypeInfo.instanceVariables) {
+                    if (let Some(value) <- routeValues.get(pattern.name)) {
+                        addDataModelField(dms, pattern.name, value, pattern.typeInfo)
+                    }
                 }
-            }
-            return deserization(parameterInfo.typeInfo, dms)
-        } else {
-            if (let Some(value) <- routeValues.get(parameterInfo.name)) {
-                return parseValue(value, parameterInfo.typeInfo)
+                return deserization(parameterInfo.typeInfo, dms)
+            } else {
+                if (let Some(value) <- routeValues.get(parameterInfo.name)) {
+                    return parseValue(value, parameterInfo.typeInfo)
+                }
             }
         }
         throw ModelBindingException("${parameterInfo}:binding fait")

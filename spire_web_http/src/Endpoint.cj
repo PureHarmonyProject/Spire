@@ -8,7 +8,7 @@ package spire_web_http
 
 import std.collection.*
 
-public abstract class Endpoint {
+public abstract class Endpoint <: ToString {
     private let _displayName: ?String
     private let _delegate: RequestDelegate
     private let _metadata: EndpointMetadataCollection
@@ -35,5 +35,9 @@ public abstract class Endpoint {
         get() {
             _displayName
         }
+    }
+
+    public func toString() {
+        return _displayName ?? String.empty
     }
 }

@@ -8,6 +8,7 @@ package spire_web_routing
 
 import spire_web_http.*
 import spire_extensions_injection.*
+import spire_web_routing.matching.*
 
 public interface RoutingApplicationBuilderExtensions {
     /*注册路由中间件*/
@@ -37,8 +38,12 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
         if (this.properties.contains(endpointRoutingMiddlewareKey)) {
             return
         }
-        let matcher = this.applicationServices.getOrThrow<IMatcher>()
-        use(EndpointRoutingMiddleware(matcher))
+        let matcherFactory = spawn {
+            let dataSource = this.applicationServices.getOrThrow<EndpointDataSource>()
+            let matcherFactory = this.applicationServices.getOrThrow<MatcherFactory>()
+            return matcherFactory.createMatcher(dataSource)
+        }
+        use(EndpointRoutingMiddleware(matcherFactory))
         this.properties[endpointRoutingMiddlewareKey] = true
     }
 
