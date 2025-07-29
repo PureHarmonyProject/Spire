@@ -6,22 +6,21 @@
 
 package spire_extensions_options
 
-public class ConfigureNamedOptions<TOptions> <: IConfigureNamedOptions<TOptions> where TOptions <: Object {
-    private let _name: String
-    private let _configure: (TOptions) -> Unit
+import spire_extensions_injection.*
 
-    init(name: String, configure: (TOptions) -> Unit) {
-        _name = name
-        _configure = configure
+public class ConfigureNamedOptions<TOptions> <: IConfigureNamedOptions<TOptions> where TOptions <: Object {
+  
+    public ConfigureNamedOptions(public let name: ?String, public let services: IServiceProvider, public let action: (TOptions, IServiceProvider) -> Unit) {
+      
     }
 
     public func configure(options: TOptions) {
         configure(Options.defaultName, options)
     }
 
-    public func configure(name: String, options: TOptions) {
-        if (name == _name) {
-            _configure(options)
+    public func configure(name: ?String, options: TOptions) {
+        if (this.name.isNone() || this.name == name) {
+            action(options, services)
         }
     }
 }

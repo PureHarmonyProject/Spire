@@ -7,5 +7,5 @@
 package spire_extensions_options
 
 public interface IConfigureNamedOptions<TOptions> <: IConfigureOptions<TOptions> where TOptions <: Object {
-    func configure(name: String, options: TOptions): Unit
+    func configure(name: ?String, options: TOptions): Unit
 }

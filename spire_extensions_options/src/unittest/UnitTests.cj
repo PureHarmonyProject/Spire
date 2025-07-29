@@ -166,7 +166,6 @@ func 测试选项命名验证_失败情况() {
 @Test
 func 测试命名选项验证_成功情况() {
     let services = ServiceCollection()
-
     services.addOptions<TestOptions>("t1")
         .configure {
             configureOptions => configureOptions.version = 1
