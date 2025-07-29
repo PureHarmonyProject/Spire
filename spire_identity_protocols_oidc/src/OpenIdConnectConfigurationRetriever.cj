@@ -18,7 +18,7 @@ public class OpenIdConnectConfigurationRetriever <: IConfigurationRetriever<Open
         let configuration = OpenIdConnectConfiguration.create(json)
         if (!configuration.jwksUri.isEmpty()) {
             let json = retriever.getDocument(configuration.jwksUri)
-            let jsonWebKey = JsonWebKeySet.deserialize(DataModel.fromJson(JsonValue.fromStr(json)))
+            let jsonWebKey = JsonWebKeySet.create(json)
             for (jwk in jsonWebKey.keys) {
                 configuration.signingKeys.add(jwk)
             }
