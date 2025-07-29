@@ -9,24 +9,24 @@ package spire_extensions_options
 import spire_extensions_injection.*
 
 public interface OptionsServiceCollectionExtensions {
-    func addOptions<TOptions>(): OptionsBuilder<TOptions> where TOptions <: Object
-    
+    func addOptions<TOptions>(): OptionsBuilder<TOptions> where TOptions <: Object {
+        addOptions<TOptions>(Options.defaultName)
+    }
+    func addOptions<TOptions>(name: String): OptionsBuilder<TOptions> where TOptions <: Object
     func configure<TOptions>(configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
-    
     func configure<TOptions>(name: String, configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
-    
     func configureAfter<TOptions>(configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
-    
     func configureAfter<TOptions>(name: String, configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
 }
 
 extend ServiceCollection <: OptionsServiceCollectionExtensions {
-    public func addOptions<TOptions>() where TOptions <: Object {
+    public func addOptions<TOptions>(name: String) where TOptions <: Object {
         tryAddSingleton<IOptions<TOptions>, UnnamedOptionsManager<TOptions>>()
-        
+
         tryAddSingleton<IOptionsMonitor<TOptions>, OptionsMonitor<TOptions>>()
 
-        tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>>{sp => 
+        tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>> {
+            sp =>
             let configures = sp.getAll<IConfigureOptions<TOptions>>()
             let configureAfters = sp.getAll<IConfigureAfterOptions<TOptions>>()
             let validations = sp.getAll<IValidateOptions<TOptions>>()
@@ -35,14 +35,14 @@ extend ServiceCollection <: OptionsServiceCollectionExtensions {
 
         tryAddSingleton<IOptionsMonitorCache<TOptions>, OptionsCache<TOptions>>()
 
-        return OptionsBuilder<TOptions>(this)
+        return OptionsBuilder<TOptions>(name, this)
     }
 
     public func configure<TOptions>(configureOptions: (TOptions) -> Unit) where TOptions <: Object {
         configure(Options.defaultName, configureOptions)
         return this
     }
-     
+
     public func configureAfter<TOptions>(configureOptions: (TOptions) -> Unit) where TOptions <: Object {
         configureAfter(Options.defaultName, configureOptions)
         return this
@@ -50,13 +50,15 @@ extend ServiceCollection <: OptionsServiceCollectionExtensions {
 
     public func configure<TOptions>(name: String, configureOptions: (TOptions) -> Unit) where TOptions <: Object {
         addOptions<TOptions>()
-        addSingleton<IConfigureOptions<TOptions>, ConfigureNamedOptions<TOptions>>(ConfigureNamedOptions<TOptions>(name, configureOptions))
+        addSingleton<IConfigureOptions<TOptions>, ConfigureNamedOptions<TOptions>>(
+            ConfigureNamedOptions<TOptions>(name, configureOptions))
         return this
     }
 
     public func configureAfter<TOptions>(name: String, configureOptions: (TOptions) -> Unit) where TOptions <: Object {
         addOptions<TOptions>()
-        this.addSingleton<IConfigureAfterOptions<TOptions>, ConfigureAfterOptions<TOptions>>(ConfigureAfterOptions<TOptions>(name, configureOptions))
+        this.addSingleton<IConfigureAfterOptions<TOptions>, ConfigureAfterOptions<TOptions>>(
+            ConfigureAfterOptions<TOptions>(name, configureOptions))
         return this
     }
 }

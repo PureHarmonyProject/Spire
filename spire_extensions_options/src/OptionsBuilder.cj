@@ -8,27 +8,25 @@ package spire_extensions_options
 
 import spire_extensions_injection.*
 
+private let DefaultValidationFailureMessage = "A validation error has occurred."
+
 public class OptionsBuilder<TOptions> where TOptions <: Object {
-    OptionsBuilder(let services: ServiceCollection) {
+    OptionsBuilder(let name: String, let services: ServiceCollection) {
     }
 
     public func configure(configureOptions: (TOptions) -> Unit) {
-        services.configure(configureOptions)
-    }
-
-    public func configure(name: String, configureOptions: (TOptions) -> Unit) {
         services.configure(name, configureOptions)
+        return this
     }
 
     public func configureAfter(configureOptions: (TOptions) -> Unit) {
-        services.configureAfter(configureOptions)
-    }
-
-    public func configureAfter(name: String, configureOptions: (TOptions) -> Unit) {
         services.configureAfter(name, configureOptions)
+        return this
     }
 
     public func validate(validation: (TOptions) -> Bool) {
-        services.addSingleton<IValidateOptions<TOptions>, ValidateOptions<TOptions>>()
+        services.addSingleton<IValidateOptions<TOptions>, ValidateOptions<TOptions>>(
+            ValidateOptions<TOptions>(name, validation, DefaultValidationFailureMessage))
+        return this
     }
 }
