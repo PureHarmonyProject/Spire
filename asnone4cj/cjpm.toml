@@ -1,0 +1,22 @@
+
+[dependencies]
+
+[package]
+  cjc-version = "1.0.0"
+  compile-option = "-O2"
+  description = "nothing here"
+  link-option = ""
+  name = "asn1"
+  output-type = "dynamic"
+  src-dir = "src"
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+  scripts = {}
+
+[target]
+  [target.x86_64-w64-mingw32.bin-dependencies]
+  path-option = ["${CANGJIE_STDX}"]
+
+  [target.x86_64-unknown-linux-gnu.bin-dependencies]    
+    path-option = ["${CANGJIE_STDX}"]
