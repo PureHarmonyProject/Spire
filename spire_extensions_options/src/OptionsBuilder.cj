@@ -15,18 +15,40 @@ public class OptionsBuilder<TOptions> where TOptions <: Object {
     }
 
     public func configure(configureOptions: (TOptions) -> Unit) {
+        configure {
+            options, _ => configureOptions(options)
+        }
+        return this
+    }
+
+    public func configure(configureOptions: (TOptions, IServiceProvider) -> Unit) {
         services.configure(name, configureOptions)
         return this
     }
 
     public func configureAfter(configureOptions: (TOptions) -> Unit) {
+        configureAfter {
+            options, _ => configureOptions(options)
+        }
+        return this
+    }
+
+    public func configureAfter(configureOptions: (TOptions, IServiceProvider) -> Unit) {
         services.configureAfter(name, configureOptions)
         return this
     }
 
     public func validate(validation: (TOptions) -> Bool) {
-        services.addSingleton<IValidateOptions<TOptions>, ValidateOptions<TOptions>>(
-            ValidateOptions<TOptions>(name, validation, DefaultValidationFailureMessage))
+        validate {
+            options, _ => validation(options)
+        }
+        return this
+    }
+
+    public func validate(validation: (TOptions, IServiceProvider) -> Bool) {
+        services.addSingleton<IValidateOptions<TOptions>, ValidateOptions<TOptions>> {
+            sp => ValidateOptions<TOptions>(name, sp, validation, DefaultValidationFailureMessage)
+        }
         return this
     }
 }
