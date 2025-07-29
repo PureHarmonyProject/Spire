@@ -15,7 +15,6 @@ import spire_extensions_logging.*
 import spire_identity_tokens_jwt.*
 
 public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAuthenticationOptions> {
-   
     public init(options: IOptionsMonitor<JwtBearerAuthenticationOptions>, logger: ILoggerFactory) {
         super(options, logger)
     }
@@ -30,10 +29,10 @@ public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAu
                 if (this.options.saveToken) {
                     properties.storeTokens(AuthenticationToken("access_token", accessToken))
                 }
-                let subject = ClaimsPrincipal(result.identity)   
+                let subject = ClaimsPrincipal(result.identity)
                 let ticket = AuthenticationTicket(subject, JwtBearerAuthenticationDefaults.Scheme, properties)
                 return AuthenticateResult.success(ticket)
-            }else {
+            } else {
                 AuthenticateResult.fail(result.exception.getOrThrow())
             }
         }
@@ -42,20 +41,25 @@ public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAu
 
     protected override func handleChallenge(properties: ?AuthenticationProperties): Unit {
         let authenticateResult = handleAuthenticateOnceSafe()
-        let error_description = authenticateResult.failure.flatMap{f => f.message} ?? String.empty
-        this.context.response.addHeader("WWW-Authenticate", "${this.options.challenge} error=\"invalid_token\", error_description=\"${error_description}\", charset=\"UTF-8\"")
+        let error_description = authenticateResult.failure.flatMap {f => f.message} ?? String.empty
+        this
+            .context
+            .response
+            .addHeader("WWW-Authenticate",
+                "${this.options.challenge} error=\"invalid_token\", error_description=\"${error_description}\", charset=\"UTF-8\"")
         super.handleChallenge(properties)
     }
 
     private func getAccessToken(): ?String {
         var accessToken: ?String = if (let Some(onMessageReceived) <- this.options.events.onMessageReceived) {
             onMessageReceived(this.context)
-        }else {
+        } else {
             None
         }
 
         if (accessToken.isNone()) {
-            if(let Some(authorizationValue) <- this.context.request.headers.getFirst("Authorization") && startWithBearer(authorizationValue)) {
+            if (let Some(authorizationValue) <- this.context.request.headers.getFirst("Authorization") &&
+                startWithBearer(authorizationValue)) {
                 accessToken = authorizationValue[7..]
             }
         }
