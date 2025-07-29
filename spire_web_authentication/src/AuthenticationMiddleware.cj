@@ -18,7 +18,7 @@ public class AuthenticationMiddleware <: IMiddleware {
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
         if (let Some(defaultAuthenticate) <- _schemes.getDefaultAuthenticateScheme()) {
-             let result = context.authenticate(defaultAuthenticate.name)
+            let result = context.authenticate(defaultAuthenticate.name)
             if (let Some(user) <- result.principal) {
                 context.user = user
             }

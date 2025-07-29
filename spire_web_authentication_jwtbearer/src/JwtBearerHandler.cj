@@ -14,13 +14,13 @@ import spire_extensions_options.*
 import spire_extensions_logging.*
 import spire_identity_tokens_jwt.*
 
-public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAuthenticationOptions> {
-    public init(options: IOptionsMonitor<JwtBearerAuthenticationOptions>, logger: ILoggerFactory) {
+public class JwtBearerHandler <: AuthenticationHandler<JwtBearerOptions> {
+    public init(options: IOptionsMonitor<JwtBearerOptions>, logger: ILoggerFactory) {
         super(options, logger)
     }
 
     public func handleAuthenticate() {
-        if (let Some(accessToken) <- getAccessToken()) {
+        if (let Some(accessToken) <- messageReceived()) {
             let jwtTokenHandler = JwtSecurityTokenHandler()
             let tokenValidationParameters = this.options.tokenValidationParameters
             let result = jwtTokenHandler.validateToken(accessToken, tokenValidationParameters)
@@ -30,7 +30,7 @@ public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAu
                     properties.storeTokens(AuthenticationToken("access_token", accessToken))
                 }
                 let subject = ClaimsPrincipal(result.identity)
-                let ticket = AuthenticationTicket(subject, JwtBearerAuthenticationDefaults.Scheme, properties)
+                let ticket = AuthenticationTicket(subject, JwtBearerDefaults.Scheme, properties)
                 return AuthenticateResult.success(ticket)
             } else {
                 AuthenticateResult.fail(result.exception.getOrThrow())
@@ -42,15 +42,11 @@ public class JwtBearerAuthenticationHandler <: AuthenticationHandler<JwtBearerAu
     protected override func handleChallenge(properties: ?AuthenticationProperties): Unit {
         let authenticateResult = handleAuthenticateOnceSafe()
         let error_description = authenticateResult.failure.flatMap {f => f.message} ?? String.empty
-        this
-            .context
-            .response
-            .addHeader("WWW-Authenticate",
-                "${this.options.challenge} error=\"invalid_token\", error_description=\"${error_description}\", charset=\"UTF-8\"")
+        this.context.response.addHeader("WWW-Authenticate", "${this.options.challenge} error=\"invalid_token\", error_description=\"${error_description}\", charset=\"UTF-8\"")
         super.handleChallenge(properties)
     }
 
-    private func getAccessToken(): ?String {
+    private func messageReceived(): ?String {
         var accessToken: ?String = if (let Some(onMessageReceived) <- this.options.events.onMessageReceived) {
             onMessageReceived(this.context)
         } else {

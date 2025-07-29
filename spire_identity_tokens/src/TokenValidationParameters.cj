@@ -19,6 +19,6 @@ public class TokenValidationParameters {
     public var validIssuer = Option<String>.None
     public var validAudience = Option<String>.None
     public var issuerSigningKey: ?SecurityKey = None
-    public let issuerSigningKeys: List<SecurityKey> = ArrayList<SecurityKey>()
+    public let issuerSigningKeys: Collection<SecurityKey> = ArrayList<SecurityKey>()
     public var authenticationType: String = "AuthenticationTypes.Federation"
 }

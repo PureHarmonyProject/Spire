@@ -13,6 +13,7 @@ public class JsonWebKeySet <: Serializable<JsonWebKeySet> {
     private let _keys = ArrayList<JsonWebKey>()
 
     public init() {
+
     }
 
     public JsonWebKeySet(keys: Collection<JsonWebKey>) {
@@ -44,4 +45,5 @@ public class JsonWebKeySet <: Serializable<JsonWebKeySet> {
         }
         return jwks
     }
+
 }
