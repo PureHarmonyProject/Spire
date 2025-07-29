@@ -10,6 +10,7 @@ import std.collection.*
 import spire_extensions_options.*
 
 public interface IAuthenticationSchemeProvider {
+    func getAllSchemes(): Collection<AuthenticationScheme>
     func getDefaultScheme(): ?AuthenticationScheme
     func getScheme(name: String): ?AuthenticationScheme
     func getDefaultAuthenticateScheme(): ?AuthenticationScheme
@@ -26,6 +27,10 @@ class AuthenticationSchemeProvider <: IAuthenticationSchemeProvider {
         for (pattern in _options.schemes) {
             _schemes.add(pattern.name, pattern)
         }
+    }
+
+    public func getAllSchemes() {
+        _schemes.values()
     }
 
     public func getScheme(name: String): ?AuthenticationScheme {

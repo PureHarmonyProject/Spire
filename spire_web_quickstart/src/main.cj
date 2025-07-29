@@ -5,14 +5,14 @@ import spire_web_routing.matching.*
 
 main() {
     let builder = WebHost.createBuilder()
-    builder.services.addAuthentication()
+    builder.services.addAuthentication(JwtBearerDefaults.Scheme)
         .addJwtBearer(JwtBearerDefaults.Scheme) {options =>
             //优先从url中读取
             options.events.onMessageReceived = { context =>
                 let token = context.request.queryForm.get("token")
                 return token
             }
-            options.metadataAddress = "https://demo.duendesoftware.com"
+            options.authority = "https://demo.duendesoftware.com"
             options.saveToken = true//保存token
             options.tokenValidationParameters.authenticationType = "JwtBearer"
             options.tokenValidationParameters.validIssuer = "spire"//发行方

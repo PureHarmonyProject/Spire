@@ -20,33 +20,23 @@ public class AuthorizationMiddleware <: IMiddleware {
     }
 
     public func invoke(context: HttpContext, next: () -> Unit) {
-        if (let Some(endpoint) <- context.getEndpoint()) {
-            //authenticate
-            if (let Some(policy) <- getPolicy(context, endpoint)) {
-                let policyEvaluator = context.services.getOrThrow<IPolicyEvaluator>()
-                let authenticateResult = authenticate(context, policy, policyEvaluator)
-                if (let Some(_) <- endpoint.metadata.getMetadata<IAllowAnonymous>()) {
-                    next()
-                    return
-                }
-
-                //authorize
-                let authorizeResult = policyEvaluator.authorize(policy, authenticateResult, context,
-                    if (_options.suppressUseHttpContextAsAuthorizationResource) {
-                        context
-                    } else {
-                        endpoint
-                    })
-
-                //handle authorize result
-                let authorizationMiddlewareResultHandler = context
-                    .services
-                    .getOrThrow<IAuthorizationMiddlewareResultHandler>()
-                authorizationMiddlewareResultHandler.handle(next, context, policy, authorizeResult)
-            } else {
+        if (let Some(endpoint) <- context.getEndpoint() && let Some(policy) <- getPolicy(context, endpoint)) {
+            let policyEvaluator = context.services.getOrThrow<IPolicyEvaluator>()
+            let authenticateResult = authenticate(context, policy, policyEvaluator)
+            //允许匿名访问
+            if (endpoint.metadata.getMetadata<IAllowAnonymous>().isSome()) {
                 next()
                 return
             }
+            //authorize
+            let resource = if (_options.suppressUseHttpContextAsAuthorizationResource) {
+                context
+            } else {
+                endpoint
+            }
+            let authorizeResult = policyEvaluator.authorize(policy, authenticateResult, context, resource)
+            let authorizationMiddlewareResultHandler = context.services.getOrThrow<IAuthorizationMiddlewareResultHandler>()
+            return authorizationMiddlewareResultHandler.handle(next, context, policy, authorizeResult)
         } else {
             next()
         }
