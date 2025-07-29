@@ -6,6 +6,29 @@
 
 package spire_extensions_options
 
-public class OptionsBuilder<TOptions> {
-    
+import spire_extensions_injection.*
+
+public class OptionsBuilder<TOptions> where TOptions <: Object {
+    OptionsBuilder(let services: ServiceCollection) {
+    }
+
+    public func configure(configureOptions: (TOptions) -> Unit) {
+        services.configure(configureOptions)
+    }
+
+    public func configure(name: String, configureOptions: (TOptions) -> Unit) {
+        services.configure(name, configureOptions)
+    }
+
+    public func configureAfter(configureOptions: (TOptions) -> Unit) {
+        services.configureAfter(configureOptions)
+    }
+
+    public func configureAfter(name: String, configureOptions: (TOptions) -> Unit) {
+        services.configureAfter(name, configureOptions)
+    }
+
+    public func validate(validation: (TOptions) -> Bool) {
+        services.addSingleton<IValidateOptions<TOptions>, ValidateOptions<TOptions>>()
+    }
 }

@@ -4,6 +4,7 @@ import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
 import spire_extensions_options.*
+import std.collection.concurrent.*
 import spire_extensions_injection.*
 
 class TestOptions {
@@ -38,7 +39,7 @@ func 测试选项是否单列以及委托是否只执行一次() {
 
 @Test
 func 测试选项是否单列以及委托是否只执行一次_并发() {
-    let counter = ArrayList<Int64>()
+    let counter = ConcurrentLinkedQueue<Int64>()
     let services = ServiceCollection()
     services.configure<TestOptions>{configureOptions =>
         configureOptions.version = 1
@@ -46,7 +47,7 @@ func 测试选项是否单列以及委托是否只执行一次_并发() {
     }
     let provider = services.build()
     let tasks = ArrayList<Future<TestOptions>>()
-    for (_ in 1..101) {
+    for (_ in 1..1001) {
         let options = provider.getOrThrow<IOptions<TestOptions>>()
         _ = options.value
     }

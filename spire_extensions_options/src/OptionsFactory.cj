@@ -8,15 +8,19 @@ package spire_extensions_options
 
 import std.sync.*
 import std.reflect.*
+import std.collection.*
 import std.collection.concurrent.*
 
 public class OptionsFactory<TOptions> <: IOptionsFactory<TOptions> where TOptions <: Object {
     private let _configures: Array<IConfigureOptions<TOptions>>
+    private let _validations: Array<IValidateOptions<TOptions>>
     private let _configureAfters: Array<IConfigureAfterOptions<TOptions>>
 
-    public init(configures: Array<IConfigureOptions<TOptions>>, configureAfters: Array<IConfigureAfterOptions<TOptions>>) {
+    public init(configures: Array<IConfigureOptions<TOptions>>,
+        configureAfters: Array<IConfigureAfterOptions<TOptions>>, validations: Array<IValidateOptions<TOptions>>) {
         _configures = configures
         _configureAfters = configureAfters
+        _validations = validations
     }
 
     public func create(name: String) {
@@ -28,8 +32,22 @@ public class OptionsFactory<TOptions> <: IOptionsFactory<TOptions> where TOption
                 pattern.configure(options)
             }
         }
+
         for (pattern in _configureAfters) {
             pattern.configureAfter(name, options)
+        }
+
+        if (_validations.size > 0) {
+            let failures = ArrayList<String>()
+            for (validate in _validations) {
+                let result = validate.validate(name, options)
+                if (result.failed) {
+                    failures.add(all: result.failures.getOrThrow() |> collectArray)
+                }
+            }
+            if (failures.size > 0) {
+                throw OptionsValidationException(name, TypeInfo.of<TOptions>(), failures |> collectArray)
+            }
         }
         return options
     }

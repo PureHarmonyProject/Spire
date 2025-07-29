@@ -10,9 +10,13 @@ import spire_extensions_injection.*
 
 public interface OptionsServiceCollectionExtensions {
     func addOptions<TOptions>(): OptionsBuilder<TOptions> where TOptions <: Object
+    
     func configure<TOptions>(configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
+    
     func configure<TOptions>(name: String, configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
+    
     func configureAfter<TOptions>(configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
+    
     func configureAfter<TOptions>(name: String, configureOptions: (TOptions) -> Unit): ServiceCollection where TOptions <: Object
 }
 
@@ -25,12 +29,13 @@ extend ServiceCollection <: OptionsServiceCollectionExtensions {
         tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>>{sp => 
             let configures = sp.getAll<IConfigureOptions<TOptions>>()
             let configureAfters = sp.getAll<IConfigureAfterOptions<TOptions>>()
-            return OptionsFactory<TOptions>(configures, configureAfters)
+            let validations = sp.getAll<IValidateOptions<TOptions>>()
+            return OptionsFactory<TOptions>(configures, configureAfters, validations)
         }
 
         tryAddSingleton<IOptionsMonitorCache<TOptions>, OptionsCache<TOptions>>()
 
-        return OptionsBuilder<TOptions>()
+        return OptionsBuilder<TOptions>(this)
     }
 
     public func configure<TOptions>(configureOptions: (TOptions) -> Unit) where TOptions <: Object {
