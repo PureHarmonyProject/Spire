@@ -6,11 +6,27 @@
 
 package spire_identity_protocols_oidc
 
+import stdx.encoding.json.*
+import spire_identity_tokens.*
 import spire_identity_protocols.*
+import stdx.serialization.serialization.*
 
 public class OpenIdConnectConfigurationRetriever <: IConfigurationRetriever<OpenIdConnectConfiguration> {
+    public func get(address: String, retriever: IDocumentRetriever): OpenIdConnectConfiguration {
+        let json = retriever.getDocument(address)
+        println(json)
+        let configuration = OpenIdConnectConfiguration.create(json)
+        if (!configuration.jwksUri.isEmpty()) {
+            let json = retriever.getDocument(configuration.jwksUri)
+            let jsonWebKey = JsonWebKeySet.create(json)
+            for (jwk in jsonWebKey.keys) {
+                configuration.signingKeys.add(jwk)
+            }
+        }
+        return configuration
+    }
+
     public func getConfiguration(address: String, documentRetriever: IDocumentRetriever): OpenIdConnectConfiguration {
-        let document = documentRetriever.getDocument(address)
-        return OpenIdConnectConfiguration.create(document)
+        return  get(address, documentRetriever)
     }
 }

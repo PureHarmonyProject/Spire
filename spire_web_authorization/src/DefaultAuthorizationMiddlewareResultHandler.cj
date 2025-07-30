@@ -15,22 +15,28 @@ public class DefaultAuthorizationMiddlewareResultHandler <: IAuthorizationMiddle
         if (authorizeResult.succeeded) {
             next()
             return
-        } else if (authorizeResult.challenged) { //401
-            if (policy.authenticationSchemes.size > 0) {
-                for (pattern in policy.authenticationSchemes) {
-                    context.challenge(pattern)
+        }
+
+        func handle() {
+            if (authorizeResult.challenged) { //401
+                if (policy.authenticationSchemes.size > 0) {
+                    for (pattern in policy.authenticationSchemes) {
+                        context.challenge(pattern)
+                    }
+                } else {
+                    context.challenge()
                 }
-            } else {
-                context.challenge()
-            }
-        } else if (authorizeResult.forbidden) {
-            if (policy.authenticationSchemes.size > 0) {
-                for (pattern in policy.authenticationSchemes) {
-                    context.forbid(pattern)
+            } else if (authorizeResult.forbidden) {
+                if (policy.authenticationSchemes.size > 0) {
+                    for (pattern in policy.authenticationSchemes) {
+                        context.forbid(pattern)
+                    }
+                } else {
+                    context.forbid()
                 }
-            } else {
-                context.forbid()
             }
         }
+
+        return handle()
     }
 }
