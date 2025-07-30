@@ -6,6 +6,7 @@
 
 package spire_web_authentication
 
+import std.collection.*
 import spire_web_http.*
 import spire_extensions_options.*
 
@@ -16,9 +17,9 @@ public interface IAuthenticationService {
 }
 
 class AuthenticationService <: IAuthenticationService {
+    private let _options: AuthenticationOptions
     private let _schemes: IAuthenticationSchemeProvider
     private let _handlers: IAuthenticationHandlerProvider
-    private let _options: AuthenticationOptions
 
     public init(schemes: IAuthenticationSchemeProvider, handlers: IAuthenticationHandlerProvider,
         options: IOptions<AuthenticationOptions>) {
@@ -28,37 +29,64 @@ class AuthenticationService <: IAuthenticationService {
     }
 
     public func authenticate(context: HttpContext, scheme: ?String): AuthenticateResult {
-        let authenticateScheme = if (scheme.isNone()) {
-            _schemes.getDefaultAuthenticateScheme().flatMap {f => f.name}
-        } else {
+        let authenticateScheme = if (let Some(scheme) <- scheme) {
             scheme
+        } else {
+            if (let Some(scheme) <- _schemes.getDefaultChallengeScheme().flatMap {f => f.name}) {
+                scheme
+            } else {
+                throw UnsupportedException(
+                    "No authenticationScheme was specified, and there was no DefaultChallengeScheme found. The default schemes can be set using either AddAuthentication(string defaultScheme) or AddAuthentication(Action<AuthenticationOptions> configureOptions).")
+            }
         }
-        if (let Some(scheme) <- authenticateScheme) {
-            let handler = _handlers.getHandler(context, scheme) ?? throw NoneValueException("authenticate scheme: ${scheme}")
-            return handler.authenticate()
-        }
-        return AuthenticateResult.noResult()
+
+        let handler = _handlers.getHandler(context, authenticateScheme) ?? throw createMissingHandlerException(
+            authenticateScheme)
+        return handler.authenticate()
     }
+
     public func challenge(context: HttpContext, scheme: ?String, properties: ?AuthenticationProperties) {
-        let challengeScheme = if (scheme.isNone()) {
-            _schemes.getDefaultChallengeScheme().flatMap {f => f.name}
-        } else {
+        let challengeScheme = if (let Some(scheme) <- scheme) {
             scheme
+        } else {
+            if (let Some(scheme) <- _schemes.getDefaultChallengeScheme().flatMap {f => f.name}) {
+                scheme
+            } else {
+                throw UnsupportedException(
+                    "No authenticationScheme was specified, and there was no DefaultChallengeScheme found. The default schemes can be set using either AddAuthentication(string defaultScheme) or AddAuthentication(Action<AuthenticationOptions> configureOptions).")
+            }
         }
-        if (let Some(scheme) <- challengeScheme) {
-            let handler = _handlers.getHandler(context, scheme) ?? throw NoneValueException("challenge scheme: ${scheme}")
-            handler.challenge(properties)
-        }
+
+        let handler = _handlers.getHandler(context, challengeScheme) ?? throw createMissingHandlerException(
+            challengeScheme)
+        handler.challenge(properties)
     }
+
     public func forbid(context: HttpContext, scheme: ?String, properties: ?AuthenticationProperties) {
-        let forbidScheme = if (scheme.isNone()) {
-            _schemes.getDefaultForbidScheme().flatMap {f => f.name}
-        } else {
+        let forbidScheme = if (let Some(scheme) <- scheme) {
             scheme
+        } else {
+            if (let Some(scheme) <- _schemes.getDefaultChallengeScheme().flatMap {f => f.name}) {
+                scheme
+            } else {
+                throw UnsupportedException(
+                    "No authenticationScheme was specified, and there was no DefaultChallengeScheme found. The default schemes can be set using either AddAuthentication(string defaultScheme) or AddAuthentication(Action<AuthenticationOptions> configureOptions).")
+            }
         }
-        if (let Some(scheme) <- forbidScheme) {
-            let handler = _handlers.getHandler(context, scheme) ?? throw NoneValueException("forbid scheme: ${scheme}")
-            handler.forbid(properties)
+
+        let handler = _handlers.getHandler(context, forbidScheme) ?? throw createMissingHandlerException(forbidScheme)
+        handler.forbid(properties)
+    }
+
+    private func createMissingHandlerException(scheme: String): Exception {
+        let schemes = String.join(_schemes.getAllSchemes() |> map {f => f.name} |> collectArray, delimiter: ', ')
+        let footer = " Did you forget to call AddAuthentication().Add[SomeAuthHandler](\"${scheme}\",...)?"
+
+        if (schemes.isEmpty()) {
+            throw UnsupportedException("No authentication handlers are registered.${footer}")
         }
+
+        return UnsupportedException(
+            "No authentication handler is registered for the scheme '${scheme}'. The registered schemes are: ${schemes}.${footer}")
     }
 }

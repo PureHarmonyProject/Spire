@@ -80,73 +80,73 @@ public class OpenIdConnectConfiguration {
     public var additionalData = HashMap<String, Any>()
 
     /** 支持的声明（claims）集合 */
-    public var claimsSupported: Collection<String> = ArrayList<String>()
+    public var claimsSupported: List<String> = ArrayList<String>()
 
     /** 支持的作用域（scopes）集合 */
-    public var scopesSupported: Collection<String> = ArrayList<String>()
+    public var scopesSupported: List<String> = ArrayList<String>()
 
     /** 支持的签名密钥集合 */
-    public var signingKeys: Collection<SecurityKey> = ArrayList<SecurityKey>()
+    public var signingKeys: List<SecurityKey> = ArrayList<SecurityKey>()
 
     /** 支持的 UI 语言列表 */
-    public var uiLocalesSupported: Collection<String> = ArrayList<String>()
+    public var uiLocalesSupported: List<String> = ArrayList<String>()
 
     /** 支持的响应模式集合 */
-    public var responseModesSupported: Collection<String> = ArrayList<String>()
+    public var responseModesSupported: List<String> = ArrayList<String>()
 
     /** 支持的响应类型集合 */
-    public var responseTypesSupported: Collection<String> = ArrayList<String>()
+    public var responseTypesSupported: List<String> = ArrayList<String>()
 
     /** 支持的认证上下文类引用值集合 */
-    public var acrValuesSupported: Collection<String> = ArrayList<String>()
+    public var acrValuesSupported: List<String> = ArrayList<String>()
 
     /** 支持的声明类型集合 */
-    public var claimTypesSupported: Collection<String> = ArrayList<String>()
+    public var claimTypesSupported: List<String> = ArrayList<String>()
 
     /** 支持的授权类型集合 */
-    public var grantTypesSupported: Collection<String> = ArrayList<String>()
+    public var grantTypesSupported: List<String> = ArrayList<String>()
 
     /** 支持的主题类型集合 */
-    public var subjectTypesSupported: Collection<String> = ArrayList<String>()
+    public var subjectTypesSupported: List<String> = ArrayList<String>()
 
     /** 支持的声明语言列表 */
-    public var claimsLocalesSupported: Collection<String> = ArrayList<String>()
+    public var claimsLocalesSupported: List<String> = ArrayList<String>()
 
     /** 支持的显示值列表 */
-    public var displayValuesSupported: Collection<String> = ArrayList<String>()
+    public var displayValuesSupported: List<String> = ArrayList<String>()
 
     /** 令牌端点支持的认证方法集合 */
-    public var tokenEndpointAuthMethodsSupported: Collection<String> = ArrayList<String>()
+    public var tokenEndpointAuthMethodsSupported: List<String> = ArrayList<String>()
 
     /** 令牌端点支持的签名算法集合 */
-    public var tokenEndpointAuthSigningAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var tokenEndpointAuthSigningAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** ID Token 加密算法支持列表 */
-    public var idTokenEncryptionAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var idTokenEncryptionAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** 请求对象签名算法支持列表 */
-    public var requestObjectSigningAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var requestObjectSigningAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** 请求对象加密算法支持列表 */
-    public var requestObjectEncryptionAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var requestObjectEncryptionAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** 请求对象加密加密方法支持列表 */
-    public var requestObjectEncryptionEncValuesSupported: Collection<String> = ArrayList<String>()
+    public var requestObjectEncryptionEncValuesSupported: List<String> = ArrayList<String>()
 
     /** Introspection 端点支持的认证方法 */
-    public var introspectionEndpointAuthMethodsSupported: Collection<String> = ArrayList<String>()
+    public var introspectionEndpointAuthMethodsSupported: List<String> = ArrayList<String>()
 
     /** UserInfo 端点支持的加密算法 */
-    public var userInfoEndpointEncryptionAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var userInfoEndpointEncryptionAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** UserInfo 端点支持的加密加密方法 */
-    public var userInfoEndpointEncryptionEncValuesSupported: Collection<String> = ArrayList<String>()
+    public var userInfoEndpointEncryptionEncValuesSupported: List<String> = ArrayList<String>()
 
     /** UserInfo 端点支持的签名算法 */
-    public var userInfoEndpointSigningAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var userInfoEndpointSigningAlgValuesSupported: List<String> = ArrayList<String>()
 
     /** Introspection 端点支持的签名算法 */
-    public var introspectionEndpointAuthSigningAlgValuesSupported: Collection<String> = ArrayList<String>()
+    public var introspectionEndpointAuthSigningAlgValuesSupported: List<String> = ArrayList<String>()
 
     private func serialize(): DataModel {
         var dms = DataModelStruct()

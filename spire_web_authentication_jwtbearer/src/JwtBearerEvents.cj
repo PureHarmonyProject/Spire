@@ -6,6 +6,8 @@
 
 package spire_web_authentication_jwtbearer
 
-public class JwtBearerAuthenticationDefaults {
-    public static let Scheme = "Bearer"
+import spire_web_http.*
+
+public class JwtBearerEvents {
+    public var onMessageReceived: ?(context: HttpContext) -> ?String = None
 }
