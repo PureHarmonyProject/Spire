@@ -1,0 +1,15 @@
+[package]
+  cjc-version = "1.0.0"
+  name = "spire_web_hosting_server"
+  description = "nothing here"
+  version = "1.0.0"
+  target-dir = ""
+  src-dir = ""
+  output-type = "static"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  spire_web_http = { path = "../spire_web_http"}
