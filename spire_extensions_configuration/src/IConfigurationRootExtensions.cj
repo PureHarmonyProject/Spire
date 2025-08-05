@@ -24,18 +24,3 @@ func getChildKeys(configuratin: IConfigurationRoot, parentPath: ?String): Iterab
     }
     return results |> collectArray
 }
-
-
-func camelCase(name: String, splitter: String) {
-    let sb = StringBuilder()
-    for ((index, pattern) in name.toAsciiLower().split(splitter, removeEmpty: true) |> enumerate) {
-        let bytes = pattern.toArray()
-        if (index == 0) {
-            sb.append(pattern)
-        }else {
-            bytes[0] = bytes[0].toAsciiUpperCase()
-            sb.append(String.fromUtf8(bytes))
-        }
-    }
-    return sb.toString().trimStart().trimEnd()
-}

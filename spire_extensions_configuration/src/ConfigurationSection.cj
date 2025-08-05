@@ -40,15 +40,15 @@ class ConfigurationSection <: IConfigurationSection {
     }
 
     public operator func [](key: String) {
-        return _root["${_path}:${key}"]
+        return _root[ConfigurationPath.combine(_path, key)]
     }
 
     public operator func [](key: String, value!: ?String) {
-        _root["${_path}:${key}"] = value
+        _root[ConfigurationPath.combine(_path, key)] = value
     }
 
     public func getSection(key: String): IConfigurationSection {
-        return ConfigurationSection("${_path}:${key}", key, this[key], _root)
+        return ConfigurationSection(ConfigurationPath.combine(_path, key), key, this[key], _root)
     }
 
     public func getChildren(): Collection<IConfigurationSection> {

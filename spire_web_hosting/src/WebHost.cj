@@ -157,7 +157,7 @@ public class WebHost <: ApplicationBuilder & IHost {
 
     private static func configureEnvironment(args: Array<String>): IHostEnvironment {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("spire")
+        configuration.addEnvVars("spire_")
         configuration.addCmdArgs(args)
         let environmentName = configuration["environment"] ?? Environments.Production
         let contentRootPath = configuration["contentRootPath"] ?? getWorkingDirectory().toString()
@@ -167,7 +167,7 @@ public class WebHost <: ApplicationBuilder & IHost {
 
     private static func configureConfiguration(args: Array<String>, environment: IHostEnvironment) {
         let configuration = ConfigurationManager()
-        configuration.addEnvVars("spire")
+        configuration.addEnvVars("spire_")
         configuration.addCmdArgs(args)
         configuration.addJsonFile("./appsettings.json", optional: true)
         configuration.addJsonFile("./appsettings.${environment.environmentName}.json", optional: true)

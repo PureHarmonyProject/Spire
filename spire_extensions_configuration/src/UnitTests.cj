@@ -44,19 +44,19 @@ func 测试配置读取_布尔() {
 @Test
 func 测试配置读取_环境变量() {
     let configuration = ConfigurationManager()
-        .addEnvVars("spire")
+        .addEnvVars("aspire_")
         .build()
 
-    @Expect(configuration.getValue<String>("hostName").getOrThrow(), "www.soulsoft.com")
+    @Expect(configuration.getValue<String>("host_name").getOrThrow(), "www.soulsoft.com")
 }
 
 @Test
 func 测试配置读取_命令行参数() {
     let configuration = ConfigurationManager()
-        .addCmdArgs("host-name=www.soulsoft.com")
+        .addCmdArgs("--host-name=www.soulsoft.com")
         .build()
 
-    @Expect(configuration.getValue<String>("hostName").getOrThrow(), "www.soulsoft.com")
+    @Expect(configuration.getValue<String>("host-name").getOrThrow(), "www.soulsoft.com")
 }
 
 @Test

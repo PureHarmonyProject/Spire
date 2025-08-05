@@ -52,7 +52,7 @@ class JsonConfigurationProvider <: ConfigurationProvider {
     }
 
     private func addValue(value: String) {
-        let key = String.join(_keys |> collectArray, delimiter: ":")
+        let key = String.join(_keys |> collectArray, delimiter: ConfigurationPath.delimiter)
         data.add(key, value)
     }
 

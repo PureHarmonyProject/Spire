@@ -7,27 +7,37 @@
 package spire_extensions_configuration
 
 import std.env.*
+import std.reflect.*
 import std.unicode.*
 import std.collection.*
 
 class EnvVarsConfigurationProvider <: ConfigurationProvider {
     private let _prefix: String
+    private let _normalizedPrefix: String
 
     init(prefix: String) {
         _prefix = prefix
+        _normalizedPrefix = normalize(prefix)
+    }
+
+    public func toString() {
+        "${ClassTypeInfo.of(this).name} Prefix: '${_prefix}'"
     }
 
     public override func load() {
-        let prefix = "${_prefix.toLower()}_"
-        for ((key, value) in getVariables()) {
-            var name = key.toLower()
-            if (!name.startsWith(prefix)) {
-                continue
-            }
-            name = name.removePrefix(prefix)
-            name = camelCase(name, '_')
-            data.add(name, value)
+        for ((name, value) in getVariables()) {
+            addIfNormalizedKeyMatchesPrefix(normalize(name), value)
         }
+    }
+
+    private func addIfNormalizedKeyMatchesPrefix(normalizedKey: String, value: String) {
+        if (normalizedKey.startsWithIgnoreAsciiCase(_normalizedPrefix)) {
+            data.add(normalizedKey[_normalizedPrefix.size..], value)
+        }
+    }
+
+    private static func normalize(key: String) {
+        return key.replace("__", ConfigurationPath.delimiter)
     }
 }
 
