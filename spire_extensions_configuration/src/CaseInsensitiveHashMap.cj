@@ -32,7 +32,7 @@ public class CaseInsensitiveHashMap<V> {
     public func get(key: String): ?V {
         let normalizedKey = normalizeKey(key)
         if (let Some((originalKey, value)) <- _innerMap.get(normalizedKey)) {
-            return Some(value)
+            return value
         }
         return None
     }

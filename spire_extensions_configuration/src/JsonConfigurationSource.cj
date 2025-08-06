@@ -53,7 +53,7 @@ class JsonConfigurationProvider <: ConfigurationProvider {
 
     private func addValue(value: String) {
         let key = String.join(_keys |> collectArray, delimiter: ":")
-        data.add(key, value)
+        data[key] = value
     }
 
     public override func load() {

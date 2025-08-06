@@ -1,0 +1,10 @@
+*.md
+.*
+.macrocall
+.*
+!.gitignore
+output
+target
+*.log
+*.lock
+*.cj.macrocall
