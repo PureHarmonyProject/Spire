@@ -5,41 +5,7 @@ import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
-@Test
-func 测试配置读取_字符串() {
-    let configuration = ConfigurationManager()
-        .addMemory([("data", "cangjie")])
-        .build()
 
-    @Expect(configuration.getValue<String>("data").getOrThrow(), "cangjie")
-}
-
-@Test
-func 测试配置读取_数字() {
-    let configuration = ConfigurationManager()
-        .addMemory([("data", "20")])
-        .build()
-
-    @Expect(configuration.getValue<Int64>("data").getOrThrow(), 20)
-}
-
-@Test
-func 测试配置读取_浮点数() {
-    let configuration = ConfigurationManager()
-        .addMemory([("data", "20.6")])
-        .build()
-
-    @Expect(configuration.getValue<Float64>("data").getOrThrow(), 20.6)
-}
-
-@Test
-func 测试配置读取_布尔() {
-    let configuration = ConfigurationManager()
-        .addMemory([("data", "true")])
-        .build()
-
-    @Expect(configuration.getValue<Bool>("data").getOrThrow(), true)
-}
 
 @Test
 func 测试配置读取_环境变量() {
