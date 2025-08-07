@@ -55,7 +55,14 @@ class EnvVarsConfigurationSource <: IConfigurationSource {
 }
 
 extend ConfigurationManager {
-    public func addEnvVars(prefix: String): IConfigurationBuilder {
+    public func addEnvVars(prefix: String) {
+        add(EnvVarsConfigurationSource(prefix))
+        return this
+    }
+}
+
+extend ConfigurationBuilder {
+    public func addEnvVars(prefix: String) {
         add(EnvVarsConfigurationSource(prefix))
         return this
     }

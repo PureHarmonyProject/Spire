@@ -102,8 +102,15 @@ class CmdArgsConfigurationSource <: IConfigurationSource {
     }
 }
 
+extend ConfigurationBuilder {
+    public func addCmdArgs(args: Array<String>, switchMappings!: ?Map<String, String> = None) {
+        add(CmdArgsConfigurationSource(args, switchMappings: switchMappings))
+        return this
+    }
+}
+
 extend ConfigurationManager {
-    public func addCmdArgs(args: Array<String>, switchMappings!: ?Map<String, String> = None): IConfigurationBuilder {
+    public func addCmdArgs(args: Array<String>, switchMappings!: ?Map<String, String> = None) {
         add(CmdArgsConfigurationSource(args, switchMappings: switchMappings))
         return this
     }

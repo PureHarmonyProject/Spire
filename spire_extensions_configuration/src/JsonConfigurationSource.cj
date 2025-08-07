@@ -69,14 +69,14 @@ class JsonConfigurationSource <: IConfigurationSource {
         _json = json
     }
 
-    public func build(_: IConfigurationBuilder): IConfigurationProvider {
+    public func build(_: IConfigurationBuilder) {
         let provider = JsonConfigurationProvider(_json)
         return provider
     }
 }
 
-extend ConfigurationManager {
-    public func addJsonStream(stream: IOStream): IConfigurationBuilder {
+extend ConfigurationBuilder {
+    public func addJsonStream(stream: IOStream) {
         let sr = StringReader(stream)
         let json = sr.readToEnd()
         add(JsonConfigurationSource(json))
@@ -88,7 +88,31 @@ extend ConfigurationManager {
         return this
     }
 
-    public func addJsonFile(path: String, optional!: Bool = true): IConfigurationBuilder {
+    public func addJsonFile(path: String, optional!: Bool = true) {
+        if (optional && !exists(path)) {
+            return this
+        }
+        try (file = File(path, OpenMode.Read)) {
+            addJsonStream(file)
+        }
+        return this
+    }
+}
+
+extend ConfigurationManager {
+    public func addJsonStream(stream: IOStream) {
+        let sr = StringReader(stream)
+        let json = sr.readToEnd()
+        add(JsonConfigurationSource(json))
+        return this
+    }
+
+    public func addJsonString(json: String) {
+        add(JsonConfigurationSource(json))
+        return this
+    }
+
+    public func addJsonFile(path: String, optional!: Bool = true) {
         if (optional && !exists(path)) {
             return this
         }

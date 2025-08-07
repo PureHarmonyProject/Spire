@@ -25,7 +25,7 @@ class MemoryConfigurationProvider <: ConfigurationProvider {
 
 class MemoryConfigurationSource <: IConfigurationSource {
     private let _values: HashMap<String, String>
-    
+
     init(values: HashMap<String, String>) {
         _values = values
     }
@@ -36,8 +36,15 @@ class MemoryConfigurationSource <: IConfigurationSource {
     }
 }
 
+extend ConfigurationBuilder {
+    public func addMemory(values: Collection<(String, String)>) {
+        add(MemoryConfigurationSource(HashMap<String, String>(values)))
+        return this
+    }
+}
+
 extend ConfigurationManager {
-    public func addMemory(values: Collection<(String, String)>): IConfigurationBuilder {
+    public func addMemory(values: Collection<(String, String)>) {
         add(MemoryConfigurationSource(HashMap<String, String>(values)))
         return this
     }
