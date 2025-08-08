@@ -31,7 +31,7 @@ extend ServiceCollection <: RoutingServiceCollectionExtension {
         this.tryAddSingleton<MatcherFactory, DfaMatcherFactory>()
 
         this.tryAddSingleton<EndpointDataSource, CompositeEndpointDataSource> {
-            sp => CompositeEndpointDataSource(sp.getOrThrow<IOptions<RouteOptions>>())
+            sp => CompositeEndpointDataSource(sp.getOrThrow<IOptions<RouteOptions>>().value.endpointDataSources)
         }
     }
 }

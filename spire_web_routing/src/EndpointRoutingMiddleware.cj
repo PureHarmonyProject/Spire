@@ -8,15 +8,17 @@ package spire_web_routing
 
 import std.sync.*
 import std.collection.*
-import spire_web_routing.matching.Matcher
+import spire_web_routing.matching.*
 
 public class EndpointRoutingMiddleware <: IMiddleware {
     private let _lock = Mutex()
     private var _matcher: ?Matcher = None
-    private let _matcherFactory: Future<Matcher>
+    private let _matcherFactory: MatcherFactory
+    private var _endpointDataSource: EndpointDataSource
 
-    init(matcherFactory: Future<Matcher>) {
+    public init(builder: EndpointRouteBuilder, matcherFactory: MatcherFactory) {
         _matcherFactory = matcherFactory
+        _endpointDataSource = CompositeEndpointDataSource(builder.dataSources)
     }
 
     public func invoke(context: HttpContext, next: () -> Unit): Unit {
@@ -35,13 +37,11 @@ public class EndpointRoutingMiddleware <: IMiddleware {
         if (let Some(matcher) <- _matcher) {
             return
         }
-
         synchronized(_lock) {
             if (let Some(matcher) <- _matcher) {
                 return
             }
-            let matcher = _matcherFactory.get()
-            _matcher = matcher
+            _matcher =  _matcherFactory.createMatcher(_endpointDataSource)
         }
     }
 }

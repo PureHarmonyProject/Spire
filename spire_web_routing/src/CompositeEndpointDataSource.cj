@@ -11,26 +11,26 @@ import std.collection.*
 
 public class CompositeEndpointDataSource <: EndpointDataSource {
     private let _lock = Mutex()
-    private let _options: RouteOptions
-    private var _endpoints: ?ReadOnlyList<Endpoint> = None
+    private var _endpoints: ?ArrayList<Endpoint> = None
+    private var _endpointDataSources: Collection<EndpointDataSource>
 
-    init(options: IOptions<RouteOptions>) {
-        _options = options.value
+    init(endpointDataSources: Collection<EndpointDataSource>) {
+        _endpointDataSources = endpointDataSources
     }
 
     public prop endpoints: ReadOnlyList<Endpoint> {
         get() {
             initialize()
-            _endpoints.getOrThrow()
+            return _endpoints.getOrThrow()
         }
     }
 
     private func initialize() {
-        if (let Some(_) <- _endpoints) {
+        if (_endpoints.isSome()) {
             return
         } else {
             synchronized(_lock) {
-                if (let Some(_) <- _endpoints) {
+                if (_endpoints.isSome()) {
                     return
                 }
                 updateEndpoints()
@@ -40,7 +40,7 @@ public class CompositeEndpointDataSource <: EndpointDataSource {
 
     private func updateEndpoints() {
         let endpoints = ArrayList<Endpoint>()
-        for (endpoint in _options.endpointDataSources |> flatMap{m => m.endpoints}) {
+        for (endpoint in _endpointDataSources |> flatMap {m => m.endpoints}) {
             endpoints.add(endpoint)
         }
         _endpoints = endpoints
