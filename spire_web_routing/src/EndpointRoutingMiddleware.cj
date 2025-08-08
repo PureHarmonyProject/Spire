@@ -41,7 +41,7 @@ public class EndpointRoutingMiddleware <: IMiddleware {
             if (let Some(matcher) <- _matcher) {
                 return
             }
-            _matcher =  _matcherFactory.createMatcher(_endpointDataSource)
+            _matcher = _matcherFactory.createMatcher(_endpointDataSource)
         }
     }
 }
