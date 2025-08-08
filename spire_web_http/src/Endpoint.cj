@@ -37,7 +37,7 @@ public abstract class Endpoint <: ToString {
         }
     }
 
-    public func toString() {
+    public open func toString() {
         return _displayName ?? String.empty
     }
 }

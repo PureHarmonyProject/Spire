@@ -23,4 +23,8 @@ public class RouteEndpoint <: Endpoint {
             _routePattern
         }
     }
+
+    public override func toString() {
+        _routePattern.rawText
+    }
 }

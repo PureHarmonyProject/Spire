@@ -38,6 +38,7 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
         if (this.properties.contains(endpointRoutingMiddlewareKey)) {
             return
         }
+        //创建线程编译状态机
         let matcherFactory = spawn {
             let dataSource = this.applicationServices.getOrThrow<EndpointDataSource>()
             let matcherFactory = this.applicationServices.getOrThrow<MatcherFactory>()

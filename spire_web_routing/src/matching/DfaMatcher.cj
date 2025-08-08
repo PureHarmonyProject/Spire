@@ -19,8 +19,8 @@ protected class DfaMatcher <: Matcher {
         //查找候选集
         let candidates = findCandidateSet(context, path)
         //筛选最终的候选结果
-        let candidateStates = ArrayList<CandidateState>()
-        for (candidate in candidates) {
+        let candidateStates = Array<CandidateState>(candidates.size, repeat: CandidateState(NotfoundEndpoint.empty, 0, None))
+        for ((i, candidate) in candidates |> enumerate) {
             var routeValues: ?RouteValues = None
             if (candidate.captures.size > 0 || candidate.catchAll.isSome()) {
                 routeValues = RouteValues()
@@ -32,10 +32,10 @@ protected class DfaMatcher <: Matcher {
                 let values = path.segments[segmentIndex..]
                 routeValues?.add(name, String.join(values, delimiter: '/'))
             }
-            candidateStates.add(CandidateState(candidate.endpoint, candidate.score, routeValues))
+            candidateStates[i] = CandidateState(candidate.endpoint, candidate.score, routeValues)
         }
         //选举
-        endpointSelector.select(context, CandidateSet(candidateStates.toArray()))
+        endpointSelector.select(context, CandidateSet(candidateStates))
     }
 
     private func findCandidateSet(context: HttpContext, path: PathSegment) {
@@ -58,5 +58,13 @@ protected class DfaMatcher <: Matcher {
 
     public func debuggerToString() {
         return String.join(states |> map {f => f.debuggerToString()} |> collectArray, delimiter: '\r\n')
+    }
+}
+
+class NotfoundEndpoint <: Endpoint {
+    public static let empty = NotfoundEndpoint()
+
+    init() {
+        super({_=>}, EndpointMetadataCollection.empty, None)
     }
 }

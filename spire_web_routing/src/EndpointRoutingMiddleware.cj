@@ -24,22 +24,22 @@ public class EndpointRoutingMiddleware <: IMiddleware {
         if (context.getEndpoint().isNone()) {
             let matcher = _matcher.getOrThrow()
             matcher.invoke(context)
-        } 
+        }
         next()
     }
 
     /*
     应用启动阶段阻塞完成状态机构建
-    */
-    private func initializationCore() {
+     */
+    private func initializationCore(): Unit {
         if (let Some(matcher) <- _matcher) {
-            return matcher
+            return
         }
 
         synchronized(_lock) {
             if (let Some(matcher) <- _matcher) {
+                return
             }
-
             let matcher = _matcherFactory.get()
             _matcher = matcher
         }
