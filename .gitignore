@@ -5,3 +5,5 @@ target
 *.log
 *.lock
 *.cj.macrocall
+
+*.md
