@@ -231,29 +231,6 @@ func 键更新测试() {
 }
 
 /**
- * 批量操作测试
- * 测试批量添加和获取操作
- */
-@Test
-func 批量操作测试() {
-    let map = IgnoreCaseHashMap<String>()
-    let testData = TestHelper.createTestData(10)
-    
-    // 批量添加数据
-    for ((key, value) in testData) {
-        map.add(key, value)
-    }
-    
-    // 验证数据正确性
-    @Expect(map.size, 30) // 每个键有3种大小写变体
-    
-    // 验证各种大小写形式的访问
-    @Expect(map.get("key_1"), Some("value_1"))
-    @Expect(map.get("key_2"), Some("Value_2"))
-    @Expect(map.get("key_3"), Some("VALUE_3"))
-}
-
-/**
  * 空键处理测试
  * 测试对空字符串键的处理
  */

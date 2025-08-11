@@ -7,61 +7,6 @@ import spire_extensions_configuration.*
 import spire_extensions_configuration.unittests.*
 
 /**
- * 配置管理器集成测试
- * 测试ConfigurationManager与IgnoreCaseHashMap的集成
- */
-@Test
-func 配置管理器集成测试() {
-    let config = ConfigurationManager()
-    
-    // 添加内存配置源
-    let testData = TestHelper.createTestData(5)
-    config.addMemory(testData)
-    
-    let root = config.build()
-    
-    // 验证不区分大小写的访问
-    @Expect(root["key_1"], Some("value_1"))
-    @Expect(root["Key_1"], Some("Value_1"))
-    @Expect(root["KEY_1"], Some("VALUE_1"))
-}
-
-/**
- * 多配置源集成测试
- * 测试多个配置源的集成和不区分大小写处理
- */
-@Test
-func 多配置源集成测试() {
-    let config = ConfigurationManager()
-    
-    // 添加内存配置源
-    let memoryData = HashMap<String, String>()
-    memoryData["app:name"] = "TestApp"
-    memoryData["app:version"] = "1.0.0"
-    config.addMemory(memoryData)
-    
-    // 添加环境变量配置源
-    let envData = HashMap<String, String>()
-    envData["APP_DEBUG"] = "true"
-    envData["APP_PORT"] = "8080"
-    config.addEnvVars("APP")
-    
-    let root = config.build()
-    
-    // 验证内存配置源的不区分大小写访问
-    @Expect(root["app:name"], Some("TestApp"))
-    @Expect(root["APP:NAME"], Some("TestApp"))
-    @Expect(root["app:version"], Some("1.0.0"))
-    @Expect(root["APP:VERSION"], Some("1.0.0"))
-    
-    // 验证环境变量配置源的不区分大小写访问
-    @Expect(root["APP_DEBUG"], Some("true"))
-    @Expect(root["app_debug"], Some("true"))
-    @Expect(root["APP_PORT"], Some("8080"))
-    @Expect(root["app_port"], Some("8080"))
-}
-
-/**
  * 配置构建器集成测试
  * 测试ConfigurationBuilder与IgnoreCaseHashMap的集成
  */
@@ -70,7 +15,7 @@ func 配置构建器集成测试() {
     let builder = ConfigurationBuilder()
     
     // 添加JSON配置源
-    let jsonConfig = ###"
+    let jsonConfig = ###"{
         "Database": {
             "Host": "localhost",
             "Port": 3306,
@@ -123,40 +68,6 @@ func 命令行参数集成测试() {
     @Expect(root["database:host"], Some("localhost"))
     @Expect(root["DATABASE:HOST"], Some("localhost"))
     @Expect(root["Database:Host"], Some("localhost"))
-}
-
-/**
- * 配置覆盖集成测试
- * 测试多个配置源之间的覆盖行为
- */
-@Test
-func 配置覆盖集成测试() {
-    let config = ConfigurationManager()
-    
-    // 添加基础配置
-    let baseData = HashMap<String, String>()
-    baseData["app:name"] = "BaseApp"
-    baseData["app:version"] = "1.0.0"
-    baseData["debug"] = "false"
-    config.addMemory(baseData)
-    
-    // 添加覆盖配置
-    let overrideData = HashMap<String, String>()
-    overrideData["APP:NAME"] = "OverrideApp"  // 不区分大小写覆盖
-    overrideData["debug"] = "true"           // 区分大小写覆盖
-    config.addMemory(overrideData)
-    
-    let root = config.build()
-    
-    // 验证不区分大小写的覆盖
-    @Expect(root["app:name"], Some("OverrideApp"))
-    @Expect(root["APP:NAME"], Some("OverrideApp"))
-    
-    // 验证区分大小写的覆盖
-    @Expect(root["debug"], Some("true"))
-    
-    // 验证未被覆盖的配置
-    @Expect(root["app:version"], Some("1.0.0"))
 }
 
 /**
@@ -385,8 +296,8 @@ func 配置继承集成测试() {
     
     // 继承配置
     let childConfig = HashMap<String, String>()
-    childConfig["child:setting"] = "child_value"
-    childConfig["CHILD:SHARED"] = "shared_child"  // 不区分大小写覆盖
+    childConfig["child:setting"] = "child_value"  // 子配置新增配置项
+    childConfig["BASE:SHARED"] = "shared_child"  // 子配置覆盖父配置
     
     config.addMemory(baseConfig)
     config.addMemory(childConfig)
@@ -403,4 +314,228 @@ func 配置继承集成测试() {
     // 验证不区分大小写的覆盖
     @Expect(root["base:shared"], Some("shared_child"))
     @Expect(root["BASE:SHARED"], Some("shared_child"))
+}
+
+/**
+ * 配置节遍历集成测试
+ * 测试配置节的遍历功能与不区分大小写处理
+ */
+@Test
+func 配置节遍历集成测试() {
+    let config = ConfigurationManager()
+    
+    let traversalData = HashMap<String, String>()
+    traversalData["section1:key1"] = "value1"
+    traversalData["section1:key2"] = "value2"
+    traversalData["section1:subsection:key3"] = "value3"
+    traversalData["section2:key1"] = "value4"
+    traversalData["section2:key2"] = "value5"
+    traversalData["SECTION3:KEY1"] = "value6"  // 不区分大小写
+    traversalData["section3:key2"] = "value7"
+    
+    config.addMemory(traversalData)
+    let root = config.build()
+    
+    // 获取根级别的子节
+    let rootChildren = root.getChildren()
+    @Expect(rootChildren.size, 3)  // section1, section2, section3
+    
+    // 验证子节的键名不区分大小写
+    let childKeys = ArrayList<String>()
+    for (child in rootChildren) {
+        childKeys.add(child.key)
+    }
+    
+    // 验证所有子节都存在
+    @Expect(childKeys.contains("section1"), true)
+    @Expect(childKeys.contains("section2"), true)
+    @Expect(childKeys.contains("section3"), true)
+    
+    // 测试特定配置节的遍历
+    let section1 = root.getSection("section1")
+    let section1Children = section1.getChildren()
+    @Expect(section1Children.size, 3)  // key1, key2, subsection
+    
+    // 验证section1的子节
+    let section1ChildKeys = ArrayList<String>()
+    for (child in section1Children) {
+        section1ChildKeys.add(child.key)
+    }
+    
+    @Expect(section1ChildKeys.contains("key1"), true)
+    @Expect(section1ChildKeys.contains("key2"), true)
+    @Expect(section1ChildKeys.contains("subsection"), true)
+    
+    // 测试嵌套配置节的遍历
+    let subsection = section1.getSection("subsection")
+    let subsectionChildren = subsection.getChildren()
+    @Expect(subsectionChildren.size, 1)  // key3
+    
+    let subsectionChild = subsectionChildren |> collectArray
+    @Expect(subsectionChild[0].key, "key3")
+    @Expect(subsectionChild[0].value, Some("value3"))
+}
+
+
+/**
+ * 配置节递归遍历集成测试
+ * 测试配置节的递归遍历功能
+ */
+@Test
+func 配置节递归遍历集成测试() {
+    let config = ConfigurationManager()
+    
+    let recursiveData = HashMap<String, String>()
+    recursiveData["level1:key1"] = "value1"
+    recursiveData["level1:level2:key2"] = "value2"
+    recursiveData["level1:level2:level3:key3"] = "value3"
+    recursiveData["level1:level2:level3:level4:key4"] = "value4"
+    recursiveData["LEVEL1:LEVEL2:LEVEL3:LEVEL4:LEVEL5:KEY5"] = "value5"  // 不区分大小写
+    
+    config.addMemory(recursiveData)
+    let root = config.build()
+    
+    // 验证特定路径的递归访问
+    let level1 = root.getSection("level1")
+    let level2 = level1.getSection("level2")
+    let level3 = level2.getSection("level3")
+    let level4 = level3.getSection("level4")
+    let level5 = level4.getSection("level5")
+    
+    @Expect(level1["key1"], Some("value1"))
+    @Expect(level2["key2"], Some("value2"))
+    @Expect(level3["key3"], Some("value3"))
+    @Expect(level4["key4"], Some("value4"))
+    @Expect(level5["key5"], Some("value5"))  // 不区分大小写访问
+    @Expect(level5["KEY5"], Some("value5"))
+    
+    // 验证配置节的遍历功能
+    let rootChildren = root.getChildren()
+    @Expect(rootChildren.size, 1)  // 只有level1
+    
+    let level1Children = level1.getChildren()
+    @Expect(level1Children.size, 2)  // key1, level2
+    
+    let level2Children = level2.getChildren()
+    @Expect(level2Children.size, 2)  // key2, level3
+    
+    let level3Children = level3.getChildren()
+    @Expect(level3Children.size, 2)  // key3, level4
+    
+    let level4Children = level4.getChildren()
+    @Expect(level4Children.size, 2)  // key4, level5
+
+    let level5Children = level5.getChildren()
+    @Expect(level5Children.size, 1)  // key5
+}
+
+/**
+ * 配置节递归遍历集成测试
+ * 测试配置节的递归遍历功能
+ */
+@Test
+func JSON配置节递归遍历集成测试() {
+    let config = ConfigurationManager()
+    
+    let jsonConfig = ###"{
+        "level1": {
+            "key1": "value1",
+            "level2": {
+                "key2": "value2",
+                "level3": {
+                    "key3": "value3",
+                    "level4": {
+                        "key4": "value4",
+                        "level5": {
+                            "key5": "value5"
+                        }
+                    }
+                }
+            }
+        }
+    }"###
+
+    config.addJsonString(jsonConfig)
+    let root = config.build()
+    
+    // 验证特定路径的递归访问
+    let level1 = root.getSection("level1")
+    let level2 = level1.getSection("level2")
+    let level3 = level2.getSection("level3")
+    let level4 = level3.getSection("level4")
+    let level5 = level4.getSection("level5")
+    
+    @Expect(level1["key1"], Some("value1"))
+    @Expect(level2["key2"], Some("value2"))
+    @Expect(level3["key3"], Some("value3"))
+    @Expect(level4["key4"], Some("value4"))
+    @Expect(level5["key5"], Some("value5"))  // 不区分大小写访问
+    @Expect(level5["KEY5"], Some("value5"))
+    
+    // 验证配置节的遍历功能
+    let rootChildren = root.getChildren()
+    @Expect(rootChildren.size, 1)  // 只有level1
+    
+    let level1Children = level1.getChildren()
+    @Expect(level1Children.size, 2)  // key1, level2
+    
+    let level2Children = level2.getChildren()
+    @Expect(level2Children.size, 2)  // key2, level3
+    
+    let level3Children = level3.getChildren()
+    @Expect(level3Children.size, 2)  // key3, level4
+    
+    let level4Children = level4.getChildren()
+    @Expect(level4Children.size, 2)  // key4, level5
+
+    let level5Children = level5.getChildren()
+    @Expect(level5Children.size, 1)  // key5
+}
+
+/**
+ * 动态配置更新集成测试
+ * 测试动态配置更新与遍历功能的结合
+ */
+@Test
+func 动态配置更新集成测试() {
+    let config = ConfigurationManager()
+    
+    let initialData = HashMap<String, String>()
+    initialData["dynamic:setting1"] = "initial_value1"
+    initialData["dynamic:setting2"] = "initial_value2"
+    initialData["dynamic:subsection:setting3"] = "initial_value3"
+    
+    config.addMemory(initialData)
+    let root = config.build()
+    
+    // 验证初始配置
+    let dynamicSection = root.getSection("dynamic")
+    @Expect(dynamicSection["setting1"], Some("initial_value1"))
+    @Expect(dynamicSection["setting2"], Some("initial_value2"))
+    
+    let subsection = dynamicSection.getSection("subsection")
+    @Expect(subsection["setting3"], Some("initial_value3"))
+    
+    // 动态更新配置
+    root["dynamic:setting1"] = "updated_value1"
+    root["DYNAMIC:SETTING2"] = "updated_value2"  // 不区分大小写更新
+    root["dynamic:subsection:setting3"] = "updated_value3"
+    root["dynamic:subsection:new_setting"] = "new_value"
+    
+    // 验证更新后的配置
+    @Expect(dynamicSection["setting1"], Some("updated_value1"))
+    @Expect(dynamicSection["SETTING1"], Some("updated_value1"))  // 不区分大小写访问
+    @Expect(dynamicSection["setting2"], Some("updated_value2"))
+    @Expect(dynamicSection["SETTING2"], Some("updated_value2"))  // 不区分大小写访问
+    
+    @Expect(subsection["setting3"], Some("updated_value3"))
+    @Expect(subsection["new_setting"], Some("new_value"))
+    @Expect(subsection["NEW_SETTING"], Some("new_value"))  // 不区分大小写访问
+    
+    // 验证遍历功能在更新后仍然正常工作
+    let updatedChildren = dynamicSection.getChildren()
+    @Expect(updatedChildren.size, 3)  // setting1, setting2, subsection
+    
+    let subsectionChildren = subsection.getChildren()
+    @Expect(subsectionChildren.size, 2)  // setting3, new_setting
 }

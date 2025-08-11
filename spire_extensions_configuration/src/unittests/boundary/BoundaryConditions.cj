@@ -20,11 +20,11 @@ func 大数据量边界测试() {
         map.add(key, value)
     }
     
-    @Expect(map.size, 3000) // 1000个键 × 3种大小写变体
+    @Expect(map.size, 1000) // 1000个键 × 3种大小写变体 = 3000 但覆盖后只有1000个
     
     // 验证数据完整性
-    @Expect(map.get("key_1"), Some("value_1"))
-    @Expect(map.get("Key_500"), Some("Value_500"))
+    @Expect(map.get("key_1"), Some("VALUE_1"))
+    @Expect(map.get("Key_500"), Some("VALUE_500"))
     @Expect(map.get("KEY_999"), Some("VALUE_999"))
     
     // 验证不存在键的处理
