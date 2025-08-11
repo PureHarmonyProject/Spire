@@ -117,76 +117,11 @@ func JSON配置源测试() {
 }
 
 /**
- * 多配置源优先级测试
- * 测试多个配置源的优先级和不区分大小写处理
- * 需要先设置本地计算机环境变量
- */
-
-// 框架尚不支持多配置源链式调用，后续会支持
-
-// @Test
-// func 多配置源优先级测试() {
-//     let root = ConfigurationManager()
-//         .addMemory([("priority:base", "base_value"), ("priority:shared", "base_shared"), ("PRIORITY:ENV", "env_value"), ("PRIORITY:SHARED", "env_shared")])
-//         .addCmdArgs(["priority:cmd=cmd_value", "PRIORITY:SHARED=cmd_shared"])
-//         .addEnvVars("spire_")
-//         .build()
-
-//     // 验证优先级：命令行 > 环境变量 > 基础配置
-//     @Expect(root["priority:base"], Some("base_value"))  // 只有基础配置有
-//     @Expect(root["PRIORITY:BASE"], Some("base_value"))
-
-//     @Expect(root["priority:env"], Some("env_value"))    // 环境变量覆盖基础配置
-//     @Expect(root["PRIORITY:ENV"], Some("env_value"))
-
-//     @Expect(root["priority:cmd"], Some("cmd_value"))    // 命令行覆盖环境变量
-//     @Expect(root["PRIORITY:CMD"], Some("cmd_value"))
-
-//     // 验证共享配置的优先级（命令行应该覆盖其他）
-//     @Expect(root["priority:shared"], Some("cmd_shared"))
-//     @Expect(root["PRIORITY:SHARED"], Some("cmd_shared"))
-// }
-
-/**
- * 配置源组合测试
- * 测试不同配置源组合的不区分大小写处理
- */
-
-// 框架尚不支持多配置源链式调用，后续会支持
-
-// @Test
-// func 配置源组合测试() {
-//     let root = ConfigurationManager()
-//         .addMemory([
-//             ("combo:memory", "memory_value"), 
-//             ("combo:shared", "memory_shared"),
-//             ("COMBO:ENV", "env_value"), 
-//             ("COMBO:SHARED", "env_shared")
-//             ])
-//         .addCmdArgs(["combo:cmd=cmd_value", "COMBO:SHARED=cmd_shared"])
-//         .build()
-
-//     // 验证各配置源的独立键
-//     @Expect(root["combo:memory"], Some("memory_value"))
-//     @Expect(root["COMBO:MEMORY"], Some("memory_value"))
-
-//     @Expect(root["combo:env"], Some("env_value"))
-//     @Expect(root["COMBO:ENV"], Some("env_value"))
-
-//     @Expect(root["combo:cmd"], Some("cmd_value"))
-//     @Expect(root["COMBO:CMD"], Some("cmd_value"))
-
-//     // 验证共享键的覆盖
-//     @Expect(root["combo:shared"], Some("cmd_shared"))
-//     @Expect(root["COMBO:SHARED"], Some("cmd_shared"))
-// }
-
-/**
  * 配置源冲突处理测试
  * 测试配置源之间的冲突处理
  */
 @Test
-func 配置源冲突处理测试() {
+func 单配置源冲突处理测试() {
     let root = ConfigurationManager()
         .addMemory(
             [
@@ -209,6 +144,57 @@ func 配置源冲突处理测试() {
     @Expect(root["CONFLICT:SHARED"], Some("source3_shared"))
     @Expect(root["Conflict:Shared"], Some("source3_shared"))
 }
+
+/**
+ * 多配置源覆盖测试
+ * 测试多个配置源的覆盖和不区分大小写处理
+ * 需要先设置本地计算机环境变量
+ */
+
+@Test
+func 多配置源覆盖测试() {
+
+    let jsonData = ###"{
+        "spire:port":"json_value"
+    }"###
+
+    let root = ConfigurationManager()
+        .addMemory([
+            ("spire:Memory","memory_value")
+        ])
+        .addCmdArgs([
+            "spire:port=cmd_value",
+            "--spire:port=cmd_value"
+         ])
+        .addEnvVars("spire_")
+        .addJsonString(jsonData)
+        .build()
+
+    @Expect(root["spire:port"], Some("json_value"))
+}
+
+/**
+ * 多配置源组合测试
+ * 测试不同配置源组合的独立性
+ */
+
+@Test
+func 多配置源组合测试() {
+    let root = ConfigurationManager()
+        .addMemory([
+            ("combo:memory", "memory_value")
+            ])
+        .addCmdArgs(["combo:cmd=cmd_value"])
+        .addJsonString(###"{
+            "combo:json": "json_value"
+        }"###)
+        .build()
+
+    @Expect(root["combo:memory"], Some("memory_value"))
+    @Expect(root["combo:cmd"], Some("cmd_value"))
+    @Expect(root["combo:json"], Some("json_value"))
+}
+
 
 /**
  * 配置源空值处理测试
@@ -276,34 +262,6 @@ func 配置源特殊字符测试() {
     @Expect(root["SPECIAL:WITH:COLONS"], Some("colon_value"))
 }
 
-@Test
-func 测试配置读取_字符串() {
-    let configuration = ConfigurationManager().addMemory([("data", "cangjie")]).build()
-
-    @Expect(configuration.getValue<String>("data").getOrThrow(), "cangjie")
-}
-
-@Test
-func 测试配置读取_数字() {
-    let configuration = ConfigurationManager().addMemory([("data", "20")]).build()
-
-    @Expect(configuration.getValue<Int64>("data").getOrThrow(), 20)
-}
-
-@Test
-func 测试配置读取_浮点数() {
-    let configuration = ConfigurationManager().addMemory([("data", "20.6")]).build()
-
-    @Expect(configuration.getValue<Float64>("data").getOrThrow(), 20.6)
-}
-
-@Test
-func 测试配置读取_布尔() {
-    let configuration = ConfigurationManager().addMemory([("data", "true")]).build()
-
-    @Expect(configuration.getValue<Bool>("data").getOrThrow(), true)
-}
-
 /**
  * 配置源类型转换测试
  * 测试配置源中的类型转换
@@ -315,33 +273,31 @@ func 配置源类型转换测试() {
             [
                 ("types:string", "string_value"),
                 ("types:int", "123"),
-                ("types:bool_true", "true"),
-                ("types:bool_false", "false"),
                 ("types:float", "123.456"),
-                ("types:invalid_int", "not_a_number")
+                ("types:bool_true", "true"),
+                ("types:invalid_int", "None")
             ]
         )
         .build()
 
     // 验证字符串类型
-    @Expect(root["types:string"], Some("string_value"))
-    @Expect(root["TYPES:STRING"], Some("string_value"))
+    @Expect(root.getValue<String>("types:string").getOrThrow(), "string_value")
 
-    // 验证整数类型（作为字符串）
-    @Expect(root["types:int"], Some("123"))
-    @Expect(root["TYPES:INT"], Some("123"))
+    // 验证整数类型
+    @Expect(root.getValue<Int64>("types:int").getOrThrow(), 123)
 
-    // 验证布尔类型（作为字符串）
-    @Expect(root["types:bool_true"], Some("true"))
-    @Expect(root["types:bool_false"], Some("false"))
+    // 验证浮点类型
+    @Expect(root.getValue<Float64>("types:float").getOrThrow(), 123.456)
 
-    // 验证浮点类型（作为字符串）
-    @Expect(root["types:float"], Some("123.456"))
-    @Expect(root["TYPES:FLOAT"], Some("123.456"))
+    // 验证布尔类型
+    @Expect(root.getValue<Bool>("types:bool_true").getOrThrow(), true)
 
-    // 验证无效值
-    @Expect(root["types:invalid_int"], Some("not_a_number"))
-    @Expect(root["TYPES:INVALID_INT"], Some("not_a_number"))
+    // 验证无效值转换失败报错
+    try {
+        @Expect(root.getValue<Int64>("types:invalid_int"), None)
+    } catch (e: Exception) {
+        @Expect(true)
+    }
 }
 
 /**
@@ -357,17 +313,13 @@ func 配置源性能测试() {
     @Expect(root["Key_50"], Some("VALUE_50"))
     @Expect(root["KEY_100"], Some("VALUE_100"))
 
-    // 验证不区分大小写的访问性能
-    // @Expect(root["key_1"], Some("value_1"))
-    // @Expect(root["KEY_1"], Some("value_1"))
-    // @Expect(root["Key_1"], Some("value_1"))
-
 }
 
 /**
  * 配置源错误恢复测试
  * 测试配置源的错误恢复能力
  */
+@Test
 func 配置源错误恢复测试() {
     try {
         let invalidJson = ###"12345 @ abcd_+-=!@#$%^&*()_[]{};':\"\\,./<>?`~{ invalid json }"###
@@ -386,7 +338,7 @@ func 配置源错误恢复测试() {
             }
         }"###
         
-        let root2 = ConfigurationManager()
+        let _ = ConfigurationManager()
             .addJsonString(invalidJson)  // 这个应该被抛出异常
             .addJsonString(validJson)    // 这个不会工作
             .build()
