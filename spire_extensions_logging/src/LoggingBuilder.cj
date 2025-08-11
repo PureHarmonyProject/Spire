@@ -32,7 +32,7 @@ public class LoggingBuilder {
     public func addProvider(provider: ILoggerProvider) {
         let key = TypeInfo.of(provider)
         if (_providers.contains(key)) {
-            return
+            return this
         }
         _providers.add(key, provider)
         return this
