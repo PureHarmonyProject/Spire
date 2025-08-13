@@ -15,11 +15,10 @@ protected class DfaMatcher <: Matcher {
     }
 
     public func invoke(context: HttpContext) {
-        let path = context.request.path.value
-        if (path == '/') {
+        let pathSegment = PathSegment.parse(context.request.path.value)
+        if (pathSegment.segments.size == 0) {
             return
         }
-        let pathSegment = PathSegment.parse(context.request.path.value)
         //查找候选集
         let candidates = findCandidateSet(context, pathSegment)
         //筛选最终的候选结果
