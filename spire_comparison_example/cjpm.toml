@@ -1,0 +1,20 @@
+[package]
+  cjc-version = "1.0.0"
+  compile-option = ""
+  description = "nothing here"
+  link-option = ""
+  name = "spire_comparison_example"
+  output-type = "executable"
+  override-compile-option = ""
+  src-dir = ""
+  target-dir = ""
+  version = "1.0.0"
+  package-configuration = {}
+
+[dependencies]
+  spire_web_mvc = { path = "../spire_web_mvc" }
+  spire_web_http = { path = "../spire_web_http" }
+  spire_web_routing = { path = "../spire_web_routing" }
+  spire_web_hosting = { path = "../spire_web_hosting" }
+  spire_extensions_injection = { path = "../spire_extensions_injection" }
+  spire_extensions_hosting = { path = "../spire_extensions_hosting" }
