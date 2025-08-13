@@ -19,7 +19,7 @@ public class UserService <: IUserService {
     public func create(user: User): User {
         let newId = nextId
         nextId = nextId + 1
-        let newUser = User(id: newId, name: user.name, email: user.email, age: user.age)
+        let newUser = User(newId, user.name, user.email, user.age)
         users.add(newId, newUser)
         return newUser
     }
