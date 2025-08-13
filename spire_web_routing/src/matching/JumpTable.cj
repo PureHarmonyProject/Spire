@@ -74,10 +74,10 @@ class DictionaryJumpTable <: JumpTable {
     protected func debuggerToString(): String {
         let entries = ArrayList<String>()
         for ((path, index) in _entries) {
-            entries.add('{"${path}": ${index}}')
+            entries.add('{\"${path}\": ${index}}')
         }
         let entriesJson = String.join(entries |> collectArray, delimiter: ', ')
-        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "entries": ${entriesJson}}'
+        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "matches": [${entriesJson}]}'
     }
 }
 
@@ -108,6 +108,6 @@ class SingleEntryJumpTable <: JumpTable {
     }
     
     protected func debuggerToString(): String {
-        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "entries": "${_entry[0]}": ${_entry[1]}}'
+        return '{"default": ${_defaultDestination}, "exit": ${_exitDestination}, "matches": {"${_entry[0]}": ${_entry[1]}}}'
     }
 }

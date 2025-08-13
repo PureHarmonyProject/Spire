@@ -122,7 +122,7 @@ protected class DfaMatcherBuilder {
         let policyEntries: ?ArrayList<PolicyJumpTableEdge> = if (let Some(policyEdges) <- node.policyEdges &&
             policyEdges.size > 0) {
             let entries = ArrayList<PolicyJumpTableEdge>(policyEdges.size)
-            for ((i, (key, value)) in policyEdges |> enumerate) {
+            for ((_, (key, value)) in policyEdges |> enumerate) {
                 entries.add(PolicyJumpTableEdge(key, transition(value)))
             }
             entries

@@ -15,21 +15,26 @@ protected class DfaMatcher <: Matcher {
     }
 
     public func invoke(context: HttpContext) {
-        let path = PathSegment.parse(context.request.path.value)
+        let path = context.request.path.value
+        if (path == '/') {
+            return
+        }
+        let pathSegment = PathSegment.parse(context.request.path.value)
         //查找候选集
-        let candidates = findCandidateSet(context, path)
+        let candidates = findCandidateSet(context, pathSegment)
         //筛选最终的候选结果
-        let candidateStates = Array<CandidateState>(candidates.size, repeat: CandidateState(NotfoundEndpoint.empty, 0, None))
+        let candidateStates = Array<CandidateState>(candidates.size,
+            repeat: CandidateState(NotfoundEndpoint.empty, 0, None))
         for ((i, candidate) in candidates |> enumerate) {
             var routeValues: ?RouteValues = None
             if (candidate.captures.size > 0 || candidate.catchAll.isSome()) {
                 routeValues = RouteValues()
             }
             for ((name, segmentIndex) in candidate.captures) {
-                routeValues?.add(name, path.segments[segmentIndex])
+                routeValues?.add(name, pathSegment.segments[segmentIndex])
             }
             if (let Some((name, segmentIndex)) <- candidate.catchAll) {
-                let values = path.segments[segmentIndex..]
+                let values = pathSegment.segments[segmentIndex..]
                 routeValues?.add(name, String.join(values, delimiter: '/'))
             }
             candidateStates[i] = CandidateState(candidate.endpoint, candidate.score, routeValues)
@@ -57,7 +62,8 @@ protected class DfaMatcher <: Matcher {
     }
 
     public func debuggerToString() {
-        return String.join(states |> map {f => f.debuggerToString()} |> collectArray, delimiter: '\r\n')
+        let states = String.join(states |> map {f => f.debuggerToString()} |> collectArray, delimiter: ',\r\n')
+        return "[${states}]"
     }
 }
 
@@ -65,6 +71,12 @@ class NotfoundEndpoint <: Endpoint {
     public static let empty = NotfoundEndpoint()
 
     init() {
-        super({_=>}, EndpointMetadataCollection.empty, None)
+        super({
+            context => context.response.status(StatusCodes.NotFound)
+        }, EndpointMetadataCollection.empty, None)
+    }
+
+    public override func toString() {
+        "Notfound"
     }
 }
