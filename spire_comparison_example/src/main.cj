@@ -12,8 +12,12 @@ main() {
     let startTime = DateTime.now()
     let builder = WebHost.createBuilder()
     
+    // 注册服务
+    builder.services.addScoped<IUserService, UserService>()
+    
+    // 添加 MVC
     builder.services.addControllers()
-        .addApplicationPart("default", TypeInfo.of<UserController>())
+        .addApplicationPart("MyApp", [TypeInfo.of<UserController>()])
 
     let host = builder.build()
 
@@ -26,6 +30,7 @@ main() {
     
     println("Spire Web MVC application started successfully!")
     println("Startup time: ${durationMs}ms")
+    println("Server running on http://localhost:8088")
 
     host.run()
 }

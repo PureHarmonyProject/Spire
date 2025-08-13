@@ -25,7 +25,7 @@ public class UserService <: IUserService {
     }
     
     public func update(user: User): User {
-        users.add(user.id.getOrThrow(), user)
+        users.add(user.id, user)
         return user
     }
     

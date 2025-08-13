@@ -7,11 +7,11 @@ public class UserController <: Controller {
     
     @HttpGet
     public func get() {
-        context.response.write("Hello from Users API!")
+        return "Hello from Users API!"
     }
     
     @HttpGet["{id}"]
     public func getById(@FromRoute id: Int64) {
-        context.response.write("User ID: ${id}")
+        return "User ID: ${id}"
     }
 }
