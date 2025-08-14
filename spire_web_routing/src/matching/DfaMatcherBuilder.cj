@@ -257,8 +257,8 @@ class DfaBuilderWorker {
         sort(_work)
 
         //处理当前工作队列
-        for (work in _work) {
-            let (endpoint, parents) = work.deconstruct()
+        for (i in 0.._workCount) {
+            let (endpoint, parents) = _work[i].deconstruct()
 
             //如果指定深度之后无必须处理的路径段
             if (!hasAdditionalRequiredSegments(endpoint, depth)) {

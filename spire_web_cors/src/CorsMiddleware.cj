@@ -91,7 +91,7 @@ public class CorsMiddleware <: IMiddleware {
             _corsService.applyResul(corsResult, context.response)
             context.response.status(StatusCodes.NoContent)
             return
-        }else {
+        } else {
             try {
                 _corsService.applyResul(corsResult, context.response)
             } catch (exception: Exception) {
