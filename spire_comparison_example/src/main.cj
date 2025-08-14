@@ -26,6 +26,27 @@ main() {
     let endTime = DateTime.now()
     let durationMs = (endTime - startTime).toMilliseconds()
     
+    logo() 
+    println("🚀 Spire Web MVC Application")
+    println("   Version: 1.0.0")
+    println("   Started in ${durationMs}ms")
+    println("   Server: http://localhost:5000")
+    println("")
+
+    host.run()
+}
+
+
+
+
+
+
+
+
+
+
+
+func logo() {
     // 打印 Spire ASCII 艺术标志
     println("""
     ╔══════════════════════════════════════════════════╗
@@ -39,12 +60,4 @@ main() {
     ║                 Spire Web V1.0.0                 ║
     ╚══════════════════════════════════════════════════╝                               
     """)
-    
-    println("🚀 Spire Web MVC Application")
-    println("   Version: 1.0.0")
-    println("   Started in ${durationMs}ms")
-    println("   Server: http://localhost:5000")
-    println("")
-
-    host.run()
 }
