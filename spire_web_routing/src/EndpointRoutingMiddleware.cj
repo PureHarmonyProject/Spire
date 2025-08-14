@@ -34,11 +34,11 @@ public class EndpointRoutingMiddleware <: IMiddleware {
     应用启动阶段阻塞完成状态机构建
      */
     private func initializationCore(): Unit {
-        if (let Some(matcher) <- _matcher) {
+        if (_matcher.isSome()) {
             return
         }
         synchronized(_lock) {
-            if (let Some(matcher) <- _matcher) {
+            if (_matcher.isSome()) {
                 return
             }
             _matcher = _matcherFactory.createMatcher(_endpointDataSource)

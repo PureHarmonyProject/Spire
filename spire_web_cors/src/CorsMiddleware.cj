@@ -94,7 +94,7 @@ public class CorsMiddleware <: IMiddleware {
         } else {
             try {
                 _corsService.applyResul(corsResult, context.response)
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 _logger.warn("Failed to apply CORS Response headers.")
             }
         }
