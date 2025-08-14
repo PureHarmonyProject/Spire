@@ -13,12 +13,9 @@ public class UserController <: Controller {
     @HttpGet["{id}"]
     public func getUser(@FromRoute id: Int64): IActionResult {
         let user = userService.getById(id)
-        println("123")
         if (user.isSome()) { 
-            println("456")
             return json(user.getOrThrow())
         } else { 
-            println("789")
             return notFound() 
         }
     }
