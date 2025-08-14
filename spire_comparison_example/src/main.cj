@@ -12,10 +12,8 @@ main() {
     let startTime = DateTime.now()
     let builder = WebHost.createBuilder()
     
-    // 注册服务
     builder.services.addSingleton<IUserService, UserService>()
     
-    // 添加 MVC
     builder.services.addControllers()
         .addApplicationPart("MyApp", [TypeInfo.of<UserController>()])
 
