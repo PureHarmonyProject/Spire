@@ -4,14 +4,40 @@ import spire_web_mvc.*
 
 @Route["api/users"]
 public class UserController <: Controller {
+    private let userService: IUserService
     
-    @HttpGet
-    public func get() {
-        return "Hello from Users API!"
+    public init(userService: IUserService) {
+        this.userService = userService
     }
     
     @HttpGet["{id}"]
-    public func getById(@FromRoute id: Int64) {
-        return "User ID: ${id}"
+    public func getUser(@FromRoute id: Int64): IActionResult {
+        let user = userService.getById(id)
+        println("123")
+        if (user.isSome()) { 
+            println("456")
+            return json(user.getOrThrow())
+        } else { 
+            println("789")
+            return notFound() 
+        }
+    }
+    
+    @HttpPost
+    public func createUser(@FromBody request: CreateUserRequest): IActionResult {
+        let validationResult = request.validate()
+        if (!validationResult.isValid) {
+            return badRequest()
+        }
+        
+        let user = User(
+            0,
+            request.name,
+            request.email,
+            request.age
+        )
+        
+        let created = userService.create(user)
+        return json(created)
     }
 }

@@ -13,7 +13,7 @@ main() {
     let builder = WebHost.createBuilder()
     
     // 注册服务
-    builder.services.addScoped<IUserService, UserService>()
+    builder.services.addSingleton<IUserService, UserService>()
     
     // 添加 MVC
     builder.services.addControllers()
@@ -28,9 +28,25 @@ main() {
     let endTime = DateTime.now()
     let durationMs = (endTime - startTime).toMilliseconds()
     
-    println("Spire Web MVC application started successfully!")
-    println("Startup time: ${durationMs}ms")
-    println("Server running on http://localhost:8088")
+    // 打印 Spire ASCII 艺术标志
+    println("""
+    ╔══════════════════════════════════════════════════╗
+    ║                                                  ║
+    ║   ███████╗  ██████╗   ██╗   ██████╗    ███████╗  ║
+    ║   ██╔════╝  ██╔══██╗  ██║   ██╔══██╗   ██╔════╝  ║
+    ║   ███████╗  ██████╔╝  ██║   ██████╔╝   █████╗    ║
+    ║   ╚════██║  ██╔═══╝   ██║   ██╔══██╗   ██╔══╝    ║
+    ║   ███████║  ██║       ██║   ██║  ██║   ███████╗  ║
+    ║   ╚══════╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝   ╚══════╝  ║
+    ║                  Spire Web V1.0.0                ║
+    ╚══════════════════════════════════════════════════╝                               
+    """)
+    
+    println("🚀 Spire Web MVC Application")
+    println("   Version: 1.0.0")
+    println("   Started in ${durationMs}ms")
+    println("   Server: http://localhost:5000")
+    println("")
 
     host.run()
 }

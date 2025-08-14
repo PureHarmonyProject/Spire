@@ -32,3 +32,9 @@
   spire_extensions_healthchecks = { path = "../spire_extensions_healthchecks" }
   spire_extensions_configuration = { path = "../spire_extensions_configuration" }
   spire_web_authentication_jwtbearer = { path = "../spire_web_authentication_jwtbearer" }
+  
+  [target.x86_64-w64-mingw32.bin-dependencies]
+    path-option = ["${CANGJIE_STDX}"]
+
+  [target.x86_64-unknown-linux-gnu.bin-dependencies]    
+    path-option = ["${CANGJIE_STDX}"]
