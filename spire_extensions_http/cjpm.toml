@@ -12,3 +12,6 @@
   package-configuration = {}
 
 [dependencies]
+  spire_net_http = { path = "../spire_net_http"}
+  spire_extensions_options = { path = "../spire_extensions_options"}  
+  spire_extensions_injection = { path = "../spire_extensions_injection"}  
