@@ -22,7 +22,7 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
         checkRequiredServices()
         let builder = getOrCreateEndpointRouteBuilder()
         endpoints(builder)
-        //adding endpointSources
+        //写入到RouteOptions
         let routeOptions = this.applicationServices.getOrThrow<IOptions<RouteOptions>>()
         for (pattern in builder.dataSources) {
             if (!routeOptions.value.endpointDataSources.contains(pattern)) {
@@ -38,12 +38,9 @@ extend ApplicationBuilder <: RoutingApplicationBuilderExtensions {
         if (this.properties.contains(endpointRoutingMiddlewareKey)) {
             return
         }
-        let matcherFactory = spawn {
-            let dataSource = this.applicationServices.getOrThrow<EndpointDataSource>()
-            let matcherFactory = this.applicationServices.getOrThrow<MatcherFactory>()
-            return matcherFactory.createMatcher(dataSource)
-        }
-        use(EndpointRoutingMiddleware(matcherFactory))
+        let builder = getOrCreateEndpointRouteBuilder()
+        let matcherFactory = this.applicationServices.getOrThrow<MatcherFactory>()
+        use(EndpointRoutingMiddleware(builder, matcherFactory))
         this.properties[endpointRoutingMiddlewareKey] = true
     }
 

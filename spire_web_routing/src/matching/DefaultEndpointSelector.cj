@@ -18,11 +18,9 @@ protected class DefaultEndpointSelector <: EndpointSelector {
         }
     }
 
-    private func apply(candidates: CandidateSet): ?CandidateState {
-        if (candidates.candidates.size == 1) {
-            return candidates.candidates[0]
-        } else if (candidates.candidates.size > 1) {
-            return candidates.candidates[0]
+    private func apply(set: CandidateSet): ?CandidateState {
+        if (set.candidates.size > 0) {
+            return set.candidates[0]
         }
         return None
     }

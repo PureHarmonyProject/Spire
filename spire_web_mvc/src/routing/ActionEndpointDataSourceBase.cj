@@ -50,10 +50,10 @@ public abstract class ActionEndpointDataSourceBase <: EndpointDataSource {
     }
 
     private func initialize() {
-        if (let Some(endpoints) <- _endpoints) {
+        if (_endpoints.isSome()) {
             return
         } else {
-            if (let Some(endpoints) <- _endpoints) {
+            if (_endpoints.isSome()) {
                 return
             }
             synchronized(_lock) {

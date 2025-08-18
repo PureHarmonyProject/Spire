@@ -13,7 +13,7 @@ struct DfaState {
     }
 
     internal func debuggerToString(): String {
-        let candidatesStr = String.join(candidates |> map {f => f.debuggerToString()} |> collectArray, delimiter: ",")
-        return '{\"jumpTable\": ${pathTransitions.debuggerToString()}, \"policyJumpTable\": ${policyTransitions?.debuggerToString() ?? "null"}, \"candidates\": [${candidatesStr}]}'
+        let candidatesStr = String.join(candidates |> map {f => "\"${f.debuggerToString()}\""} |> collectArray, delimiter: ",")
+        return '{\"path\": ${pathTransitions.debuggerToString()}, \"policies\": ${policyTransitions?.debuggerToString() ?? "null"}, \"candidates\": [${candidatesStr}]}'
     }
 }
