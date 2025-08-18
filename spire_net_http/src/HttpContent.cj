@@ -4,7 +4,10 @@
 package spire_net_http
 
 import std.io.*
+import stdx.encoding.json.ToJson
 import std.collection.*
+import stdx.encoding.json.*
+import stdx.serialization.serialization.*
 
 public abstract class HttpContent {
     private let _headers = HttpContentHeaders()
@@ -14,9 +17,9 @@ public abstract class HttpContent {
             _headers
         }
     }
-   
+
     public func readAsStream(): InputStream
-    
+
     public func readAsString(): String {
         StringReader(readAsStream()).readToEnd()
     }
@@ -28,13 +31,18 @@ public abstract class HttpContent {
         while (true) {
             let size = stream.read(buffer)
             if (size > 0) {
-               for (pattern in 0..size) {
-                    bytes.add(buffer[pattern]) 
-               }
-            }else {
+                for (pattern in 0..size) {
+                    bytes.add(buffer[pattern])
+                }
+            } else {
                 break
             }
         }
         return bytes |> collectArray
+    }
+
+    public func readFromJson<T>() where T <: Serializable<T> {
+        let json = readAsString()
+        return T.deserialize(DataModel.fromJson(JsonValue.fromStr(json)))
     }
 }
