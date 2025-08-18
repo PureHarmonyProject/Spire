@@ -3,6 +3,15 @@
 
 package spire_net_http
 
-public interface IHttpMessageHandler {
-    func send(request: HttpRequestMessage, next: DelegatingHandler): HttpResponseMessage
+import std.runtime.*
+
+public abstract class HttpMessageHandler <: Resource {
+    protected func send(request: HttpRequestMessage): HttpResponseMessage
+
+    public open func isClosed() {
+        return true
+    }
+
+    public open func close() {
+    }
 }

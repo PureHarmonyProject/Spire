@@ -11,41 +11,41 @@
 ```cangjie
 package spire_net_http
 
-import encoding.url.*
+import stdx.net.http.*
+import stdx.encoding.url.*
 
-main(): Int64 {
-    let client = HttpClient({options => 
-        options.address = URL.parse("https://localhost:7053")
-        options.handlers.add(LoggingHandlerV1())
-        options.handlers.add(LoggingHandlerV2())
-    })
-    let request = HttpRequestMessage(HttpMethod.get, "/WeatherForecast")
-    request.content = FormUrlContent([("name", "zs")])
-    let response = client.send(request)
-    println(response.content.readAsString())
+main() {
+    //创建调用链
+    let handler = LoggingHandler(AuthHandler(HttpClientHandler()))
+    let client = HttpClient(handler)
+    client.getString("https://www.baidu.com/?tn=68018901_16_pg") |> println
     return 0
 }
 
-/**
-切面1：模拟身份认证
-*/
-public class LoggingHandlerV1 <: IHttpMessageHandler {
-    public func send(request: HttpRequestMessage, next: DelegatingHandler): HttpResponseMessage {
-        println("LoggingHandlerV1:start")
-        let response = next(request)
-        println("LoggingHandlerV1:end")
+/*处理日志记录*/
+public class LoggingHandler <: DelegatingHandler {
+    public init(innerHandler: HttpMessageHandler){
+        super(innerHandler)
+    }
+
+    public override func send(request: HttpRequestMessage) {
+        println("LoggingHandler:start")
+        let response = super.send(request)
+        println("LoggingHandler:ended")
         return response
     }
 }
 
-/**
-切面2：模拟日志记录
-*/
-public class LoggingHandlerV2 <: IHttpMessageHandler {
-    public func send(request: HttpRequestMessage, next: DelegatingHandler): HttpResponseMessage {
-        println("LoggingHandlerV2:start")
-        let response = next(request)
-        println("LoggingHandlerV2:end")
+/*处理身份认证*/
+public class AuthHandler <: DelegatingHandler {
+    public init(innerHandler: HttpMessageHandler){
+        super(innerHandler)
+    }
+
+    public override func send(request: HttpRequestMessage) {
+        println("AuthHandler:start")
+        let response = super.send(request)
+        println("AuthHandler:ended")
         return response
     }
 }

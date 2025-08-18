@@ -10,7 +10,7 @@ import std.collection.*
 import stdx.encoding.url.*
 
 public class HttpRequestMessage {
-    private let _requestUri: URL
+    private var _requestUri: ?URL
     private let _method: HttpMethod
     private let _headers = HttpRequestHeaders()
     private let _properties = HashMap<String, Any>()
@@ -32,9 +32,12 @@ public class HttpRequestMessage {
         }
     }
 
-    public prop requestUri: URL {
+    public mut prop requestUri: ?URL {
         get() {
             _requestUri
+        }
+        set(value) {
+            _requestUri = value
         }
     }
 
