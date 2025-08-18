@@ -46,7 +46,7 @@ public class HttpResponseMessage {
         }
     }
 
-    public prop isSuccessStatusCode:Bool {
+    public prop isSuccessStatusCode: Bool {
         get() {
             status >= 200 && status <= 299
         }
