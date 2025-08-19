@@ -9,11 +9,14 @@ public interface HttpClientFactoryServiceCollectionExtensions {
 
 extend ServiceCollection <: HttpClientFactoryServiceCollectionExtensions {
     public func addHttpClient(): ServiceCollection {
-        this.addSingleton<HttpClientMappingRegistry>(HttpClientMappingRegistry())
+        this.tryAddSingleton(HttpClientMappingRegistry())
+        this.tryAddSingleton<IHttpClientFactory, DefaultHttpClientFactory>()
+        this.tryAddSingleton<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>()
         return this
     }
 
     public func addHttpClient(name: String): HttpClientBuilder {
+        addHttpClient()
         return HttpClientBuilder(name, this)
     }
 }

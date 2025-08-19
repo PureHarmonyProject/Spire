@@ -6,12 +6,12 @@
 
 package spire_net_http
 
-import stdx.net.tls.*
-import stdx.net.http.*
+import std.sync.*
 import stdx.encoding.url.*
-import std.collection.*
 
 public class HttpClient <: HttpMessageInvoker {
+    private var _baseAddress: ?URL = None
+    private let _operationStarted = AtomicBool(false)
     private var _defaultRequestHeaders: ?HttpRequestHeaders = None
 
     public init() {
@@ -22,10 +22,16 @@ public class HttpClient <: HttpMessageInvoker {
         super(handler)
     }
 
-    public var baseAddress: ?URL = None
-  
-    public var timeout: Duration = Duration.second * 100
-  
+    public mut prop baseAddress: ?URL {
+        get() {
+            _baseAddress
+        }
+        set(value){
+            checkClosedOrStarted()
+            _baseAddress = value
+        }
+    }
+
     public prop defaultRequestHeaders: HttpRequestHeaders {
         get() {
             if (let Some(defaultRequestHeaders) <- _defaultRequestHeaders) {
@@ -113,6 +119,8 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func send(request: HttpRequestMessage): HttpResponseMessage {
+        checkClosed()
+        setOperationStarted()
         prepareRequestMessage(request)
         return super.send(request)
     }
@@ -140,6 +148,17 @@ public class HttpClient <: HttpMessageInvoker {
                     request.headers.set(name, value)
                 }
             }
+        }
+    }
+
+    private func setOperationStarted() {
+        _operationStarted.compareAndSwap(false, true)
+    }
+
+    private func checkClosedOrStarted() {
+        checkClosed()
+        if (_operationStarted.load()) {
+            throw UnsupportedException(StringResx.net_http_operation_started)
         }
     }
 }

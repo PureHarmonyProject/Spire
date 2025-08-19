@@ -7,28 +7,28 @@ import spire_extensions_options.*
 import spire_extensions_injection.*
 
 public class HttpClientBuilder {
-    private let _name: String
-    private let _services: ServiceCollection
+    private let name: String
+    private let services: ServiceCollection
 
     init(name: String, services: ServiceCollection) {
-        _name = name
-        _services = services
+        this.name = name
+        this.services = services
     }
 
     public func configureHttpClient(configureClient: (HttpClient) -> Unit) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options.httpClientActions.add(configureClient)
         }
     }
 
     public func configureHttpClient(configureClient: (HttpClient, IServiceProvider) -> Unit) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options, sp => options.httpClientActions.add({client => configureClient(client, sp)})
         }
     }
 
     public func addHttpMessageHandler(configureHandler: () -> DelegatingHandler) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options
                 .httpMessageHandlerBuilderActions
                 .add({
@@ -38,7 +38,7 @@ public class HttpClientBuilder {
     }
 
     public func addHttpMessageHandler(configureHandler: (IServiceProvider) -> DelegatingHandler) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options
                 .httpMessageHandlerBuilderActions
                 .add({
@@ -48,7 +48,7 @@ public class HttpClientBuilder {
     }
 
     public func addHttpMessageHandler<THandler>() where THandler <: DelegatingHandler {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options
                 .httpMessageHandlerBuilderActions
                 .add({
@@ -58,13 +58,13 @@ public class HttpClientBuilder {
     }
 
     public func configureHttpMessageHandlerBuilder(configureBuilder: (HttpMessageHandlerBuilder) -> Unit) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options.httpMessageHandlerBuilderActions.add(configureBuilder)
         }
     }
 
     public func configurePrimaryHttpMessageHandler(configureHandler: () -> HttpMessageHandler) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options.httpMessageHandlerBuilderActions.add({
                 b => b.primaryHandler = configureHandler()
             })
@@ -72,7 +72,7 @@ public class HttpClientBuilder {
     }
 
     public func configurePrimaryHttpMessageHandler(configureHandler: (IServiceProvider) -> HttpMessageHandler) {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options
                 .httpMessageHandlerBuilderActions
                 .add({
@@ -82,7 +82,7 @@ public class HttpClientBuilder {
     }
 
     public func configurePrimaryHttpMessageHandler<THandler>() where THandler <: HttpMessageHandler {
-        _services.configure<HttpClientFactoryOptions>(_name) {
+        services.configure<HttpClientFactoryOptions>(name) {
             options => options
                 .httpMessageHandlerBuilderActions
                 .add({
@@ -96,17 +96,17 @@ public class HttpClientBuilder {
     }
 
     private func addTypedClientCore<TClient>(validateSingleType: Bool, factory: (HttpClient, IServiceProvider) -> TClient) where TClient <: Object {
-        reserveClient(TypeInfo.of<TClient>(), _name, validateSingleType)
-        _services.addTransient<TClient, TClient> {
+        reserveClient(TypeInfo.of<TClient>(), name, validateSingleType)
+        services.addTransient<TClient, TClient> {
             sp =>
             let httpClientFactory = sp.getOrThrow<IHttpClientFactory>()
-            let client = httpClientFactory.createClient(_name)
-            return factory(client, sp)
+            let httpClient = httpClientFactory.createClient(name)
+            return factory(httpClient, sp)
         }
     }
 
     private func reserveClient(typeInfo: TypeInfo, name: String, validateSingleType: Bool) {
-        let registry = _services
+        let registry = services
             .iterator()
             .filter {f => f.serviceType == TypeInfo.of<HttpClientMappingRegistry>()}
             .first()
