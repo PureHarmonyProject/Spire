@@ -12,7 +12,7 @@ import stdx.encoding.url.*
 import std.collection.*
 
 public class HttpClient <: HttpMessageInvoker {
-    private var _defaultRequestHeaders: ?HttpHeaders = None
+    private var _defaultRequestHeaders: ?HttpRequestHeaders = None
 
     public init() {
         this(HttpClientHandler())
@@ -23,13 +23,15 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public var baseAddress: ?URL = None
+  
     public var timeout: Duration = Duration.second * 100
-    public prop defaultRequestHeaders: HttpHeaders {
+  
+    public prop defaultRequestHeaders: HttpRequestHeaders {
         get() {
             if (let Some(defaultRequestHeaders) <- _defaultRequestHeaders) {
                 defaultRequestHeaders
             } else {
-                _defaultRequestHeaders = HttpHeaders()
+                _defaultRequestHeaders = HttpRequestHeaders()
                 return _defaultRequestHeaders.getOrThrow()
             }
         }

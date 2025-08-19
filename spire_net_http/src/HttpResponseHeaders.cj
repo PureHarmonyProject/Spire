@@ -9,7 +9,7 @@ import stdx.net.http.HttpHeaders
 public class HttpResponseHeaders <: Iterable<(String, Collection<String>)> {
     private let _headers: HttpHeaders
 
-    init(headers: HttpHeaders) {
+    protected init(headers: HttpHeaders) {
         _headers = headers
     }
 

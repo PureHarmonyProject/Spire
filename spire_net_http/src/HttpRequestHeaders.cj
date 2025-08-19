@@ -8,9 +8,11 @@ import stdx.net.http.HttpHeaders
 
 public class HttpRequestHeaders <: Iterable<(String, Collection<String>)> {
     private let _headers = HttpHeaders()
-    init() {
+    
+    protected init() {
         
     }
+
     public func iterator() {
         _headers.iterator()
     }
