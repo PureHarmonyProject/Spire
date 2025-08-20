@@ -21,7 +21,7 @@ public abstract class HttpMessageHandlerBuilder {
        
         var next = primaryHandler
 
-        let i = additionalHandlers.size - 1
+        var i = additionalHandlers.size - 1
         while (i >= 0) {
             let handler = additionalHandlersList[i]
             if (handler.innerHandler.isSome()) {
@@ -30,6 +30,7 @@ public abstract class HttpMessageHandlerBuilder {
 
             handler.innerHandler = next
             next = handler
+            i--
         }
       
         return next

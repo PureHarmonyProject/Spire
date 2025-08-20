@@ -22,11 +22,15 @@ public class HttpClient <: HttpMessageInvoker {
         super(handler)
     }
 
+    public init(handler: HttpMessageHandler, closeHandler: Bool) {
+        super(handler, closeHandler)
+    }
+
     public mut prop baseAddress: ?URL {
         get() {
             _baseAddress
         }
-        set(value){
+        set(value) {
             checkClosedOrStarted()
             _baseAddress = value
         }
