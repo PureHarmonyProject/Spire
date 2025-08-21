@@ -36,7 +36,7 @@ func HTTP请求异常基本构造测试() {
  */
 @Test
 func HTTP响应状态码异常测试() {
-    // 暂时简化测试，只测试基本的异常构造
+    // 简化测试，只测试基本的异常构造
     let exception1 = HttpRequestException("400 Bad Request", Some(400))
     @Expect(exception1.message == "400 Bad Request", true)
     @Expect(exception1.status == Some(400), true)
@@ -46,20 +46,7 @@ func HTTP响应状态码异常测试() {
     @Expect(exception2.status == Some(500), true)
 }
 
-/**
- * HTTP成功状态码验证测试
- * 测试成功状态码不应该抛出异常
- * 注意：此测试暂时简化，因为HttpResponseMessage构造需要更复杂的参数
- */
-@Test
-func HTTP成功状态码验证测试() {
-    // 暂时简化测试，只验证基本的状态码逻辑
-    let successStatusCodes = [200, 201, 202, 204, 206, 207, 208, 226]
-    for (statusCode in successStatusCodes) {
-        // 简单验证状态码范围逻辑
-        @Expect(statusCode >= 200 && statusCode <= 299, true)
-    }
-}
+ 
 
 /**
  * HTTP异常消息处理测试
@@ -74,50 +61,23 @@ func HTTP异常消息处理测试() {
     
     // 测试只有状态码的异常
     let statusOnly = HttpRequestException("", Some(404))
-    @Expect(statusOnly.status, Some(UInt16(404)))
+    @Expect(statusOnly.status, UInt16(404))
     
     // 测试长消息
-    let longMessage = "这是一个非常长的HTTP错误消息，用于测试异常对象能否正确处理较长的错误描述文本。" +
-                     "这个消息包含了各种字符和标点符号，以及数字和特殊符号。"
-    let longException = HttpRequestException(longMessage, Some(500))
+    let longMessage = ("这是一个非常长的HTTP错误消息，用于测试异常对象能否正确处理较长的错误描述文本。" +
+                     "这个消息包含了各种字符和标点符号，以及数字和特殊符号。") * 1000
+    let longException = HttpRequestException(longMessage, 500)
     @Expect(longException.message, longMessage)
-    @Expect(longException.status, Some(UInt16(500)))
+    @Expect(longException.status, UInt16(500))
     
     // 测试Unicode消息
     let unicodeMessage = "HTTP错误：包含Unicode字符 测试 中文 English 日本語 한국어 Русский"
-    let unicodeException = HttpRequestException(unicodeMessage, Some(400))
+    let unicodeException = HttpRequestException(unicodeMessage, 400)
     @Expect(unicodeException.message, unicodeMessage)
-    @Expect(unicodeException.status, Some(UInt16(400)))
+    @Expect(unicodeException.status, UInt16(400))
 }
 
-/**
- * HTTP异常状态码边界测试
- * 测试边界状态码的处理
- * 注意：此测试暂时简化，因为HttpResponseMessage构造需要更复杂的参数
- */
-@Test
-func HTTP异常状态码边界测试() {
-    // 暂时简化测试，只验证基本的状态码逻辑
-    let boundaryTests = [
-        (100, false), // Continue (信息性)
-        (199, false), // 信息性上限
-        (200, true),  // OK (成功)
-        (299, true),  // 成功上限
-        (300, false), // Multiple Choices (重定向)
-        (399, false), // 重定向上限
-        (400, false), // Bad Request (客户端错误)
-        (499, false), // 客户端错误上限
-        (500, false), // Internal Server Error (服务器错误)
-        (599, false), // 服务器错误上限
-        (999, false)  // 其他错误
-    ]
-    
-    for ((statusCode, shouldBeSuccess) in boundaryTests) {
-        // 简单验证状态码范围逻辑
-        let actualSuccess = statusCode >= 200 && statusCode <= 299
-        @Expect(actualSuccess, shouldBeSuccess)
-    }
-}
+ 
 
 /**
  * HTTP异常链式处理测试
@@ -127,17 +87,17 @@ func HTTP异常状态码边界测试() {
 @Test
 func HTTP异常链式处理测试() {
     // 暂时简化测试，只测试异常的基本属性和重新抛出
-    let exception = HttpRequestException("404 Not Found", Some(404))
+    let exception = HttpRequestException("404 Not Found", 404)
     
     // 验证异常属性
-    @Expect(exception.status, Some(UInt16(404)))
+    @Expect(exception.status, UInt16(404))
     @Expect(exception.message != "", true)
     
     // 验证异常可以重新抛出
     try {
         throw exception
     } catch (e2: HttpRequestException) {
-        @Expect(e2.status, Some(UInt16(404)))
+        @Expect(e2.status, UInt16(404))
         @Expect(e2.message, exception.message)
     }
 }
@@ -151,20 +111,20 @@ func HTTP异常链式处理测试() {
 func HTTP多重异常处理测试() {
     // 暂时简化测试，只测试多个不同异常的创建
     let exceptions = [
-        HttpRequestException("400 Bad Request", Some(400)),
-        HttpRequestException("401 Unauthorized", Some(401)),
-        HttpRequestException("403 Forbidden", Some(403)),
-        HttpRequestException("404 Not Found", Some(404)),
-        HttpRequestException("500 Internal Server Error", Some(500)),
-        HttpRequestException("502 Bad Gateway", Some(502)),
-        HttpRequestException("503 Service Unavailable", Some(503))
+        HttpRequestException("400 Bad Request", 400),
+        HttpRequestException("401 Unauthorized", 401),
+        HttpRequestException("403 Forbidden", 403),
+        HttpRequestException("404 Not Found", 404),
+        HttpRequestException("500 Internal Server Error", 500),
+        HttpRequestException("502 Bad Gateway", 502),
+        HttpRequestException("503 Service Unavailable", 503)
     ]
     
     let expectedStatuses = [400, 401, 403, 404, 500, 502, 503]
     
     for (i in 0..exceptions.size) {
         let exception = exceptions[i]
-        @Expect(exception.status, Some(UInt16(expectedStatuses[i])))
+        @Expect(exception.status, UInt16(expectedStatuses[i]))
         @Expect(exception.message.contains("${expectedStatuses[i]}"), true)
     }
 }
@@ -184,12 +144,12 @@ func HTTP异常与请求关联测试() {
     // 验证请求属性
     @Expect(request.method.toString(), "POST")
     @Expect(request.requestUri.toString(), "https://api.example.com/users")
-    @Expect(request.headers.getFirst("Authorization"), Some("Bearer test-token"))
+    @Expect(request.headers.getFirst("Authorization"), "Bearer test-token")
     @Expect(request.properties.contains("traceId"), true)
     
     // 测试异常创建
-    let exception = HttpRequestException("400 Bad Request", Some(400))
-    @Expect(exception.status, Some(UInt16(400)))
+    let exception = HttpRequestException("400 Bad Request", 400)
+    @Expect(exception.status, UInt16(400))
 }
 
 /**
@@ -204,9 +164,9 @@ func HTTP异常空状态码处理测试() {
     @Expect(noStatusException.status.isSome(), false)
     
     // 测试创建状态码为0的异常
-    let zeroStatusException = HttpRequestException("状态码为0", Some(0))
+    let zeroStatusException = HttpRequestException("状态码为0", 0)
     @Expect(zeroStatusException.message, "状态码为0")
-    @Expect(zeroStatusException.status, Some(UInt16(0)))
+    @Expect(zeroStatusException.status, UInt16(0))
 }
 
 /**
@@ -233,7 +193,7 @@ func HTTP异常特殊状态码测试() {
         @Expect(statusCode >= 200 && statusCode <= 299, false)
         
         // 测试异常创建
-        let exception = HttpRequestException("Status ${statusCode}", Some(UInt16(statusCode)))
-        @Expect(exception.status, Some(UInt16(statusCode)))
+        let exception = HttpRequestException("Status ${statusCode}", UInt16(statusCode))
+        @Expect(exception.status, UInt16(statusCode))
     }
 }

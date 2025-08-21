@@ -32,7 +32,12 @@ func HttpClient配置构造函数测试() {
         opts.headers.add("Authorization", "Bearer token")
     })
     
+    // 验证客户端状态
     @Expect(!client.isClosed())
+    
+    // 注意：HttpClient没有公共的options getter方法
+    // 配置验证需要通过实际的行为测试来验证
+    // 这里我们验证客户端能正常创建和配置
 }
 
 /**
@@ -67,9 +72,11 @@ func HttpClient基础URL解析测试() {
         opts.address = Some(URL.parse("https://api.example.com"))
     })
     
-    // 测试相对URL解析（这里主要测试URL构建逻辑）
-    // 实际的HTTP请求需要模拟服务器响应
+    // 验证客户端状态
     @Expect(!client.isClosed())
+    
+    // 注意：基础URL配置验证需要通过实际的HTTP请求测试
+    // 这里我们验证客户端能正常创建
 }
 
 /**
@@ -82,7 +89,11 @@ func HttpClient超时设置测试() {
         opts.timeout = Duration.second * 10
     })
     
+    // 验证客户端状态
     @Expect(!client.isClosed())
+    
+    // 注意：超时配置验证需要通过实际的HTTP请求测试
+    // 这里我们验证客户端能正常创建和配置
 }
 
 /**
@@ -96,7 +107,11 @@ func HttpClient默认头部测试() {
         opts.headers.add("Accept", "application/json")
     })
     
+    // 验证客户端状态
     @Expect(!client.isClosed())
+    
+    // 注意：默认头部配置验证需要通过实际的HTTP请求测试
+    // 这里我们验证客户端能正常创建和配置
 }
 
 /**
@@ -110,7 +125,11 @@ func HttpClient处理器链测试() {
         // 实际的处理器实现需要具体的HttpMessageHandler
     })
     
+    // 验证客户端状态
     @Expect(!client.isClosed())
+    
+    // 注意：处理器链配置验证需要通过实际的HTTP请求测试
+    // 这里我们验证客户端能正常创建
 }
 
 /**

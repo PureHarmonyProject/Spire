@@ -9,17 +9,7 @@ import stdx.encoding.url.*
 import spire_net_http.*
 import spire_net_http.unittests.*
 
-/**
- * HTTP请求响应完整流程测试
- * 测试从创建请求到处理响应的完整流程
- */
-@Test
-func HTTP请求响应完整流程测试() {
-    let client = TestHelper.createClient()
-    let response = client.get("${TestHelper.TEST_SERVER_BASE_URL}/ok")
-    @Expect(response.status, UInt16(200))
-    @Expect(response.isSuccessStatusCode, true)
-}
+ 
 
 /**
  * 多种HTTP方法测试
@@ -45,20 +35,20 @@ func 多种HTTP方法测试() {
 func HTTP内容类型集成测试() {
     let client = TestHelper.createClient()
     // JSON
-    let jsonContent = StringContent("{\"name\":\"John\",\"age\":30}", "application/json")
+    let jsonContent = StringContent("{\"name\":\"Danny\",\"age\":30}", "application/json")
     let rj = client.post("${TestHelper.TEST_SERVER_BASE_URL}/content/json", Some(jsonContent))
     @Expect(rj.isSuccessStatusCode, true)
     // XML
-    let xmlContent = StringContent("<user><name>John</name></user>", "application/xml")
+    let xmlContent = StringContent("<user><name>Danny</name></user>", "application/xml")
     let rx = client.post("${TestHelper.TEST_SERVER_BASE_URL}/content/xml", Some(xmlContent))
     @Expect(rx.isSuccessStatusCode, true)
     // FORM
-    let formContent = FormUrlContent([("name", "John"), ("age", "30")])
+    let formContent = FormUrlContent([("name", "Danny"), ("age", "30")])
     let rf = client.post("${TestHelper.TEST_SERVER_BASE_URL}/content/form", Some(formContent))
     @Expect(rf.isSuccessStatusCode, true)
     // MULTIPART
     let mp = MultipartFormDataContent()
-    mp.add(StringContent("John"), "name")
+    mp.add(StringContent("Danny"), "name")
     let rm = client.post("${TestHelper.TEST_SERVER_BASE_URL}/content/multipart", Some(mp))
     @Expect(rm.isSuccessStatusCode, true)
 }
@@ -69,22 +59,12 @@ func HTTP内容类型集成测试() {
  */
 @Test
 func HTTP头部传播测试() {
-    let client = TestHelper.createClientWithHeaders([("User-Agent", "MyApp/1.0")])
+    let client = TestHelper.createClientWithHeaders([("User-Agent", "MyApp/1.0"), ("Content-Type", "application/json")])
     let r = client.post("${TestHelper.TEST_SERVER_BASE_URL}/echo/headers", None)
     @Expect(r.isSuccessStatusCode, true)
 }
 
-/**
- * HTTP错误状态码处理测试
- * 测试各种HTTP错误状态码的处理
- */
-@Test
-func HTTP错误状态码处理测试() {
-    let client = TestHelper.createClient()
-    let r404 = client.get("${TestHelper.TEST_SERVER_BASE_URL}/status/404")
-    @Expect(r404.status, UInt16(404))
-    @Expect(r404.isSuccessStatusCode, false)
-}
+ 
 
 /**
  * HTTP配置集成测试
@@ -96,7 +76,7 @@ func HTTP配置集成测试() {
     let options = HttpClientOptions()
     options.address = Some(URL.parse(TestHelper.TEST_SERVER_BASE_URL))
     options.timeout = Duration.second * 30
-    options.headers.add("Authorization", "Bearer config-token")
+    options.headers.add("Authorization", "Bearer token123")
     options.headers.add("Accept", "application/json")
     
     // 创建客户端
@@ -125,7 +105,7 @@ func HTTP属性传播测试() {
     // 添加请求属性
     request.properties["traceId"] = "trace-123"
     request.properties["requestId"] = "req-456"
-    request.properties["userId"] = "user-789"
+    request.properties["userId"] = "user-123"
     request.properties["timestamp"] = DateTime.now().toString()
     
     // 验证请求属性保持不变
@@ -180,8 +160,8 @@ func HTTP多部分表单集成测试() {
     let multipart = MultipartFormDataContent()
     
     // 添加文本字段
-    multipart.add(StringContent("John Doe"), "name")
-    multipart.add(StringContent("john@example.com"), "email")
+    multipart.add(StringContent("Danny"), "name")
+    multipart.add(StringContent("danny@example.com"), "email")
     multipart.add(StringContent("true"), "newsletter")
     
     // 添加文件内容
@@ -202,9 +182,9 @@ func HTTP多部分表单集成测试() {
     // 验证内容可以读取
     let text = multipart.readAsString()
     @Expect(text.contains("name=name"), true)
-    @Expect(text.contains("John Doe"), true)
+    @Expect(text.contains("Danny"), true)
     @Expect(text.contains("name=email"), true)
-    @Expect(text.contains("john@example.com"), true)
+    @Expect(text.contains("danny@example.com"), true)
     @Expect(text.contains("name=avatar"), true)
     @Expect(text.contains("filename=profile.jpg"), true)
 }
@@ -251,7 +231,7 @@ func HTTP请求构建链测试() {
     let options = HttpClientOptions()
     options.address = Some(URL.parse(TestHelper.TEST_SERVER_BASE_URL))
     options.timeout = Duration.second * 15
-    options.headers.add("Authorization", "Bearer chain-token")
+    options.headers.add("Authorization", "Bearer token123")
     options.headers.add("Accept", "application/json")
     
     // 2. 创建客户端
@@ -273,7 +253,7 @@ func HTTP请求构建链测试() {
     request.headers.add("X-Client-Version", "1.0.0")
     
     // 5. 设置请求内容
-    let userData = "{\"name\":\"Chain User\",\"email\":\"chain@example.com\"}"
+    let userData = "{\"name\":\"Danny\",\"email\":\"danny@example.com\"}"
     request.content = StringContent(userData, "application/json")
     
     // 6. 添加请求属性
@@ -284,6 +264,70 @@ func HTTP请求构建链测试() {
     @Expect(!client.isClosed())
     @Expect(request.method.toString(), "POST")
     @Expect(request.requestUri.toString(), "users")
-    @Expect(request.headers.getFirst("X-Request-ID"), Some("req-chain-123"))
+    @Expect(request.headers.getFirst("X-Request-ID"), "req-chain-123")
     @Expect(request.properties.contains("chainId"), true)
+}
+
+/**
+ * HTTP成功状态码不抛异常测试
+ * 验证ensureSuccessStatusCode在2xx状态码下不抛出异常
+ */
+@Test
+func HTTP成功状态码不抛异常测试() {
+    let client = TestHelper.createClient()
+    let response = client.get("${TestHelper.TEST_SERVER_BASE_URL}/ok")
+    @Expect(response.status, UInt16(200))
+    @Expect(response.isSuccessStatusCode, true)
+    // 不应抛出异常
+    response.ensureSuccessStatusCode()
+    @Expect(true)
+}
+
+/**
+ * HTTP错误状态码触发异常测试
+ * 验证ensureSuccessStatusCode在非2xx状态码下抛出HttpRequestException
+ */
+@Test
+func HTTP错误状态码触发异常测试() {
+    let client = TestHelper.createClient()
+    let response = client.get("${TestHelper.TEST_SERVER_BASE_URL}/status/400")
+    @Expect(response.isSuccessStatusCode, false)
+    try {
+        response.ensureSuccessStatusCode()
+        // 不应到达此处
+        @Expect(false)
+    } catch (ex: HttpRequestException) {
+        // 根据实现，异常状态为None，但消息应包含状态码
+        @Expect(ex.status.isSome(), false)
+        @Expect(ex.message.contains("400"), true)
+    }
+}
+
+/**
+ * HTTP超时抛异常测试
+ * 设置很短的超时并请求一个延迟端点，验证抛出HttpRequestException
+ */
+@Test
+func HTTP超时抛异常测试() {
+    let client = TestHelper.createClientWithTimeout(Duration.millisecond * 100)
+    try {
+        let _ = client.get("${TestHelper.TEST_SERVER_BASE_URL}/delay/1000")
+        @Expect(false)
+    } catch (ex: HttpRequestException) {
+        @Expect(ex.status.isSome(), false)
+        @Expect(ex.message != "", true)
+    }
+}
+
+/**
+ * 基础地址解析与相对路径请求测试
+ * 验证设置base address后使用相对路径能够正确请求
+ */
+@Test
+func HTTP基础地址相对路径测试() {
+    let client = TestHelper.createClient()
+    // 使用相对路径（不含scheme/host）
+    let response = client.get("ok")
+    @Expect(response.status, UInt16(200))
+    @Expect(response.isSuccessStatusCode, true)
 }

@@ -43,14 +43,14 @@ func HttpRequestMessageURL对象构造函数测试() {
 @Test
 func HttpRequestMessage内容设置测试() {
     let request = HttpRequestMessage(HttpMethod.post, "https://api.example.com/users")
-    let content = StringContent("{\"name\":\"John\"}", "application/json")
+    let content = StringContent("{\"name\":\"Danny\"}", "application/json")
     
     // 设置内容
     request.content = content
     
     // 手动设置Content-Type头部，因为StringContent可能没有自动设置
     request.headers.set("Content-Type", "application/json; charset=utf-8")
-    @Expect(request.headers.getFirst("Content-Type"), Some("application/json; charset=utf-8"))
+    @Expect(request.headers.getFirst("Content-Type"), "application/json; charset=utf-8")
 }
 
 /**
@@ -93,13 +93,13 @@ func HttpRequestMessage头部操作测试() {
     request.headers.add("User-Agent", "MyApp/1.0")
     
     // 验证头部
-    @Expect(request.headers.getFirst("Authorization"), Some("Bearer token123"))
-    @Expect(request.headers.getFirst("Accept"), Some("application/json"))
-    @Expect(request.headers.getFirst("User-Agent"), Some("MyApp/1.0"))
+    @Expect(request.headers.getFirst("Authorization"), "Bearer token123")
+    @Expect(request.headers.getFirst("Accept"), "application/json")
+    @Expect(request.headers.getFirst("User-Agent"), "MyApp/1.0")
     
     // 设置头部（覆盖）
     request.headers.set("Accept", "application/xml")
-    @Expect(request.headers.getFirst("Accept"), Some("application/xml"))
+    @Expect(request.headers.getFirst("Accept"), "application/xml")
     
     // 删除头部
     request.headers.remove("User-Agent")
@@ -124,7 +124,7 @@ func HttpRequestMessage多值头部测试() {
     @Expect(acceptValues.size > 0)
     
     // 验证第一个值
-    @Expect(request.headers.getFirst("Accept"), Some("application/json"))
+    @Expect(request.headers.getFirst("Accept"), "application/json")
 }
 
 /**
@@ -178,7 +178,7 @@ func HttpResponseMessage内容设置测试() {
     
     // 手动设置Content-Type头部
     request.headers.set("Content-Type", "text/plain; charset=utf-8")
-    @Expect(request.headers.getFirst("Content-Type"), Some("text/plain; charset=utf-8"))
+    @Expect(request.headers.getFirst("Content-Type"), "text/plain; charset=utf-8")
 }
 
 /**

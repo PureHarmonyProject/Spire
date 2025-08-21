@@ -27,9 +27,9 @@ func HttpRequestHeaders基本操作测试() {
     @Expect(headers.getFirst("Accept") != None)
     
     // 获取头部值
-    @Expect(headers.getFirst("Authorization"), Some("Bearer token123"))
-    @Expect(headers.getFirst("Content-Type"), Some("application/json"))
-    @Expect(headers.getFirst("Accept"), Some("application/json"))
+    @Expect(headers.getFirst("Authorization"), "Bearer token123")
+    @Expect(headers.getFirst("Content-Type"), "application/json")
+    @Expect(headers.getFirst("Accept"), "application/json")
     
     // 删除头部
     headers.remove("Content-Type")
@@ -55,7 +55,7 @@ func HttpRequestHeaders多值头部_多值测试() {
     @Expect(acceptValues.size > 0)
     
     // 获取第一个值
-    @Expect(headers.getFirst("Accept"), Some("application/json"))
+    @Expect(headers.getFirst("Accept"), "application/json")
     
     // 验证多值头部存在
     @Expect(headers.getFirst("Accept") != None)
@@ -81,7 +81,7 @@ func HttpRequestHeaders多值头部_覆盖测试() {
     headers.set("Test-Header", "NewValue")
     
     // 验证现在只有一个值
-    @Expect(headers.getFirst("Test-Header"), Some("NewValue"))
+    @Expect(headers.getFirst("Test-Header"), "NewValue")
     
     // 验证多值集合被替换
     let newValues = headers.get("Test-Header")
@@ -102,9 +102,9 @@ func HttpRequestHeaders大小写不敏感测试() {
     headers.add("user-agent", "MyApp/1.0")
     
     // 使用不同大小写获取
-    @Expect(headers.getFirst("content-type"), Some("application/json"))
-    @Expect(headers.getFirst("Authorization"), Some("Bearer token"))
-    @Expect(headers.getFirst("User-Agent"), Some("MyApp/1.0"))
+    @Expect(headers.getFirst("content-type"), "application/json")
+    @Expect(headers.getFirst("Authorization"), "Bearer token")
+    @Expect(headers.getFirst("User-Agent"), "MyApp/1.0")
     
     // 使用不同大小写检查存在性
     @Expect(headers.getFirst("content-type") != None)
@@ -161,9 +161,9 @@ func HttpRequestHeaders特殊字符测试() {
     headers.add("X-API-Key", "key-with-dashes_and_underscores")
     headers.add("X-Request-ID", "req-123-456-789")
     
-    @Expect(headers.getFirst("X-Custom-Header"), Some("Value!@#$%^&*()"))
-    @Expect(headers.getFirst("X-API-Key"), Some("key-with-dashes_and_underscores"))
-    @Expect(headers.getFirst("X-Request-ID"), Some("req-123-456-789"))
+    @Expect(headers.getFirst("X-Custom-Header"), "Value!@#$%^&*()")
+    @Expect(headers.getFirst("X-API-Key"), "key-with-dashes_and_underscores")
+    @Expect(headers.getFirst("X-Request-ID"), "req-123-456-789")
 }
 
 /**
@@ -249,14 +249,14 @@ func HttpContentHeaders基本操作测试() {
     headers.add("Content-Language", "zh-CN")
     
     // 验证头部
-    @Expect(headers.getFirst("Content-Type"), Some("application/json"))
-    @Expect(headers.getFirst("Content-Length"), Some("1024"))
-    @Expect(headers.getFirst("Content-Encoding"), Some("gzip"))
-    @Expect(headers.getFirst("Content-Language"), Some("zh-CN"))
+    @Expect(headers.getFirst("Content-Type"), "application/json")
+    @Expect(headers.getFirst("Content-Length"), "1024")
+    @Expect(headers.getFirst("Content-Encoding"), "gzip")
+    @Expect(headers.getFirst("Content-Language"), "zh-CN")
     
     // 测试大小写不敏感
-    @Expect(headers.getFirst("content-type"), Some("application/json"))
-    @Expect(headers.getFirst("CONTENT-LENGTH"), Some("1024"))
+    @Expect(headers.getFirst("content-type"), "application/json")
+    @Expect(headers.getFirst("CONTENT-LENGTH"), "1024")
 }
 
 /**
@@ -270,13 +270,13 @@ func HttpContentHeaders内容长度测试() {
     // 设置内容长度
     headers.add("Content-Length", "1024")
     
-    @Expect(headers.getFirst("Content-Length"), Some("1024"))
-    @Expect(headers.getFirst("content-length"), Some("1024"))
+    @Expect(headers.getFirst("Content-Length"), "1024")
+    @Expect(headers.getFirst("content-length"), "1024")
     
     // 更新内容长度
     headers.set("Content-Length", "2048")
     
-    @Expect(headers.getFirst("Content-Length"), Some("2048"))
+    @Expect(headers.getFirst("Content-Length"), "2048")
 }
 
 /**
@@ -290,7 +290,7 @@ func HttpContentHeaders内容编码测试() {
     // 设置内容编码
     headers.add("Content-Encoding", "gzip")
     
-    @Expect(headers.getFirst("Content-Encoding"), Some("gzip"))
+    @Expect(headers.getFirst("Content-Encoding"), "gzip")
     
     // 添加多个编码值（虽然不常见）
     headers.add("Content-Encoding", "deflate")
@@ -318,7 +318,7 @@ func HttpContentHeaders媒体类型测试() {
     
     for (mediaType in mediaTypes) {
         headers.set("Content-Type", mediaType)
-        @Expect(headers.getFirst("Content-Type"), Some(mediaType))
+        @Expect(headers.getFirst("Content-Type"), mediaType)
     }
 }
 
@@ -333,14 +333,14 @@ func HTTP头部边界值测试() {
     // 测试很长的头部名称
     let longName = "X-" + "Very" * 50 + "-Long-Header-Name"
     headers.add(longName, "value")
-    @Expect(headers.getFirst(longName), Some("value"))
+    @Expect(headers.getFirst(longName), "value")
     
     // 测试很长的头部值
     let longValue = "Very" * 1000 + "-Long-Value"
     headers.add("X-Long-Value", longValue)
-    @Expect(headers.getFirst("X-Long-Value"), Some(longValue))
+    @Expect(headers.getFirst("X-Long-Value"), longValue)
     
     // 测试包含Unicode的头部
     headers.add("X-Unicode", "测试数据")
-    @Expect(headers.getFirst("X-Unicode"), Some("测试数据"))
+    @Expect(headers.getFirst("X-Unicode"), "测试数据")
 }

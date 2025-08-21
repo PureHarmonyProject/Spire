@@ -72,12 +72,12 @@ func HTTP异常构造函数测试() {
     // 测试带消息的异常
     let exception1 = HttpRequestException("测试异常", None)
     @Expect(exception1.message, "测试异常")
-    @Expect(exception1.status.isSome(), false)
+    @Expect(exception1.status, None)
     
     // 测试带消息和状态码的异常
     let exception2 = HttpRequestException("404错误", Some(404))
     @Expect(exception2.message, "404错误")
-    @Expect(exception2.status.isSome(), true)
+    @Expect(exception2.status, UInt16(404))
 }
 
 /**
@@ -91,9 +91,9 @@ func HTTP异常状态码测试() {
     let serverError = HttpRequestException("服务器错误", Some(500))
     let unauthorized = HttpRequestException("未授权", Some(401))
     
-    @Expect(notFound.status.isSome(), true)
-    @Expect(serverError.status.isSome(), true)
-    @Expect(unauthorized.status.isSome(), true)
+    @Expect(notFound.status, UInt16(404))
+    @Expect(serverError.status, UInt16(500))
+    @Expect(unauthorized.status, UInt16(401))
 }
 
 /**
@@ -107,7 +107,7 @@ func HTTP异常消息测试() {
     @Expect(emptyMessage.message, "")
     
     // 测试长消息
-    let longMessage = "这是一个非常长的错误消息，用于测试异常对象能否正确处理较长的错误描述文本"
+    let longMessage = "这是一个非常长的错误消息，用于测试异常对象能否正确处理较长的错误描述文本" * 1000
     let longException = HttpRequestException(longMessage, None)
     @Expect(longException.message, longMessage)
     

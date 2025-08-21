@@ -28,12 +28,12 @@ func StringContent默认构造函数测试() {
  */
 @Test
 func StringContent自定义媒体类型测试() {
-    let content = StringContent("{\"name\":\"John\"}", "application/json")
+    let content = StringContent("{\"name\":\"Danny\"}", "application/json")
     
     @Expect(content.headers.getFirst("Content-Type"), Some("application/json; charset=utf-8"))
     
     let text = content.readAsString()
-    @Expect(text, "{\"name\":\"John\"}")
+    @Expect(text, "{\"name\":\"Danny\"}")
 }
 
 /**
@@ -285,7 +285,7 @@ func MultipartFormDataContent自定义边界测试() {
     let content = MultipartFormDataContent("custom_boundary_123")
     
     let contentType = content.headers.getFirst("Content-Type")
-    // 对象创建一定会成功，直接验证内容
+    // 验证内容
     @Expect(contentType.flatMap { v => Some(v.contains("boundary=custom_boundary_123")) }, Some(true))
 }
 
@@ -298,7 +298,7 @@ func MultipartFormDataContent添加内容测试() {
     let content = MultipartFormDataContent()
     
     // 添加文本内容
-    let textContent = StringContent("John Doe")
+    let textContent = StringContent("Danny")
     content.add(textContent, "name")
     
     // 添加带文件名的内容
@@ -308,7 +308,7 @@ func MultipartFormDataContent添加内容测试() {
     // 验证内容被正确添加
     let text = content.readAsString()
     @Expect(text.contains("name=name"))
-    @Expect(text.contains("John Doe"))
+    @Expect(text.contains("Danny"))
     @Expect(text.contains("name=avatar"))
     @Expect(text.contains("filename=profile.jpg"))
 }
