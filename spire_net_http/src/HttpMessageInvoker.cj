@@ -3,9 +3,12 @@
 
 package spire_net_http
 
+import std.sync.*
+import std.reflect.*
+
 public open class HttpMessageInvoker <: Resource {
-    private var _isColsed = false
     private let _closeHandler: Bool
+    private let _isClosed = AtomicBool(false)
     private let _handler: HttpMessageHandler
 
     public init(handler: HttpMessageHandler) {
@@ -18,17 +21,29 @@ public open class HttpMessageInvoker <: Resource {
     }
 
     public open func send(request: HttpRequestMessage) {
+        checkClosed()
         return _handler.send(request)
     }
 
-    public func isClosed() {
-        return _isColsed
+    public open func isClosed() {
+        return _isClosed.load()
     }
 
-    public func close() {
-        if (_closeHandler && !_handler.isClosed()) {
-            _handler.close()
+    public open func close() {
+        close(true)
+    }
+
+    protected open func close(closing: Bool) {
+        if (closing && _isClosed.compareAndSwap(false, true)) {
+            if (_closeHandler) {
+                _handler.close()
+            }
         }
-        _isColsed = true
+    }
+
+    protected func checkClosed() {
+        if (_isClosed.load()) {
+            throw ObjectDisposedException(ClassTypeInfo.of(this).toString())
+        }
     }
 }

@@ -8,10 +8,15 @@ import std.runtime.*
 public abstract class HttpMessageHandler <: Resource {
     protected func send(request: HttpRequestMessage): HttpResponseMessage
 
+    public func close() {
+        close(true)
+    }
+
     public open func isClosed() {
         return true
     }
 
-    public open func close() {
+    protected open func close(_: Bool) {
+        
     }
 }
