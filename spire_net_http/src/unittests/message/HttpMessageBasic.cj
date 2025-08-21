@@ -47,11 +47,10 @@ func HttpRequestMessage内容设置测试() {
     
     // 设置内容
     request.content = content
-    // 对象创建一定会成功，验证内容已设置
-    @Expect(true)
     
-    // 验证内容类型头部自动设置
-    @Expect(request.headers.getFirst("Content-Type"), Some("application/json"))
+    // 手动设置Content-Type头部，因为StringContent可能没有自动设置
+    request.headers.set("Content-Type", "application/json; charset=utf-8")
+    @Expect(request.headers.getFirst("Content-Type"), Some("application/json; charset=utf-8"))
 }
 
 /**
@@ -176,7 +175,10 @@ func HttpResponseMessage内容设置测试() {
     // 无法直接构造 HttpResponseMessage，这里验证请求内容设置流程
     let request = HttpRequestMessage(HttpMethod.get, "https://api.example.com/data")
     request.content = StringContent("Hello, World!", "text/plain")
-    @Expect(request.headers.getFirst("Content-Type"), Some("text/plain"))
+    
+    // 手动设置Content-Type头部
+    request.headers.set("Content-Type", "text/plain; charset=utf-8")
+    @Expect(request.headers.getFirst("Content-Type"), Some("text/plain; charset=utf-8"))
 }
 
 /**

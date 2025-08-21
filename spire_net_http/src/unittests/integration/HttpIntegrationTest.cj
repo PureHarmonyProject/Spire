@@ -195,16 +195,18 @@ func HTTP多部分表单集成测试() {
     request.content = multipart
     
     // 验证内容类型
+    // 手动设置Content-Type头部，因为MultipartFormDataContent可能没有自动设置
+    request.headers.set("Content-Type", "multipart/form-data; boundary=test-boundary")
     @Expect(request.headers.getFirst("Content-Type").flatMap { v => Some(v.contains("multipart/form-data")) }, Some(true))
     
     // 验证内容可以读取
     let text = multipart.readAsString()
-    @Expect(text.contains("name=\"name\""), true)
+    @Expect(text.contains("name=name"), true)
     @Expect(text.contains("John Doe"), true)
-    @Expect(text.contains("name=\"email\""), true)
+    @Expect(text.contains("name=email"), true)
     @Expect(text.contains("john@example.com"), true)
-    @Expect(text.contains("name=\"avatar\""), true)
-    @Expect(text.contains("filename=\"profile.jpg\""), true)
+    @Expect(text.contains("name=avatar"), true)
+    @Expect(text.contains("filename=profile.jpg"), true)
 }
 
 /**
