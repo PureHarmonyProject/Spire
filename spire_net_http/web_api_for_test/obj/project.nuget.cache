@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "udu0wJIgfNk=",
+  "success": true,
+  "projectFilePath": "D:\\document\\mycode\\spire\\spire_net_http\\web_api_for_test\\web_api_for_test.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\17804\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.6\\microsoft.aspnetcore.openapi.9.0.6.nupkg.sha512",
+    "C:\\Users\\17804\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -5,7 +5,7 @@
   description = "nothing here"
   link-option = ""
   name = "spire_web_http"
-  output-type = "static"
+  output-type = "executable"
   override-compile-option = ""
   src-dir = ""
   target-dir = ""

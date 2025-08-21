@@ -46,9 +46,13 @@ public class EndpointMetadataCollection <: ReadOnlyList<Any> {
         }
     }
 
-    public func get(index: Int64) {
-        _metadata.get(index)
+    public func get(index: Int64): ?Any {
+        Some(_metadata[index])
     }
+
+    // public func get(index: Int64): ?Any {
+    //     _metadata.get(index)
+    // }
 
     public operator func [](index: Int64): Any {
         _metadata[index]

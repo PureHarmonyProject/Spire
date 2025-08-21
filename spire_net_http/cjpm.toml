@@ -8,7 +8,7 @@
   name = "spire_net_http"
   output-type = "static"
   override-compile-option = ""
-  src-dir = ""
+  src-dir = "src"
   target-dir = ""
   version = "1.0.0"
   package-configuration = {}
