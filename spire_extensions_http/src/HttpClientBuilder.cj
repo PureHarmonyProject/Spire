@@ -29,6 +29,18 @@ public class HttpClientBuilder {
 }
 
 extend HttpClientBuilder {
+
+    public func setHandlerLifetime(handlerLifetime: Duration) {
+        if (handlerLifetime != Duration.Zero && handlerLifetime < HttpClientFactoryOptions.MinimumHandlerLifetime) {
+            throw IllegalArgumentException("The handler lifetime must be at least ${HttpClientFactoryOptions.MinimumHandlerLifetime.toSeconds()} second.")
+        }
+       
+        services.configure<HttpClientFactoryOptions>(name) {
+            options => options.handlerLifetime = handlerLifetime
+        }
+        return this
+    }
+
     public func configureHttpClient(configureClient: (HttpClient) -> Unit) {
         services.configure<HttpClientFactoryOptions>(name) {
             options => options.httpClientActions.add(configureClient)
