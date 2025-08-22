@@ -7,3 +7,5 @@ target
 *.cj.macrocall
 
 *.md
+obj
+bin
