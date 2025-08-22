@@ -5,9 +5,6 @@
 // The modifications to this file by Soulsoft are licensed under the MIT license.
 package spire_web_staticfiles
 
-import std.io.*
-import std.fs.*
-import std.convert.*
 import spire_extensions_options.*
 
 class StaticFileMiddleware <: IMiddleware {

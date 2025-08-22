@@ -6,7 +6,6 @@
 
 package spire_web_routing
 
-import std.collection.*
 import spire_web_routing.matching.*
 
 public interface RoutingServiceCollectionExtension {

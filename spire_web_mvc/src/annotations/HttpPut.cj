@@ -1,7 +1,6 @@
 package spire_web_mvc.annotations
 
 import spire_web_http.*
-import spire_web_mvc.routing.*
 
 @Annotation[target: [MemberFunction]]
 public class HttpPut <: HttpMethod {

@@ -6,11 +6,9 @@
 
 package spire_web_authentication
 
-import std.reflect.*
 import spire_web_http.*
 import spire_extensions_options.*
 import spire_extensions_logging.*
-import spire_extensions_injection.*
 
 public abstract class AuthenticationHandler<TOptions> <: IAuthenticationHandler where TOptions <: AuthenticationSchemeOptions {
     private var _options: ?TOptions = None

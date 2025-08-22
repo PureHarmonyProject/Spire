@@ -6,10 +6,8 @@
 
 package spire_identity_protocols_oidc
 
-import stdx.encoding.json.*
 import spire_identity_tokens.*
 import spire_identity_protocols.*
-import stdx.serialization.serialization.*
 
 public class OpenIdConnectConfigurationRetriever <: IConfigurationRetriever<OpenIdConnectConfiguration> {
     public func get(address: String, retriever: IDocumentRetriever): OpenIdConnectConfiguration {

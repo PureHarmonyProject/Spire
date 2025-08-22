@@ -6,7 +6,6 @@
 
 package spire_web_authentication
 
-import std.time.*
 import std.collection.*
 
 public class AuthenticationProperties {

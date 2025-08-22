@@ -7,7 +7,6 @@
 package spire_web_routing
 
 import std.sync.*
-import std.collection.*
 import spire_web_routing.matching.*
 
 public class EndpointRoutingMiddleware <: IMiddleware {

@@ -1,9 +1,7 @@
 package spire_web_authentication_jwtbearer
 
 import spire_identity_protocols.*
-import spire_web_authentication.*
 import spire_extensions_options.*
-import spire_extensions_injection.*
 import spire_identity_protocols_oidc.*
 
 public class JwtBearerConfigureAfterOptions <: IConfigureAfterOptions<JwtBearerOptions> {

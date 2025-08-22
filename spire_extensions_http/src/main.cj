@@ -8,13 +8,19 @@ import spire_extensions_injection.*
 main(): Int64 {
     let services = ServiceCollection()
     services.addHttpClient()
-    services.addHttpClient("dev")
+
+    services.addTransient<Logging1DelegatingHandler, Logging1DelegatingHandler>()
+    services.addTransient<Logging2DelegatingHandler, Logging2DelegatingHandler>()
+
+    services
+        .addHttpClient("dev")
         .setHandlerLifetime(Duration.second * 3)
-        .addHttpMessageHandler{Logging1DelegatingHandler()}
+        .addHttpMessageHandler<Logging1DelegatingHandler>()
 
     services.configureHttpClientDefaults {
-        b => b.addHttpMessageHandler {Logging1DelegatingHandler()}
-            .addHttpMessageHandler {Logging2DelegatingHandler()}
+        b => b
+            .addHttpMessageHandler<Logging1DelegatingHandler>()
+            .addHttpMessageHandler<Logging2DelegatingHandler>()
             .setHandlerLifetime(Duration.second * 2)
     }
     let provider = services.build()

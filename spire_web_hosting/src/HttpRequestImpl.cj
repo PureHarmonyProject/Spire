@@ -3,7 +3,6 @@
 package spire_web_hosting
 
 import std.io.*
-import std.collection.*
 import stdx.encoding.url.{URL, Form}
 import stdx.net.http.{HttpHeaders, Protocol}
 import stdx.net.http.HttpRequest as HttpRequestBase
