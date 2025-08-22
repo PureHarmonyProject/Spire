@@ -13,8 +13,8 @@ import spire_identity_protocols_oidc.*
 
 public class JwtBearerOptions <: AuthenticationSchemeOptions {
     public var saveToken = true
-    public var metadataAddress = ""
-    public var authority: ?String = None
+    public var authority = String.empty
+    public var metadataAddress = String.empty
     public var requireHttpsMetadata = false
     public let events = JwtBearerEvents()
     public var challenge = JwtBearerDefaults.Scheme

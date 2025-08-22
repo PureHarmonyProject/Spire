@@ -12,19 +12,24 @@ public class JwtBearerConfigureAfterOptions <: IConfigureAfterOptions<JwtBearerO
             //如果有配资源
             if (let Some(configuration) <- options.configuration) {
                 options.configurationManager = StaticConfigurationManager<OpenIdConnectConfiguration>(configuration)
-            } else {
-                //否则从认证中心下载
-                let address: String = if (!options.metadataAddress.isEmpty()) {
-                    options.metadataAddress
-                } else if (let Some(authority) <- options.authority) {
-                    "${authority}/.well-known/openid-configuration"
-                } else {
-                    throw NoneValueException("Please configure either 'authority' or 'metadataAddress'.")
+            } else if(!(options.metadataAddress.isEmpty() && options.authority.isEmpty())) {
+                if (options.metadataAddress.isEmpty() && !options.authority.isEmpty()) {
+                    options.metadataAddress = options.authority
+                    if (!options.metadataAddress.endsWith("/"))
+                    {
+                        options.metadataAddress += "/"
+                    }
+
+                    options.metadataAddress += ".well-known/openid-configuration"
                 }
+
+                if (options.requireHttpsMetadata && !options.metadataAddress.toAsciiLower().startsWith("https://")) {
+                    throw IllegalArgumentException("The MetadataAddress or Authority must use HTTPS unless disabled for development by setting RequireHttpsMetadata=false.")
+                }
+
                 let documentRetriever = HttpDocumentRetriever(requireHttps: options.requireHttpsMetadata)
-                let configurationRetriever = OpenIdConnectConfigurationRetriever()
-                options.configurationManager = ConfigurationManager<OpenIdConnectConfiguration>(address,
-                    documentRetriever, configurationRetriever)
+                let configurationManager = ConfigurationManager<OpenIdConnectConfiguration>(options.metadataAddress, documentRetriever, OpenIdConnectConfigurationRetriever())
+                options.configurationManager = configurationManager
             }
         }
     }
