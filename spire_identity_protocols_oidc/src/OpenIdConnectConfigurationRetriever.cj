@@ -14,7 +14,6 @@ import stdx.serialization.serialization.*
 public class OpenIdConnectConfigurationRetriever <: IConfigurationRetriever<OpenIdConnectConfiguration> {
     public func get(address: String, retriever: IDocumentRetriever): OpenIdConnectConfiguration {
         let json = retriever.getDocument(address)
-        println(json)
         let configuration = OpenIdConnectConfiguration.create(json)
         if (!configuration.jwksUri.isEmpty()) {
             let json = retriever.getDocument(configuration.jwksUri)
