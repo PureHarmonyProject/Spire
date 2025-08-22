@@ -11,6 +11,7 @@ main(): Int64 {
     services.addHttpClient("dev")
         .setHandlerLifetime(Duration.second * 3)
         .addHttpMessageHandler{Logging1DelegatingHandler()}
+
     services.configureHttpClientDefaults {
         b => b.addHttpMessageHandler {Logging1DelegatingHandler()}
             .addHttpMessageHandler {Logging2DelegatingHandler()}
@@ -19,46 +20,24 @@ main(): Int64 {
     let provider = services.build()
     let factory = provider.getOrThrow<IHttpClientFactory>()
     test1(factory)
-    gc()
-    sleep(Duration.second * 20)
-    println()
-    //test2(factory)
-    gc()
-    sleep(Duration.second * 20)
-    gc()
-    sleep(Duration.second * 20)
+    for (_ in 0..10) {
+        gc()
+        sleep(Duration.second * 10)
+    }
     return 0
 }
 
 private func test1(factory: IHttpClientFactory) {
     let client1 = factory.createClient()
-    let client2 = factory.createClient("dev")
-
     client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
-    "===================================A==============================="|> println
-    client2.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
-    
-}
-
-private func test2(factory: IHttpClientFactory) {
-    let client1 = factory.createClient()
-    let client2 = factory.createClient("dev")
-
-    client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
-    "===================================A==============================="|> println
-    client2.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
-}
-
-
-class Student {
-    
+    gc()
 }
 
 class Logging1DelegatingHandler <: DelegatingHandler {
     public override func send(request: HttpRequestMessage) {
-        println("Logging1:start...")
+        //println("Logging1:start...")
         let response = super.send(request)
-        println("Logging1:end...")
+        //println("Logging1:end...")
         return response
     }
 
@@ -70,9 +49,9 @@ class Logging1DelegatingHandler <: DelegatingHandler {
 
 class Logging2DelegatingHandler <: DelegatingHandler {
     public override func send(request: HttpRequestMessage) {
-        println("Logging2:start...")
+        //println("Logging2:start...")
         let response = super.send(request)
-        println("Logging2:end...")
+        //println("Logging2:end...")
         return response
     }
 

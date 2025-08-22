@@ -10,9 +10,10 @@ import spire_extensions_injection.*
 该类是单例的并且线程安全的，需要关注多线创建同名的client导致的并发安全问题
  */
 class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactory {
+    private var _cleanupTimer: ?Timer = None
     private let _cleanupTimerLock = Mutex()
     private let _cleanupActiveLock = Mutex()
-    private let _cleanupTimerStarted = AtomicBool(false)
+    private static let _cleanupInterval = Duration.second * 5
 
     private let _serviceScopeFactory: IServiceScopeFactory
     private let _optionsMonitor: IOptionsMonitor<HttpClientFactoryOptions>
@@ -47,17 +48,22 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
         return entry.handler
     }
 
-    private func createHandlerEntry(name: String) {
-        let options = _optionsMonitor.get(name)
+    private func createHandlerEntry(name: String): ActiveHandlerTrackingEntry {
         let scope = _serviceScopeFactory.createScope()
-        let builder = scope.services.getOrThrow<HttpMessageHandlerBuilder>()
-        builder.name = name
-        for (action in options.httpMessageHandlerBuilderActions) {
-            action(builder)
+        let options = _optionsMonitor.get(name)
+        try {
+            let builder = scope.services.getOrThrow<HttpMessageHandlerBuilder>()
+            builder.name = name
+            for (action in options.httpMessageHandlerBuilderActions) {
+                action(builder)
+            }
+            // 转换成支持生命周期跟踪的处理器
+            let handler = LifetimeTrackingHttpMessageHandler(builder.build())
+            return ActiveHandlerTrackingEntry(name, options.handlerLifetime, scope, handler)
+        } catch (ex: Exception) {
+            scope.close()
+            throw ex
         }
-        // 转换成支持生命周期跟踪的处理器
-        let handler = LifetimeTrackingHttpMessageHandler(builder.build())
-        return ActiveHandlerTrackingEntry(name, options.handlerLifetime, scope, handler)
     }
 
     /*
@@ -72,9 +78,9 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
     /*
     活动项关联的定时器执行的任务
      */
-    private func expiryTimerTick(entry: ActiveHandlerTrackingEntry) {       
-        _activeHandlers.remove(entry.name)
-        let expired = ExpiredHandlerTrackingEntry(entry)
+    private func expiryTimerTick(active: ActiveHandlerTrackingEntry) {
+        _activeHandlers.remove(active.name)
+        let expired = ExpiredHandlerTrackingEntry(active)
         _expiredHandlers.add(expired)
         //启动清理线程
         startCleanupTimer()
@@ -85,9 +91,9 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
      */
     public func startCleanupTimer(): Unit {
         //如果同时触发，那么丢弃
-        if (_cleanupTimerStarted.compareAndSwap(false, true)) {
-            Timer.once(Duration.second * 10) {
-                cleanupTimerTick()
+        synchronized(_cleanupTimerLock) {
+            if (_cleanupTimer.isNone()) {
+                _cleanupTimer = Timer.once(_cleanupInterval, cleanupTimerTick)
             }
         }
     }
@@ -96,7 +102,9 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
     停止垃圾回收定时器
      */
     public func stopCleanupTimer() {
-        _cleanupTimerStarted.store(false)
+        synchronized(_cleanupTimerLock) {
+            _cleanupTimer = None
+        }
     }
 
     /*
@@ -114,13 +122,13 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
         try {
             let initialCount = _expiredHandlers.size
             for (_ in 0..initialCount) {
-                 
                 let entry = _expiredHandlers.remove().getOrThrow()
                 if (entry.canDispose) {
                     try {
                         entry.innerHandler?.close()
                         entry.scope.close()
-                    } catch (_: Exception) {
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
                     }
                 } else {
                     _expiredHandlers.add(entry)
@@ -131,6 +139,7 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
         }
 
         if (!_expiredHandlers.isEmpty()) {
+            println(_expiredHandlers.size)
             startCleanupTimer()
         }
     }
