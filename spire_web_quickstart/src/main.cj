@@ -1,6 +1,5 @@
 package spire_web_quickstart
 
-
 import std.time.*
 import std.random.*
 import std.reflect.*
@@ -32,33 +31,40 @@ main(args: Array<String>): Int64 {
     builder.services.addTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>()
 
     //注册身份认证方案
-    builder.services.addAuthentication(JwtBearerDefaults.Scheme)
+    builder
+        .services
+        .addAuthentication(JwtBearerDefaults.Scheme)
         //注册basic认证方案
         .addScheme<BasicAuthenticationOptions, BasicAuthenticationHandler>(BasicAuthenticationDefault.Scheme)
         //注册jwtBearer认证方案
-        .addJwtBearer(JwtBearerDefaults.Scheme) { configureOptions =>
-            let secret = builder.configuration["authentication:securityKey"].getOrThrow().toArray()
-            let securityKey = SymmetricSecurityKey(secret)
-            //优先从url中读取
-            configureOptions.events.onMessageReceived = { context =>
-                let token = context.request.queryForm.get("token")
-                return token
-            }
-            configureOptions.saveToken = true//保存token
-            configureOptions.tokenValidationParameters.authenticationType = JwtBearerDefaults.Scheme
-            configureOptions.tokenValidationParameters.validIssuer = "spire"//发行方
-            configureOptions.tokenValidationParameters.validateAudience = false//不验证受众
-            configureOptions.tokenValidationParameters.issuerSigningKey = securityKey//验签key
+        .addJwtBearer(JwtBearerDefaults.Scheme) {
+            configureOptions =>
+                let secret = builder.configuration["authentication:securityKey"].getOrThrow().toArray()
+                let securityKey = SymmetricSecurityKey(secret)
+                //优先从url中读取
+                configureOptions.events.onMessageReceived = {
+                    context =>
+                        let token = context.request.queryForm.get("token")
+                        return token
+                }
+                configureOptions.saveToken = true //保存token
+                configureOptions.tokenValidationParameters.authenticationType = JwtBearerDefaults.Scheme
+                configureOptions.tokenValidationParameters.validIssuer = "spire" //发行方
+                configureOptions.tokenValidationParameters.validateAudience = false //不验证受众
+                configureOptions.tokenValidationParameters.issuerSigningKey = securityKey //验签key
         }
 
+    //注册CustomRequirement授权处理器
+    builder.services.addTransient<IAuthorizationHandler, CustomAuthorizationHandler>()
     //注册授权服务
-    builder.services.addAuthorizationBuilder()
-        .addPolicy("default") { policy =>
-            //必须包含username
-            policy.requireClaim("username")
-            //基本要求，具体参考源码
-            policy.requireAuthenticatedUser()
-        }
+    builder.services.addAuthorizationBuilder().addPolicy("default") {
+        policy => policy.requireClaim("username") //必须包含username
+            .requireAuthenticatedUser() //基本要求，具体参考源码
+    }.addPolicy("custom") {
+        //添加要求，该要求没有需要额外配置
+        policy => policy.addRequirements(CustomRequirement()) //自定义的配置要求
+            .requireAuthenticatedUser() //基本要求，具体参考源码
+    }
 
     //注册健康检查项
     builder.services.addHealthChecks().addCheck("self") {
@@ -72,12 +78,14 @@ main(args: Array<String>): Int64 {
     }
 
     //配置跨域策略
-    builder.services.addCors{ configureOptions => 
+    builder.services.addCors {
+        configureOptions =>
         //创建一个跨域策略
-        configureOptions.addPolicy("dev") {configurePolicy => 
-            configurePolicy.allowAnyHeader()
-            configurePolicy.allowAnyMethod()
-            configurePolicy.allowAnyOrigin()
+        configureOptions.addPolicy("dev") {
+            configurePolicy =>
+                configurePolicy.allowAnyHeader()
+                configurePolicy.allowAnyMethod()
+                configurePolicy.allowAnyOrigin()
         }
     }
 
@@ -94,14 +102,15 @@ main(args: Array<String>): Int64 {
     host.useHealthChecks("/health")
 
     //默认静态资源
-    host.useDefaultFiles{ configureOptions =>
-        configureOptions.defaultFileNames.add("welcome.html")
+    host.useDefaultFiles {
+        configureOptions => configureOptions.defaultFileNames.add("welcome.html")
     }
 
     //静态资源
-    host.useStaticFiles{ configureOptions =>
-        configureOptions.serveUnknownFileTypes = true
-        configureOptions.defaultContentType = "application/octet-stream"
+    host.useStaticFiles {
+        configureOptions =>
+            configureOptions.serveUnknownFileTypes = true
+            configureOptions.defaultContentType = "application/octet-stream"
     }
 
     //使用跨域支持
@@ -117,34 +126,36 @@ main(args: Array<String>): Int64 {
     host.useAuthorization()
 
     //动态资源(负责注册和执行)
-    host.useEndpoints { endpoints =>
-        //创建token
-        endpoints.mapGet("connect/token") { context =>
-            let securityKey = SymmetricSecurityKey(
-                host.configuration["authentication:securityKey"].getOrThrow().toArray())
-            let jwtHeader = JwtHeader(SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256))
-            let jwtPayload = JwtPayload(issuer: "spire", notBefore: DateTime.now(), expires: DateTime.now().addDays(1),
-                claims: [("sub", "1024")])
-            jwtPayload.add("username", "admin")
-            let jwtTokenHander = JwtSecurityTokenHandler()
-            let accessToken = jwtTokenHander.writeToken(JwtSecurityToken(jwtHeader, jwtPayload))
-            context.response.write(accessToken)
-        }
-        //登出接口需要授权
-        endpoints.mapGet("connect/logout") { context => 
-            let token = context.getToken("access_token") ?? "not token"
-            context.response.write(token)
-        }
-        .requireAuthorization("default")
+    host.useEndpoints {
+        endpoints =>
+            //创建token
+            endpoints.mapGet("connect/token") {
+                context =>
+                    let securityKey = SymmetricSecurityKey(
+                        host.configuration["authentication:securityKey"].getOrThrow().toArray())
+                    let jwtHeader = JwtHeader(SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256))
+                    let jwtPayload = JwtPayload(issuer: "spire", notBefore: DateTime.now(),
+                        expires: DateTime.now().addDays(1), claims: [("sub", "1024")])
+                    jwtPayload.add("username", "admin")
+                    let jwtTokenHander = JwtSecurityTokenHandler()
+                    let accessToken = jwtTokenHander.writeToken(JwtSecurityToken(jwtHeader, jwtPayload))
+                    context.response.write(accessToken)
+            }
+            //登出接口需要授权
+            endpoints.mapGet("connect/logout") {
+                context =>
+                    let token = context.getToken("access_token") ?? "not token"
+                    context.response.write(token)
+            }.requireAuthorization("custom")
 
-        //无须授权
-        endpoints.mapPost("hello") { context =>
-            context.response.write("hello:spire")
-        }
+            //无须授权
+            endpoints.mapPost("hello") {
+                context => context.response.write("hello:spire")
+            }
 
-        endpoints.mapControllers()
-            //所有的action需要授权
-            .requireAuthorization("default")
+            endpoints.mapControllers()
+                //所有的action需要授权
+                .requireAuthorization("custom")
     }
     host.run()
     return 0
