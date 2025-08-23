@@ -6,7 +6,6 @@
 
 package spire_extensions_injection
 
-import std.sync.*
 import std.reflect.*
 import std.collection.*
 import std.collection.concurrent.*

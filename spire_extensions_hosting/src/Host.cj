@@ -8,8 +8,6 @@ package spire_extensions_hosting
 
 import std.env.*
 import std.sync.*
-import std.process.*
-import std.collection.*
 
 public class Host <: IHost {
     private let _logger: ILogger

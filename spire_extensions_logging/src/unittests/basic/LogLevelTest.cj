@@ -2,7 +2,6 @@ package spire_extensions_logging.unittests.basic
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import std.collection.*
 import spire_extensions_logging.*
 import spire_extensions_logging.unittests.*
 

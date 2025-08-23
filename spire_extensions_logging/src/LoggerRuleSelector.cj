@@ -6,8 +6,6 @@
 
 package spire_extensions_logging
 
-import std.reflect.TypeInfo
-
 class LoggerRuleSelector {
     
     private static let _wildcardChar = '*'

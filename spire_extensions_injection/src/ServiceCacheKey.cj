@@ -6,8 +6,6 @@
 
 package spire_extensions_injection
 
-import std.reflect.*
-
 struct ServiceCacheKey <: Hashable & Equatable<ServiceCacheKey> {
     private let _slot: Int64
     private let _identifier: ServiceIdentifier
