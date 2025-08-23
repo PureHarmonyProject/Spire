@@ -1,7 +1,5 @@
 package spire_extensions_injection.unittests.service_collection
 
-import std.random.*
-import std.collection.*
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.reflect.*

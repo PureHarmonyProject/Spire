@@ -10,8 +10,6 @@
 
 package spire_extensions_logging
 
-import std.console.Console
-
 class ConsoleLogger <: ILogger {
     private let _categoryName: String
 
