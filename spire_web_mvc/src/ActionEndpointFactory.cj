@@ -30,13 +30,19 @@ class ActionEndpointFactory {
             let template: ?String = if (pattern.startsWith('/')) {
                 pattern
             } else if (let Some(default) <- default) {
-                "${default}/${pattern.trimStart('/')}"
+                if (pattern.isEmpty()) {
+                    default
+                }else if (pattern.startsWith('/')) {
+                    "${default}${pattern}"
+                } else {
+                    "${default}/${pattern}"
+                }
             } else {
                 None
             }
             //create endpoints
             if (let Some(template) <- template) {
-                let routePattern = createRoutePattern(template.trimStart('/').trimEnd('/'), actionDescriptor)
+                let routePattern = createRoutePattern(template, actionDescriptor)
                 let builder = createEndpointBuilder(routePattern, actionDescriptor)
                 configureEndpointBuilder(builder, conventions)
                 configureEndpointMetadata(builder, actionDescriptor)
