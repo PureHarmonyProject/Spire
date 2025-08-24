@@ -1,11 +1,9 @@
 package spire_web_quickstart
 
-import std.time.*
 import std.random.*
 import std.reflect.*
 import std.collection.*
 import spire_web_quickstart.controllers.*
-import spire_web_quickstart.hostservices.*
 import spire_web_quickstart.authentication.*
 import spire_web_quickstart.infrastructure.*
 //framework
@@ -29,7 +27,7 @@ main(args: Array<String>): Int64 {
 
     //注册资源所有者验证器
     builder.services.addTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>()
-
+    builder.services.addSingleton<JwtTokenService, JwtTokenService>()
     //注册身份认证方案
     builder
         .services
@@ -131,15 +129,12 @@ main(args: Array<String>): Int64 {
             //创建token
             endpoints.mapGet("connect/token") {
                 context =>
-                    let securityKey = SymmetricSecurityKey(
-                        host.configuration["authentication:securityKey"].getOrThrow().toArray())
-                    let jwtHeader = JwtHeader(SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256))
-                    let jwtPayload = JwtPayload(issuer: "spire", notBefore: DateTime.now(),
-                        expires: DateTime.now().addDays(1), claims: [("sub", "1024")])
-                    jwtPayload.add("username", "admin")
-                    let jwtTokenHander = JwtSecurityTokenHandler()
-                    let accessToken = jwtTokenHander.writeToken(JwtSecurityToken(jwtHeader, jwtPayload))
-                    context.response.write(accessToken)
+                    let tokenService = context.services.getOrThrow<JwtTokenService>()
+                    var claims = ArrayList<Claim>()
+                    claims.add(Claim("sub", "1024"))
+                    claims.add(Claim(ClaimNames.Role, "admin"))
+                    let token = tokenService.createToken(claims)
+                    context.response.write(token)
             }
             //登出接口需要授权
             endpoints.mapGet("connect/logout") {
