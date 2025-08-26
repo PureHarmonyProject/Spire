@@ -92,6 +92,7 @@ extend HttpClientBuilder {
         services.configure<HttpClientFactoryOptions>(name) {
             options => options.httpMessageHandlerBuilderActions.add(configureBuilder)
         }
+        return this
     }
 
     public func configurePrimaryHttpMessageHandler(configureHandler: () -> HttpMessageHandler) {

@@ -1,6 +1,5 @@
 package spire_extensions_http
 
-import std.ref.*
 import std.runtime.*
 import spire_net_http.*
 import spire_extensions_injection.*
@@ -34,9 +33,11 @@ main(): Int64 {
 }
 
 private func test1(factory: IHttpClientFactory) {
-    let client1 = factory.createClient()
-    client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
-    gc()
+    spawn {
+        let client1 = factory.createClient()
+        client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
+        gc()
+    }
 }
 
 class Logging1DelegatingHandler <: DelegatingHandler {
