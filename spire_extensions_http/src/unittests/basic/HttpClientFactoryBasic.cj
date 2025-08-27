@@ -21,7 +21,8 @@ func HTTP客户端工厂接口测试() {
     services.addHttpClient()
     let serviceProvider = services.build()
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试默认名称的客户端创建
     let defaultClient = factory.createClient()
@@ -91,10 +92,10 @@ func HTTP客户端映射注册表测试() {
 func HTTP消息处理器构建器抽象类测试() {
     let services = ServiceCollection()
     let serviceProvider = services.build()
-    let builder = DefaultHttpMessageHandlerBuilder(serviceProvider)
+    let builder = TestDefaultHttpMessageHandlerBuilder(serviceProvider)
     
     // 测试处理器管道创建
-    let primaryHandler = HttpClientHandler() 
+    let primaryHandler = MockHttpClientHandler() 
     let additionalHandlers = ArrayList<DelegatingHandler>()
     
     // 添加一些真实的委托处理器
@@ -167,11 +168,11 @@ func HTTP客户端构建器服务集合扩展测试() {
 func 默认HTTP消息处理器构建器测试() {
     let services = ServiceCollection()
     let serviceProvider = services.build()
-    let builder = DefaultHttpMessageHandlerBuilder(serviceProvider)
+    let builder = TestDefaultHttpMessageHandlerBuilder(serviceProvider)
     
     // 验证初始状态
     @Expect(builder.name, None)  
-    @Expect(builder.primaryHandler is HttpClientHandler)
+    @Expect(builder.primaryHandler is MockHttpClientHandler)
     @Expect(builder.additionalHandlers.size, 0)
     
     // 测试设置名称
@@ -179,7 +180,7 @@ func 默认HTTP消息处理器构建器测试() {
     @Expect(builder.name, Some("TestBuilder"))
     
     // 测试设置主处理器
-    let newPrimaryHandler = HttpClientHandler()
+    let newPrimaryHandler = MockHttpClientHandler()
     builder.primaryHandler = newPrimaryHandler
     @Expect(refEq(builder.primaryHandler, newPrimaryHandler))
     
@@ -217,7 +218,7 @@ func HTTP客户端工厂选项验证测试() {
     @Expect(options.httpMessageHandlerBuilderActions.size, 5)
     
     // 执行所有动作
-    let mockClient = HttpClient(HttpClientHandler(), false)
+    let mockClient = HttpClient(MockHttpClientHandler(), false)
     let services = ServiceCollection()
     let serviceProvider = services.build()
     let mockBuilder = DefaultHttpMessageHandlerBuilder(serviceProvider)
@@ -271,10 +272,10 @@ func HTTP客户端映射注册表冲突测试() {
 func HTTP消息处理器构建器管道测试() {
     let services = ServiceCollection()
     let serviceProvider = services.build()
-    let builder = DefaultHttpMessageHandlerBuilder(serviceProvider)
+    let builder = TestDefaultHttpMessageHandlerBuilder(serviceProvider)
     
     // 创建主处理器
-    let primaryHandler = HttpClientHandler()
+    let primaryHandler = MockHttpClientHandler()
     
     // 创建多个委托处理器
     let handlers = ArrayList<DelegatingHandler>()
@@ -338,7 +339,7 @@ func HTTP客户端工厂选项空处理测试() {
     @Expect(options.httpMessageHandlerBuilderActions.size, 0)
     
     // 尝试执行空的动作列表
-    let mockClient = HttpClient(HttpClientHandler(), false)
+    let mockClient = HttpClient(MockHttpClientHandler(), false)
     let services = ServiceCollection()
     let serviceProvider = services.build()
     let mockBuilder = DefaultHttpMessageHandlerBuilder(serviceProvider)
@@ -390,10 +391,10 @@ func HTTP客户端映射注册表边界测试() {
 func HTTP消息处理器构建器空处理器测试() {
     let services = ServiceCollection()
     let serviceProvider = services.build()
-    let builder = DefaultHttpMessageHandlerBuilder(serviceProvider)
+    let builder = TestDefaultHttpMessageHandlerBuilder(serviceProvider)
     
     // 创建主处理器
-    let primaryHandler = HttpClientHandler()
+    let primaryHandler = MockHttpClientHandler()
     
     // 创建空的额外处理器列表
     let emptyHandlers = ArrayList<DelegatingHandler>()

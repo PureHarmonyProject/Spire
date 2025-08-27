@@ -80,7 +80,7 @@ func HTTP客户端构建器与依赖注入集成测试() {
     // 配置主处理器
     builder.configurePrimaryHttpMessageHandler({ sp => 
         _ = sp.getOrThrow<ConfigService>()
-        return HttpClientHandler()
+        return MockHttpClientHandler()
     })
     
     // 构建服务提供者
@@ -133,7 +133,7 @@ func HTTP客户端多租户集成测试() {
     // 配置租户3客户端
     tenant3Builder.configurePrimaryHttpMessageHandler({ sp => 
         _ = sp.getOrThrow<TenantService>()
-        return HttpClientHandler()
+        return MockHttpClientHandler()
     })
     
     // 构建服务提供者
@@ -259,7 +259,7 @@ func HTTP客户端API网关集成测试() {
     })
     
     // 配置主处理器
-    gatewayBuilder.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    gatewayBuilder.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 配置客户端设置
     gatewayBuilder.configureHttpClient({ _ => 
@@ -315,7 +315,7 @@ func HTTP客户端分布式追踪集成测试() {
     })
     
     // 配置主处理器
-    tracingBuilder.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    tracingBuilder.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 构建服务提供者
     let serviceProvider = services.build()
@@ -453,7 +453,7 @@ func HTTP客户端事件驱动集成测试() {
     })
     
     // 配置主处理器
-    eventBuilder.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    eventBuilder.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 构建服务提供者
     let serviceProvider = services.build()

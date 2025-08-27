@@ -82,7 +82,7 @@ func HTTP客户端消息处理器管道集成测试() {
     builder.addHttpMessageHandler({ => LoggingDelegatingHandler() })
     
     // 配置主处理器
-    builder.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    builder.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 构建服务提供者
     let serviceProvider = services.build()
@@ -175,7 +175,7 @@ func HTTP客户端多重服务集成测试() {
     // 配置不同的客户端
     builder1.configureHttpClient({ _ => })
     builder2.addHttpMessageHandler({ => LoggingDelegatingHandler() })
-    builder3.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    builder3.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 构建服务提供者
     let serviceProvider = services.build()
@@ -580,7 +580,7 @@ func HTTP客户端完整企业级集成测试() {
     })
     
     // 配置主处理器
-    builder.configurePrimaryHttpMessageHandler({ => HttpClientHandler() })
+    builder.configurePrimaryHttpMessageHandler({ => MockHttpClientHandler() })
     
     // 配置客户端设置
     builder.configureHttpClient({ _ => 

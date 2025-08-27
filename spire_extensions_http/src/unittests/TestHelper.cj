@@ -2,6 +2,8 @@ package spire_extensions_http.unittests
 
 import std.collection.*
 import spire_net_http.*
+import spire_extensions_injection.*
+import spire_extensions_http.*
 
 /**
  * HTTP测试辅助类
@@ -70,6 +72,21 @@ class LoggingHttpMessageHandler <: HttpMessageHandler {
     }
 }
 
+// 模拟的HttpClientHandler，避免证书依赖
+// 用于测试中替代真实的HttpClientHandler
+class MockHttpClientHandler <: HttpMessageHandler {
+    public init() {}
+    
+    public override func send(request: HttpRequestMessage): HttpResponseMessage {
+        // 避免网络依赖，抛出异常表示这是模拟类
+        throw UnsupportedException("MockHttpClientHandler.send() called - avoiding network dependency")
+    }
+    
+    public override func close(closing: Bool) {
+        // 简单的关闭实现
+    }
+}
+
 // 简单的真实服务类，用于测试
 class LoggingService {
     public func doSomething(): String {
@@ -135,3 +152,71 @@ class EventSubscriber { public init() {} }
 class ContainerService { public init() {} }
 class Orchestrator { public init() {} }
 class HealthMonitor { public init() {} }
+
+/**
+ * 测试版本的DefaultHttpMessageHandlerBuilder
+ * 仿照生产代码但使用MockHttpClientHandler避免证书依赖
+ */
+class TestDefaultHttpMessageHandlerBuilder <: HttpMessageHandlerBuilder {
+    private var _name: ?String = None
+    private let _services: IServiceProvider
+    private var _primaryHandler: HttpMessageHandler
+    private let _additionalHandlers = ArrayList<DelegatingHandler>()
+
+    public init(services: IServiceProvider) {
+        _services = services
+        _primaryHandler = createPrimaryHandler()
+    }
+
+    public mut prop name: ?String {
+        get() {
+            _name
+        }
+        set(value) {
+            _name = value
+        }
+    }
+    
+    public prop services: IServiceProvider {
+        get() {
+            _services
+        }
+    }
+
+    public mut prop primaryHandler: HttpMessageHandler {
+        get() {
+            _primaryHandler
+        }
+        set(value) {
+            _primaryHandler = value
+        }
+    }
+
+    public prop additionalHandlers: List<DelegatingHandler> {
+        get() {
+            _additionalHandlers
+        }
+    }
+
+    public func build(): HttpMessageHandler {
+        return createHandlerPipeline(primaryHandler, additionalHandlers)
+    }
+
+    private static func createPrimaryHandler(): HttpMessageHandler {
+        // 使用MockHttpClientHandler而不是HttpClientHandler，避免证书依赖
+        return MockHttpClientHandler()
+    }
+    
+    public func createHandlerPipeline(primaryHandler: HttpMessageHandler, additionalHandlers: List<DelegatingHandler>): HttpMessageHandler {
+        var next = primaryHandler
+        
+        // 从后往前构建处理器链
+        for (i in (additionalHandlers.size - 1)..0) {
+            let handler = additionalHandlers.get(i)
+            handler.getOrThrow().innerHandler = next
+            next = handler.getOrThrow()
+        }
+        
+        return next
+    }
+}

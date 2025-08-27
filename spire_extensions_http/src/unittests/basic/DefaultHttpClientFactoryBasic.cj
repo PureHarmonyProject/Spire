@@ -23,8 +23,11 @@ func 默认HTTP客户端工厂测试() {
     // 获取真实的选项监控器
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
+    // 获取服务范围工厂
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
     // 创建工厂
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 验证工厂创建成功
     @Expect(factory is DefaultHttpClientFactory, true)
@@ -103,7 +106,9 @@ func HTTP客户端工厂范围服务测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试创建处理器时的范围管理
     let handler = factory.createHandler("TestClient")
@@ -122,7 +127,9 @@ func HTTP客户端工厂客户端配置测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试创建客户端
     let client = factory.createClient("ConfiguredClient")
@@ -141,7 +148,9 @@ func HTTP客户端工厂处理器构建测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试创建处理器
     let handler = factory.createHandler("BuilderClient")
@@ -160,7 +169,9 @@ func HTTP客户端工厂默认客户端测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试创建默认客户端
     let defaultClient = factory.createClient()
@@ -179,7 +190,9 @@ func HTTP客户端工厂多客户端测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 创建多个客户端
     let client1 = factory.createClient("Client1")
@@ -225,7 +238,9 @@ func HTTP客户端工厂服务提供者测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试工厂使用服务提供者
     let client = factory.createClient("ServiceProviderTest")
@@ -244,7 +259,9 @@ func HTTP客户端工厂错误处理测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试正常情况下的错误处理
     let client = factory.createClient("ErrorHandlingTest")
@@ -263,7 +280,9 @@ func HTTP客户端工厂线程安全测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 创建多个客户端测试线程安全
     let client1 = factory.createClient("ThreadSafe1")
@@ -286,7 +305,9 @@ func HTTP客户端工厂资源管理测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试资源管理
     let client = factory.createClient("ResourceManagement")
@@ -305,7 +326,9 @@ func HTTP客户端工厂性能测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 创建多个客户端测试性能
     for (i in 0..10) {
@@ -326,7 +349,9 @@ func HTTP客户端工厂配置验证测试() {
     
     let optionsMonitor = serviceProvider.getOrThrow<IOptionsMonitor<HttpClientFactoryOptions>>()
     
-    let factory = DefaultHttpClientFactory(serviceProvider, optionsMonitor)
+    let scopeFactory = serviceProvider.getOrThrow<IServiceScopeFactory>()
+    
+    let factory = DefaultHttpClientFactory(scopeFactory, optionsMonitor)
     
     // 测试配置验证
     let client = factory.createClient("ConfigValidation")
