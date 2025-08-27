@@ -6,8 +6,6 @@
 
 package spire_extensions_options
 
-import spire_extensions_injection.*
-
 public interface IConfigureOptions<TOptions> where TOptions <: Object {
     func configure(options: TOptions): Unit 
 }

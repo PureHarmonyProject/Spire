@@ -6,7 +6,6 @@
 
 package spire_web_staticfiles
 
-import std.fs.{exists, File}
 import spire_extensions_options.*
 
 class DefaultFileMiddleware <: IMiddleware {

@@ -29,19 +29,6 @@ public abstract class DelegatingHandler <: HttpMessageHandler {
         }
     }
 
-    public open func isClosed() {
-        return _isClosed.load()
-    }
-
-    public func close(closing: Bool) {
-        if (closing && _isClosed.compareAndSwap(false, true)) {
-            if (let Some(innerHandler) <- innerHandler && !innerHandler.isClosed()) {
-                innerHandler.close()
-            }
-        }
-        super.close(closing)
-    }
-
     protected open func send(request: HttpRequestMessage): HttpResponseMessage {
         setOperationStarted()
         if (let Some(innerHandler) <- _innerHandler) {
@@ -49,6 +36,20 @@ public abstract class DelegatingHandler <: HttpMessageHandler {
         } else {
             throw UnsupportedException(StringResx.net_http_handler_not_assigned)
         }
+    }
+
+    public open func isClosed() {
+        return _isClosed.load()
+    }
+
+    protected open func close(closing: Bool) {
+        if (closing && _isClosed.compareAndSwap(false, true)) {
+            //递归释放
+            if (let Some(innerHandler) <- innerHandler && !innerHandler.isClosed()) {
+                innerHandler.close()
+            }
+        }
+        super.close(closing)
     }
 
     private func checkClosed() {

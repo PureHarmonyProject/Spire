@@ -5,7 +5,6 @@ import std.unittest.testmacro.*
 import std.collection.*
 import std.reflect.*
 import spire_extensions_options.*
-import spire_extensions_injection.*
 import spire_extensions_options.unittests.*
 
 /**

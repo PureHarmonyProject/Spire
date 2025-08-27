@@ -2,9 +2,7 @@ package spire_extensions_caching.unittests.extension
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import std.time.*
 import spire_extensions_caching.*
-import spire_extensions_options.*
 import spire_extensions_injection.*
 import spire_extensions_caching.unittests.*
 

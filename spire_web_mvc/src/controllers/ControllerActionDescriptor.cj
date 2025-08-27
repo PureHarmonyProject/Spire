@@ -2,7 +2,6 @@ package spire_web_mvc.controllers
 
 import std.reflect.*
 import std.collection.*
-import spire_web_mvc.abstractions.*
 
 public class ControllerActionDescriptor {
     private let _actionName: String

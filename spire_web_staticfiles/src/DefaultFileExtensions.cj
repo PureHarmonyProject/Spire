@@ -7,7 +7,6 @@
 package spire_web_staticfiles
 
 import spire_extensions_options.*
-import spire_extensions_injection.*
 
 public interface DefaultFileExtensions {
     func useDefaultFiles(): Unit

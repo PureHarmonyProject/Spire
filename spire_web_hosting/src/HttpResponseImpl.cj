@@ -3,7 +3,7 @@
 
 package spire_web_hosting
 
-import std.io.{InputStream, ByteBuffer}
+import std.io.*
 import stdx.net.http.HttpResponseBuilder as HttpResponseBase
 
 class HttpResponseImpl <: HttpResponse {

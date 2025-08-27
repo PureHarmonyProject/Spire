@@ -7,7 +7,6 @@
 package spire_extensions_injection
 
 import std.collection.*
-import std.sync.ReentrantMutex
 
 /*
 服务访问链路：进行循环依赖检测

@@ -16,4 +16,8 @@ public interface IAuthorizationRequirement <: Hashable & Equatable<IAuthorizatio
     func hashCode() {
         ClassTypeInfo.of(this).hashCode()
     }
+
+    func toString() {
+        ClassTypeInfo.of(this).qualifiedName
+    }
 }

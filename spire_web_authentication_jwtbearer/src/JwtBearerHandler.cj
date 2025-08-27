@@ -70,10 +70,8 @@ public class JwtBearerHandler <: AuthenticationHandler<JwtBearerOptions> {
     }
 
     private func setupTokenValidationParameters() {
-        println(11)
         let tokenValidationParameters = options.tokenValidationParameters.clone()
         if (let Some(configurationManager) <- options.configurationManager) {
-            println(22)
             let configuration = configurationManager.getConfiguration()
            
             let issuers = ArrayList<String>([configuration.issuer])

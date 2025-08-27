@@ -7,7 +7,6 @@
 package spire_web_routing.http
 
 import spire_web_http.*
-import std.collection.*
 import spire_web_routing.patterns.*
 
 public class RouteEndpoint <: Endpoint {

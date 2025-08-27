@@ -1,7 +1,5 @@
 package spire_extensions_options
 
-import std.collection.*
-
 public class ValidateOptionsResult {
     public static let skip: ValidateOptionsResult
 

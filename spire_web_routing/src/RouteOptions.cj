@@ -6,7 +6,6 @@
 
 package spire_web_routing
 
-import std.random.Random
 import std.collection.*
 
 public class RouteOptions {

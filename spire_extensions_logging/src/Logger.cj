@@ -6,8 +6,6 @@
 
 package spire_extensions_logging
 
-import std.collection
-
 class Logger <: ILogger {
     private let _loggers: Collection<LoggerInformation>
 

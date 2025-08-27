@@ -30,7 +30,13 @@ class ActionEndpointFactory {
             let template: ?String = if (pattern.startsWith('/')) {
                 pattern
             } else if (let Some(default) <- default) {
-                "${default}/${pattern}"
+                if (pattern.isEmpty()) {
+                    default
+                }else if (pattern.startsWith('/')) {
+                    "${default}${pattern}"
+                } else {
+                    "${default}/${pattern}"
+                }
             } else {
                 None
             }

@@ -7,7 +7,6 @@
 package spire_web_http
 
 import std.io.*
-import std.collection.*
 import stdx.encoding.url.{URL, Form}
 import stdx.net.http.{HttpHeaders, Protocol}
 

@@ -5,7 +5,6 @@ import std.reflect.*
 import std.collection.*
 import spire_web_http.*
 import stdx.encoding.json.*
-import stdx.serialization.*
 import spire_web_mvc.bindings.*
 import stdx.serialization.serialization.*
 

@@ -6,12 +6,14 @@
 
 package spire_extensions_injection
 
-import std.sync.*
 import std.reflect.*
 import std.collection.*
 import std.collection.concurrent.*
 
-public class ServiceProvider <: IServiceProvider & Resource {
+let SERVICE_PROVIDER_TYPE = TypeInfo.of<IServiceProvider>()
+let SERVICE_SCOPE_FACTORY_TYPE = TypeInfo.of<IServiceScopeFactory>()
+
+public class ServiceProvider <: IServiceProvider & IServiceScopeFactory & Resource {
     private var _isClosed = false
     private let _root: ?ServiceProvider
     private let _services: ServiceCollection
@@ -33,11 +35,15 @@ public class ServiceProvider <: IServiceProvider & Resource {
 
     public func getOrDefault(serviceType: TypeInfo): ?Object {
         //解析容器本身，返回this
-        let providerType = TypeInfo.of<IServiceProvider>()
-        if(serviceType == providerType || serviceType.isSubtypeOf(providerType)){
+        if (serviceType == SERVICE_PROVIDER_TYPE) {
             return getServiceProviderEngine() as Object
         }
-        if (let Some(descriptor) <- _services.findLast(serviceType)) {   
+        
+        if (serviceType == SERVICE_SCOPE_FACTORY_TYPE) {
+            return getServiceProviderEngine() as Object
+        }
+
+        if (let Some(descriptor) <- _services.findLast(serviceType)) {
             return resolve(descriptor, getServiceProviderEngine())
         }
         return None
@@ -62,8 +68,8 @@ public class ServiceProvider <: IServiceProvider & Resource {
     private func getServiceProviderEngine(): IServiceProvider {
         //判断是否启用循环依赖检测
         if (_options.validateLoopDependency) {
-            return  ServiceProviderEngine(this)
-        }  
+            return ServiceProviderEngine(this)
+        }
         return this
     }
 
@@ -89,32 +95,37 @@ public class ServiceProvider <: IServiceProvider & Resource {
             let instance = createInstance(descriptor, engine)
             return instance
         }
-       
+
         //如果容器中存在缓存，那么立即返回
         if (_instances.contains(cacheKey)) {
             return _instances[cacheKey]
         }
 
-        return _instances.entryView(cacheKey) { entry =>
-            if (entry.value.isNone()) {
-                entry.value = createInstance(descriptor, engine)
+        return _instances
+            .entryView(cacheKey) {
+                entry => if (entry.value.isNone()) {
+                    entry.value = createInstance(descriptor, engine)
+                }
             }
-        }.getOrThrow()
+            .getOrThrow()
     }
-   
+
     private func createInstance(descriptor: ServiceDescriptor, serviceProvider: IServiceProvider): Object {
-        let instance = if (let Some(implementationFactory) <- descriptor.implementationFactory.flatMap {f => f as (IServiceProvider) -> Object}) {
+        let instance = if (let Some(implementationFactory) <- descriptor
+            .implementationFactory
+            .flatMap {f => f as (IServiceProvider) -> Object}) {
             implementationFactory(serviceProvider)
         } else if (let Some(obj) <- descriptor.implementationInstance) {
             obj
         } else if (let Some(implementationType) <- descriptor.implementationType) {
             ActivatorUtilities.createInstance(serviceProvider, implementationType)
         } else {
-            throw UnsupportedException("Unable to create an instance for the service descriptor. The descriptor lacks a valid implementation factory, instance, or type. Please ensure that at least one of these is provided.")
+            throw UnsupportedException(
+                "Unable to create an instance for the service descriptor. The descriptor lacks a valid implementation factory, instance, or type. Please ensure that at least one of these is provided.")
         }
 
         //保存需释放的资源
-        if(let resource: Resource <- instance) {
+        if (let resource: Resource <- instance) {
             _resources.add(resource)
         }
 

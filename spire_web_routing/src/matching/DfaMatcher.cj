@@ -8,7 +8,6 @@ package spire_web_routing.matching
 
 import std.collection.*
 import spire_web_http.*
-import spire_web_routing.http.*
 
 protected class DfaMatcher <: Matcher {
     DfaMatcher(let endpointSelector: EndpointSelector, let states: Array<DfaState>) {

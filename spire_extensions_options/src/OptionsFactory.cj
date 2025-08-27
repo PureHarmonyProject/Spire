@@ -6,10 +6,8 @@
 
 package spire_extensions_options
 
-import std.sync.*
 import std.reflect.*
 import std.collection.*
-import std.collection.concurrent.*
 
 public class OptionsFactory<TOptions> <: IOptionsFactory<TOptions> where TOptions <: Object {
     private let _configures: Array<IConfigureOptions<TOptions>>

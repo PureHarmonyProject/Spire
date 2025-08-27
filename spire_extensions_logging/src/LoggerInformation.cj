@@ -6,8 +6,6 @@
 
 package spire_extensions_logging
 
-import std.reflect.TypeInfo
-
 class LoggerInformation {
     private let _logger: ILogger
     private let _category: String

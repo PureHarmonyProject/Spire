@@ -6,8 +6,6 @@
 
 package spire_extensions_hosting
 
-import std.collection.*
-
 public interface IHostLifetime {
     func onStarted(callback: () -> Unit): Unit
     func onStopped(callback: () -> Unit): Unit
