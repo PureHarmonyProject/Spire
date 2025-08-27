@@ -2,6 +2,7 @@ package spire_extensions_http
 
 import std.sync.*
 import spire_net_http.*
+import std.collection.*
 import spire_extensions_options.*
 import std.collection.concurrent.*
 import spire_extensions_injection.*
@@ -13,11 +14,12 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
     private var _cleanupTimer: ?Timer = None
     private let _cleanupTimerLock = Mutex()
     private let _cleanupActiveLock = Mutex()
+    private let _lock = Mutex()
     private static let _cleanupInterval = Duration.second * 5
 
     private let _serviceScopeFactory: IServiceScopeFactory
     private let _optionsMonitor: IOptionsMonitor<HttpClientFactoryOptions>
-    private let _activeHandlers = ConcurrentHashMap<String, ActiveHandlerTrackingEntry>()
+    private let _activeHandlers = HashMap<String, ActiveHandlerTrackingEntry>()
     private let _expiredHandlers = ConcurrentLinkedQueue<ExpiredHandlerTrackingEntry>()
 
     public init(serviceScopeFactory: IServiceScopeFactory, optionsMonitor: IOptionsMonitor<HttpClientFactoryOptions>) {
@@ -37,15 +39,24 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
 
     public func createHandler(name: String): HttpMessageHandler {
         //处理器应被设计为线程安全的
-        let entry = _activeHandlers
-            .entryView(name) {
-                view => if (view.value.isNone()) {
-                    view.value = createHandlerEntry(name)
-                }
-            }
-            .getOrThrow()
+        let entry = getOrCreateActiveHandlerTrackingEntry(name)
         startHandlerEntryTimer(entry)
         return entry.handler
+    }
+
+    private func getOrCreateActiveHandlerTrackingEntry(name: String) {
+        if (_activeHandlers.contains(name)) {
+            return _activeHandlers[name]
+        }
+
+        synchronized(_lock) {
+            if (_activeHandlers.contains(name)) {
+                return _activeHandlers[name]
+            }
+            let entry = createHandlerEntry(name)
+            _activeHandlers.add(name, entry)
+            return entry
+        }
     }
 
     private func createHandlerEntry(name: String): ActiveHandlerTrackingEntry {
@@ -79,7 +90,9 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
     活动项关联的定时器执行的任务
      */
     private func expiryTimerTick(active: ActiveHandlerTrackingEntry) {
-        _activeHandlers.remove(active.name)
+        synchronized(_lock) {
+            _activeHandlers.remove(active.name)
+        }
         let expired = ExpiredHandlerTrackingEntry(active)
         _expiredHandlers.add(expired)
         //启动清理线程
@@ -139,8 +152,10 @@ class DefaultHttpClientFactory <: IHttpClientFactory & IHttpMessageHandlerFactor
         }
 
         if (!_expiredHandlers.isEmpty()) {
-            println(_expiredHandlers.size)
+            println('未清空')
             startCleanupTimer()
+        }else {
+            println('已清空')
         }
     }
 }

@@ -13,18 +13,20 @@ main(): Int64 {
 
     services
         .addHttpClient("dev")
-        .setHandlerLifetime(Duration.second * 3)
+        .setHandlerLifetime(Duration.second * 3) //3s失效
         .addHttpMessageHandler<Logging1DelegatingHandler>()
 
     services.configureHttpClientDefaults {
         b => b
             .addHttpMessageHandler<Logging1DelegatingHandler>()
             .addHttpMessageHandler<Logging2DelegatingHandler>()
-            .setHandlerLifetime(Duration.second * 2)
+            .setHandlerLifetime(Duration.second * 2) //2s失效
     }
     let provider = services.build()
     let factory = provider.getOrThrow<IHttpClientFactory>()
     test1(factory)
+    sleep(Duration.second * 10) //防止使用缓存
+    test2(factory)
     for (_ in 0..10) {
         gc()
         sleep(Duration.second * 10)
@@ -35,6 +37,14 @@ main(): Int64 {
 private func test1(factory: IHttpClientFactory) {
     spawn {
         let client1 = factory.createClient()
+        client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
+        gc()
+    }
+}
+
+private func test2(factory: IHttpClientFactory) {
+    spawn {
+        let client1 = factory.createClient("dev")
         client1.getString("http://127.0.0.1:4523/m1/3694996-3324920-default/test") |> println
         gc()
     }
