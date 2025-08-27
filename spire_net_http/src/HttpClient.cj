@@ -52,7 +52,7 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func get(requestUri: URL) {
-        let request = HttpRequestMessage(HttpMethod.get, requestUri)
+        let request = HttpRequestMessage(HttpMethod.Get, requestUri)
         return send(request)
     }
 
@@ -97,7 +97,7 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func post(requestUri: URL, content: ?HttpContent) {
-        let request = HttpRequestMessage(HttpMethod.post, requestUri)
+        let request = HttpRequestMessage(HttpMethod.Post, requestUri)
         request.content = content
         return send(request)
     }
@@ -107,7 +107,7 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func put(requestUri: URL, content: ?HttpContent) {
-        let request = HttpRequestMessage(HttpMethod.put, requestUri)
+        let request = HttpRequestMessage(HttpMethod.Put, requestUri)
         request.content = content
         return send(request)
     }
@@ -117,7 +117,7 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func delete(requestUri: URL, content: ?HttpContent) {
-        let request = HttpRequestMessage(HttpMethod.delete, requestUri)
+        let request = HttpRequestMessage(HttpMethod.Delete, requestUri)
         request.content = content
         return send(request)
     }

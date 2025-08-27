@@ -13,15 +13,15 @@ public class HttpMethod <: ToString {
         _method = method
     }
 
-    public static let get = HttpMethod("GET")
-    public static let post = HttpMethod("POST")
-    public static let put = HttpMethod("PUT")
-    public static let delete = HttpMethod("DELETE")
-    public static let patch = HttpMethod("PATCH")
-    public static let head = HttpMethod("HEAD")
-    public static let options = HttpMethod("OPTIONS")
-    public static let trace = HttpMethod("TRACE")
-    public static let connect = HttpMethod("CONNECT")
+    public static let Get = HttpMethod("GET")
+    public static let Post = HttpMethod("POST")
+    public static let Put = HttpMethod("PUT")
+    public static let Delete = HttpMethod("DELETE")
+    public static let Patch = HttpMethod("PATCH")
+    public static let Head = HttpMethod("HEAD")
+    public static let Options = HttpMethod("OPTIONS")
+    public static let Trace = HttpMethod("TRACE")
+    public static let Connect = HttpMethod("CONNECT")
 
     public func toString() {
         return _method.toAsciiUpper()
