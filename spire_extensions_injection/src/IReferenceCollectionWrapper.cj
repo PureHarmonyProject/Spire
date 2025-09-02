@@ -11,19 +11,19 @@ import std.reflect.*
 /*
 通过该接口来规避cangjie不能协变问题
  */
-interface IReferenceWrapper {
+interface IReferenceCollectionWrapper {
     operator func [](index: Int64, value!: Object): Unit
 
-    static func create(itemType: TypeInfo, size: Int64): IReferenceWrapper {
+    static func create(itemType: TypeInfo, size: Int64): IReferenceCollectionWrapper {
         let arrayType = ClassTypeInfo.get("spire_extensions_injection.ReferenceCollection<${itemType.qualifiedName}>")
-        return (arrayType.construct(size) as IReferenceWrapper).getOrThrow()
+        return (arrayType.construct(size) as IReferenceCollectionWrapper).getOrThrow()
     }
 }
 
 /*
 定义一个引用类型的数组
  */
-class ReferenceCollection<T> <: Collection<T> & IReferenceWrapper {
+class ReferenceCollection<T> <: Collection<T> & IReferenceCollectionWrapper {
     private let _items: Array<T>
 
     public init(size: Int64) {

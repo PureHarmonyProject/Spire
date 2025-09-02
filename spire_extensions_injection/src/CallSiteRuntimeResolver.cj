@@ -53,7 +53,7 @@ class CallSiteRuntimeResolver <: CallSiteVisitor<RuntimeResolverContext, ?Object
     }
 
     protected func visitCollection(callSite: CollectionCallSite, context: RuntimeResolverContext): ?Object {
-        let array = IReferenceWrapper.create(callSite.itemType, callSite.serviceCallSites.size)
+        let array = IReferenceCollectionWrapper.create(callSite.itemType, callSite.serviceCallSites.size)
 
         for ((index, callSite) in callSite.serviceCallSites |> enumerate) {
             if (let Some(value) <- visitCallSite(callSite, context)) {
