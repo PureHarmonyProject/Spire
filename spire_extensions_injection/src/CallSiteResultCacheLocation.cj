@@ -24,9 +24,11 @@ enum CallSiteResultCacheLocation <: Comparable<CallSiteResultCacheLocation> {
     }
 
     public func compare(that: CallSiteResultCacheLocation) {
-        if (value == that.value) {
+        let a = value
+        let b = that.value
+        if (a == b) {
             Ordering.EQ
-        } else if (value >= that.value) {
+        } else if (a >= b) {
             Ordering.GT
         } else {
             Ordering.LT

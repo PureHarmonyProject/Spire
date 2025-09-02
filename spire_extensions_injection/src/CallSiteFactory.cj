@@ -327,7 +327,7 @@ class CallSiteFactory <: IServiceProviderIsService {
     }
 
     /*
-    对于Iterable<T>获取最小生命周期
+    对于Collection<T>获取最大生命周期
      */
     private func getCommonCacheLocation(locationA: CallSiteResultCacheLocation, locationB: CallSiteResultCacheLocation) {
         if (locationA > locationB) {
