@@ -60,13 +60,7 @@ extend ServiceCollection <: OptionsServiceCollectionExtensions {
 
         tryAddSingleton<IOptionsMonitor<TOptions>, OptionsMonitor<TOptions>>()
 
-        tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>> {
-            sp =>
-            let configures = sp.getAll<IConfigureOptions<TOptions>>()
-            let configureAfters = sp.getAll<IConfigureAfterOptions<TOptions>>()
-            let validations = sp.getAll<IValidateOptions<TOptions>>()
-            return OptionsFactory<TOptions>(configures, configureAfters, validations)
-        }
+        tryAddSingleton<IOptionsFactory<TOptions>, OptionsFactory<TOptions>>()
 
         tryAddSingleton<IOptionsMonitorCache<TOptions>, OptionsCache<TOptions>>()
 

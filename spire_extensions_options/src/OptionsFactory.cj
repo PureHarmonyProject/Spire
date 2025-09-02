@@ -10,12 +10,12 @@ import std.reflect.*
 import std.collection.*
 
 public class OptionsFactory<TOptions> <: IOptionsFactory<TOptions> where TOptions <: Object {
-    private let _configures: Array<IConfigureOptions<TOptions>>
-    private let _validations: Array<IValidateOptions<TOptions>>
-    private let _configureAfters: Array<IConfigureAfterOptions<TOptions>>
+    private let _configures: Collection<IConfigureOptions<TOptions>>
+    private let _validations: Collection<IValidateOptions<TOptions>>
+    private let _configureAfters: Collection<IConfigureAfterOptions<TOptions>>
 
-    public init(configures: Array<IConfigureOptions<TOptions>>,
-        configureAfters: Array<IConfigureAfterOptions<TOptions>>, validations: Array<IValidateOptions<TOptions>>) {
+    public init(configures: Collection<IConfigureOptions<TOptions>>,
+        configureAfters: Collection<IConfigureAfterOptions<TOptions>>, validations: Collection<IValidateOptions<TOptions>>) {
         _configures = configures
         _configureAfters = configureAfters
         _validations = validations

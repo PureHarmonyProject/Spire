@@ -1,78 +1,96 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-// This code has been modified and is maintained by the Soulsoft organization.
-// The modifications to this file by Soulsoft are licensed under the MIT license.
-
 package spire_extensions_injection
 
 import std.sort.*
 import std.reflect.*
 import std.collection.*
 
-/*
-用于创建依赖容器中但是未注册的服务
-*/
 public class ActivatorUtilities {
-    public static func createInstance<T>(serviceProvider: IServiceProvider, args: Array<Any>): T {
-        let obj = createInstance(serviceProvider, TypeInfo.of<T>(), args) as T
-        return obj.getOrThrow()
+    private init() {
     }
 
-    public static func createInstance(serviceProvider: IServiceProvider, typeInfo: TypeInfo, args: Array<Any>): Object {
-        if (let classTypeInfo: ClassTypeInfo <- typeInfo) {
-            let constructors = classTypeInfo.constructors |> collectArray
-            if (constructors.size > 1) {
-                sort(constructors, by: {x, y =>
-                    if ( x.parameters.size > y.parameters.size) {
-                        Ordering.LT
-                    } else if ( x.parameters.size < y.parameters.size) {
-                        Ordering.GT
-                    } else {
-                        Ordering.EQ
-                    }
-                })
-            }
-            for ((index, constructor) in constructors |> enumerate) {
-                let isFinal = index + 1 == constructors.size
-                if (let Some(instance) <- apply(constructor, serviceProvider, isFinal, args)) {
-                    return instance
-                }
-            }
+    public static func createInstance<T>(provider: IServiceProvider, parameters: Array<Any>): T {
+        let instance = createInstance(provider, TypeInfo.of<T>(), parameters) as T
+        return instance.getOrThrow()
+    }
+
+    public static func createInstance(provider: IServiceProvider, serviceType: TypeInfo, parameters: Array<Any>): Object {
+        if (!(serviceType is ClassTypeInfo) || (serviceType as ClassTypeInfo).flatMap {f => f.isAbstract()} == true) {
+            throw UnsupportedException("Instances of abstract classes cannot be created.")
         }
+       
+        let callSiteFactory = provider.getOrThrow<IServiceProviderIsService>()
+        let matcher = ConstructorMatcher(serviceType, callSiteFactory, parameters)
+
+        if (let Some(constructor) <- matcher.find()) {
+            return matcher.createInstance(provider, constructor)
+        }
+
         throw UnsupportedException(
-            "Failed to create an instance because no applicable constructor was found for the type '${typeInfo}'. Ensure that the provided arguments match one of the constructors' signatures."
-        )
+            "A suitable constructor for type '${serviceType}' could not be located. Ensure the type is concrete and all parameters of a public constructor are either registered as services or passed as arguments. Also ensure no extraneous arguments are provided.")
+    }
+}
+
+private struct ConstructorMatcher {
+    ConstructorMatcher(let typeInfo: TypeInfo, let callSiteFactory: IServiceProviderIsService,
+        let parameterValues: Array<Any>) {
     }
 
-    private static func apply(constructor: ConstructorInfo, sp: IServiceProvider, isFinal: Bool, customArguments: Array<Any>): ?Object {
-        var customArgumentIndex = 0
-        let arguments = ArrayList<Any>()
-        for (pattern in constructor.parameters) {
-            if (let Some(argument) <- sp.getOrDefault(pattern.typeInfo)) {
-                arguments.add(argument)
+    public func createInstance(provider: IServiceProvider, constructor: ConstructorInfo): Object {
+        let parameters = constructor.parameters
+        let args = Array<Any>(parameters.size, repeat: None)
+        var parameterValueIndex = 0
+        for ((index, parameterInfo) in parameters |> enumerate) {
+            if (callSiteFactory.isService(parameterInfo.typeInfo)) {
+                args[index] = provider.getOrThrow(parameterInfo.typeInfo)
             } else {
-                if (customArguments.size <= customArgumentIndex) {
-                    return noServiceResult(isFinal, pattern.typeInfo)
-                }
-                let customArgument = customArguments[customArgumentIndex]
-                let customArgumentType = TypeInfo.of(customArgument)
-                if (!(customArgumentType == pattern.typeInfo || customArgumentType.isSubtypeOf(pattern.typeInfo))) {
-                    return noServiceResult(isFinal, pattern.typeInfo)
-                }
-                arguments.add(customArguments[customArgumentIndex])
-                customArgumentIndex += 1
+                args[index] = parameterValues[parameterValueIndex]
+                parameterValueIndex++
             }
         }
-        return constructor.apply(arguments |> collectArray) as Object
+
+        return (constructor.apply(args) as Object).getOrThrow()
     }
 
-    private static func noServiceResult(isFinal: Bool, typeInfo: TypeInfo): ?Object {
-        if (isFinal) {
-            //如果是最后一个构造器依赖的服务未注册
-            throw NoneValueException("No service for type ${typeInfo}' has been registered.")
-        } else {
-            return None
+    public func find(): ?ConstructorInfo {
+        var bestConstructor: ?ConstructorInfo = None
+        if (let classTypeInfo: ClassTypeInfo <- typeInfo) {
+            let constructors = classTypeInfo.constructors.toArray()
+            sort(constructors, key: {a => a.parameters.size}, descending: true)
+            let parameterTypes = parameterValues |> map {f => TypeInfo.of(f)} |> collectArray
+            for (constructor in constructors) {
+                if (isMatch(constructor, parameterTypes)) {
+                    if (bestConstructor.isNone()) {
+                        bestConstructor = constructor
+                    } else {
+                        throw UnsupportedException(
+                            "Multiple constructors accepting all given argument types have been found in type '${typeInfo}'. There should only be one applicable constructor.")
+                    }
+                }
+            }
         }
+
+        return bestConstructor
+    }
+
+    /*
+    判断构造器是否匹配
+    1. 参数必须是服务类型，或者和用户输入的类型匹配
+    2. 必须和用户输入的参数数量匹配
+     */
+    private func isMatch(constructor: ConstructorInfo, parameterTypes: Array<TypeInfo>) {
+        
+        let parameters = constructor.parameters
+        var parameterTypeMatchCount = 0
+        for (parameter in parameters) {
+            let isService = callSiteFactory.isService(parameter.typeInfo)
+            let isSubtype = parameterTypes |> any{f => f.isSubtypeOf(parameter.typeInfo)}
+            if (!(isService || isSubtype)) {
+                return false
+            }
+            if (!isService) {
+                parameterTypeMatchCount++
+            }
+        }
+        return parameterTypeMatchCount == parameterTypes.size
     }
 }
