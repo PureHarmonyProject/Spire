@@ -1,14 +1,14 @@
 [package]
-  cjc-version = "1.0.0"
-  compile-option = ""
-  description = "nothing here"
-  link-option = ""
+  cjc-version = "1.0.1"
   name = "spire_extensions_injection"
-  output-type = "static"
-  override-compile-option = ""
-  src-dir = ""
-  target-dir = ""
+  description = "nothing here"
   version = "1.0.0"
+  target-dir = ""
+  src-dir = ""
+  output-type = "static"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
   package-configuration = {}
 
 [dependencies]

@@ -16,7 +16,7 @@ public class Host <: IHost {
     private let _services: IServiceProvider
     private let _environment: IHostEnvironment
     private let _configuration: IConfiguration
-    private let _hostedServices: Array<IHostedService>
+    private let _hostedServices: Collection<IHostedService>
 
     init(services: IServiceProvider, lifetime: HostLifetime) {
         _services = services

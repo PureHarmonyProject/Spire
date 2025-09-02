@@ -7,11 +7,12 @@
 package spire_extensions_injection
 
 import std.reflect.*
+import std.collection.*
 
 /*
 服务描述信息
  */
-public class ServiceDescriptor {
+public class ServiceDescriptor <: ToString {
     private let _serviceType: TypeInfo
     private let _implementationType: ?TypeInfo
     private let _implementationInstance: ?Object
@@ -37,8 +38,7 @@ public class ServiceDescriptor {
     public init(serviceType: TypeInfo, implementationType: TypeInfo, lifetime: ServiceLifetime) {
         if (!implementationType.isSubtypeOf(serviceType)) {
             UnsupportedException(
-                "The implementation type '${implementationType}' is not a subtype of the service type '${serviceType}'. "
-            )
+                "The implementation type '${implementationType}' is not a subtype of the service type '${serviceType}'. ")
         }
         _serviceType = serviceType
         _implementationType = implementationType
@@ -77,6 +77,12 @@ public class ServiceDescriptor {
         }
     }
 
+    public func toString() {
+        return serviceType.toString()
+    }
+}
+
+extend ServiceDescriptor {
     public static func singleton<TServiceType>(instance: TServiceType) {
         ServiceDescriptor(TypeInfo.of<TServiceType>(), instance)
     }
@@ -89,7 +95,7 @@ public class ServiceDescriptor {
         ServiceDescriptor(TypeInfo.of<TServiceType>(), sp, ServiceLifetime.Scoped)
     }
 
-    public static func transient<TServiceType, TImplementationType>(sp: (IServiceProvider) -> TImplementationType) where TImplementationType <: Object{
+    public static func transient<TServiceType, TImplementationType>(sp: (IServiceProvider) -> TImplementationType) where TImplementationType <: Object {
         ServiceDescriptor(TypeInfo.of<TServiceType>(), sp, ServiceLifetime.Transient)
     }
 
@@ -119,5 +125,16 @@ public class ServiceDescriptor {
 
     public static func singleton(serviceType: TypeInfo, implementationType: TypeInfo) {
         ServiceDescriptor(serviceType, implementationType, ServiceLifetime.Singleton)
+    }
+}
+
+extend ArrayList<ServiceDescriptor> {
+    internal func indexOf(element: ServiceDescriptor): ?Int64 {
+        for (index in 0..this.size) {
+            if (refEq(this[index], element)) {
+                return index
+            }
+        }
+        return None
     }
 }

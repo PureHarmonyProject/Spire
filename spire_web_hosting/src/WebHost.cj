@@ -18,7 +18,7 @@ public class WebHost <: ApplicationBuilder & IHost {
     private let _environment: IHostEnvironment
     private let _configuration: IConfiguration
     private let _properties = HashMap<String, Any>()
-    private let _hostedServices: Array<IHostedService>
+    private let _hostedServices: Collection<IHostedService>
     private let _middlewares = ArrayList<(RequestDelegate) -> RequestDelegate>()
 
     init(services: IServiceProvider, lifetime: HostLifetime) {
