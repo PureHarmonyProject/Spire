@@ -23,7 +23,7 @@ public class ActivatorUtilities {
         if (!(serviceType is ClassTypeInfo) || (serviceType as ClassTypeInfo).flatMap {f => f.isAbstract()} == true) {
             throw UnsupportedException("Instances of abstract classes cannot be created.")
         }
-       
+
         let callSiteFactory = provider.getOrThrow<IServiceProviderIsService>()
         let matcher = ConstructorMatcher(serviceType, callSiteFactory, parameters)
 
@@ -37,8 +37,10 @@ public class ActivatorUtilities {
 }
 
 private struct ConstructorMatcher {
+    private let parameterValueTypes: Array<TypeInfo>
     ConstructorMatcher(let typeInfo: TypeInfo, let callSiteFactory: IServiceProviderIsService,
         let parameterValues: Array<Any>) {
+        parameterValueTypes = parameterValues |> map {f => TypeInfo.of(f)} |> collectArray
     }
 
     public func createInstance(provider: IServiceProvider, constructor: ConstructorInfo): Object {
@@ -46,11 +48,12 @@ private struct ConstructorMatcher {
         let args = Array<Any>(parameters.size, repeat: None)
         var parameterValueIndex = 0
         for ((index, parameterInfo) in parameters |> enumerate) {
-            if (callSiteFactory.isService(parameterInfo.typeInfo)) {
-                args[index] = provider.getOrThrow(parameterInfo.typeInfo)
-            } else {
+            // 用户传入参数优先
+            if (parameterValueTypes[parameterValueIndex].isSubtypeOf(parameterInfo.typeInfo)) {
                 args[index] = parameterValues[parameterValueIndex]
                 parameterValueIndex++
+            } else {
+                args[index] = provider.getOrThrow(parameterInfo.typeInfo)
             }
         }
 
@@ -62,9 +65,8 @@ private struct ConstructorMatcher {
         if (let classTypeInfo: ClassTypeInfo <- typeInfo) {
             let constructors = classTypeInfo.constructors.toArray()
             sort(constructors, key: {a => a.parameters.size}, descending: true)
-            let parameterTypes = parameterValues |> map {f => TypeInfo.of(f)} |> collectArray
             for (constructor in constructors) {
-                if (isMatch(constructor, parameterTypes)) {
+                if (isMatch(constructor, parameterValueTypes)) {
                     if (bestConstructor.isNone()) {
                         bestConstructor = constructor
                     } else {
@@ -84,16 +86,14 @@ private struct ConstructorMatcher {
     2. 必须和用户输入的参数数量匹配
      */
     private func isMatch(constructor: ConstructorInfo, parameterTypes: Array<TypeInfo>) {
-        
-        let parameters = constructor.parameters
         var parameterTypeMatchCount = 0
-        for (parameter in parameters) {
+        for (parameter in constructor.parameters) {
             let isService = callSiteFactory.isService(parameter.typeInfo)
-            let isSubtype = parameterTypes |> any{f => f.isSubtypeOf(parameter.typeInfo)}
+            let isSubtype = parameterTypes |> any {f => f.isSubtypeOf(parameter.typeInfo)}
             if (!(isService || isSubtype)) {
                 return false
             }
-            if (!isService) {
+            if (!isService || isSubtype) {
                 parameterTypeMatchCount++
             }
         }
