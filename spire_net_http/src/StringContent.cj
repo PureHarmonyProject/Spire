@@ -20,6 +20,6 @@ public class StringContent <: ByteArrayContent {
 
     public init(content: String, mediaType: String, encoding: String) {
         super(content.toArray())
-        headers.add("Content-Type", "${mediaType}; charset=${encoding}")
+        headers.add(HeaderNames.ContentType, "${mediaType}; charset=${encoding}")
     }
 }
