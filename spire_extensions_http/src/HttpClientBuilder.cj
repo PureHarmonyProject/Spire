@@ -29,12 +29,12 @@ public class HttpClientBuilder {
 }
 
 extend HttpClientBuilder {
-
     public func setHandlerLifetime(handlerLifetime: Duration) {
         if (handlerLifetime != Duration.Zero && handlerLifetime < HttpClientFactoryOptions.MinimumHandlerLifetime) {
-            throw IllegalArgumentException("The handler lifetime must be at least ${HttpClientFactoryOptions.MinimumHandlerLifetime.toSeconds()} second.")
+            throw IllegalArgumentException(
+                "The handler lifetime must be at least ${HttpClientFactoryOptions.MinimumHandlerLifetime.toSeconds()} second.")
         }
-       
+
         services.configure<HttpClientFactoryOptions>(name) {
             options => options.handlerLifetime = handlerLifetime
         }
@@ -57,33 +57,27 @@ extend HttpClientBuilder {
 
     public func addHttpMessageHandler(configureHandler: () -> DelegatingHandler) {
         services.configure<HttpClientFactoryOptions>(name) {
-            options => options
-                .httpMessageHandlerBuilderActions
-                .add({
-                    b => b.additionalHandlers.add(configureHandler())
-                })
+            options => options.httpMessageHandlerBuilderActions.add({
+                b => b.additionalHandlers.add(configureHandler())
+            })
         }
         return this
     }
 
     public func addHttpMessageHandler(configureHandler: (IServiceProvider) -> DelegatingHandler) {
         services.configure<HttpClientFactoryOptions>(name) {
-            options => options
-                .httpMessageHandlerBuilderActions
-                .add({
-                    b => b.additionalHandlers.add(configureHandler(b.services))
-                })
+            options => options.httpMessageHandlerBuilderActions.add({
+                b => b.additionalHandlers.add(configureHandler(b.services))
+            })
         }
         return this
     }
 
     public func addHttpMessageHandler<THandler>() where THandler <: DelegatingHandler {
         services.configure<HttpClientFactoryOptions>(name) {
-            options => options
-                .httpMessageHandlerBuilderActions
-                .add({
-                    b => b.additionalHandlers.add(b.services.getOrThrow<THandler>())
-                })
+            options => options.httpMessageHandlerBuilderActions.add({
+                b => b.additionalHandlers.add(b.services.getOrThrow<THandler>())
+            })
         }
         return this
     }
@@ -106,39 +100,59 @@ extend HttpClientBuilder {
 
     public func configurePrimaryHttpMessageHandler(configureHandler: (IServiceProvider) -> HttpMessageHandler) {
         services.configure<HttpClientFactoryOptions>(name) {
-            options => options
-                .httpMessageHandlerBuilderActions
-                .add({
-                    b => b.primaryHandler = configureHandler(b.services)
-                })
+            options => options.httpMessageHandlerBuilderActions.add({
+                b => b.primaryHandler = configureHandler(b.services)
+            })
         }
         return this
     }
 
     public func configurePrimaryHttpMessageHandler<THandler>() where THandler <: HttpMessageHandler {
         services.configure<HttpClientFactoryOptions>(name) {
-            options => options
-                .httpMessageHandlerBuilderActions
-                .add({
-                    b => b.primaryHandler = b.services.getOrThrow<THandler>()
-                })
+            options => options.httpMessageHandlerBuilderActions.add({
+                b => b.primaryHandler = b.services.getOrThrow<THandler>()
+            })
         }
         return this
     }
 
-    public func addTypedClient<TClient>(factory: (HttpClient, IServiceProvider) -> TClient) where TClient <: Object {
-        addTypedClientCore<TClient>(false, factory)
+    public func addTypedClient<TClient, TImplementation>() where TImplementation <: Object {
+        addTypedClientCore<TClient, TImplementation>(false)
         return this
     }
 
-    private func addTypedClientCore<TClient>(validateSingleType: Bool, factory: (HttpClient, IServiceProvider) -> TClient) where TClient <: Object {
-        reserveClient(TypeInfo.of<TClient>(), name, validateSingleType)
-        services.addTransient<TClient, TClient> {
+    internal func addTypedClientCore<TClient, TImplementation>(validateSingleType: Bool) where TImplementation <: Object {
+        reserveClient(TypeInfo.of<TClient>(), name, false)
+
+        services.addTransient<TClient, TImplementation> {
             sp =>
-            let httpClientFactory = sp.getOrThrow<IHttpClientFactory>()
-            let httpClient = httpClientFactory.createClient(name)
-            return factory(httpClient, sp)
+                let clientFactory = sp.getOrThrow<IHttpClientFactory>()
+                let client = clientFactory.createClient(name)
+                ActivatorUtilities.createInstance<TImplementation>(sp, client)
         }
+        return this
+    }
+
+    public func addTypedClient<TClient, TImplementation>(factory: (HttpClient) -> TImplementation) where TImplementation <: Object {
+        reserveClient(TypeInfo.of<TClient>(), name, false)
+        services.addTransient<TClient, TImplementation> {
+            sp =>
+                let httpClientFactory = sp.getOrThrow<IHttpClientFactory>()
+                let httpClient = httpClientFactory.createClient(name)
+                return factory(httpClient)
+        }
+        return this
+    }
+
+    public func addTypedClient<TClient, TImplementation>(factory: (HttpClient, IServiceProvider) -> TImplementation) where TImplementation <: Object {
+        reserveClient(TypeInfo.of<TClient>(), name, false)
+        services.addTransient<TClient, TImplementation> {
+            sp =>
+                let httpClientFactory = sp.getOrThrow<IHttpClientFactory>()
+                let httpClient = httpClientFactory.createClient(name)
+                return factory(httpClient, sp)
+        }
+        return this
     }
 
     private func reserveClient(typeInfo: TypeInfo, name: String, validateSingleType: Bool) {
@@ -157,6 +171,8 @@ extend HttpClientBuilder {
 
     private func getHttpClientMappingRegistry() {
         let descriptor = services |> filter {f => f.serviceType == TypeInfo.of<HttpClientMappingRegistry>()} |> first
-        return descriptor.flatMap {f => f.implementationInstance as HttpClientMappingRegistry}.getOrThrow()
+        return descriptor
+            .flatMap {f => f.implementationInstance.flatMap {f => f as HttpClientMappingRegistry}}
+            .getOrThrow()
     }
 }
