@@ -1,9 +1,8 @@
-package spire_extensions_logging.unittests
+package spire_unnitests.logging.unittests
 
 import std.collection.*
 import spire_extensions_logging.*
 
-// @When[test]
 /**
  * Logging Test Helper
  * Provides helper methods and test data for testing

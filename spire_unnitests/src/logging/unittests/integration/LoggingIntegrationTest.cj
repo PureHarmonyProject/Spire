@@ -1,6 +1,5 @@
 package spire_extensions_logging.unittests.integration
 
-@When[!test]
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.collection.*
@@ -11,7 +10,6 @@ import spire_extensions_logging.unittests.*
  * 日志构建器集成测试
  * 测试LoggingBuilder与LoggerFactory的集成
  */
-@When[!test]
 @Test
 func 日志构建器集成测试() {
     // 创建日志构建器并添加控制台提供者
@@ -35,7 +33,6 @@ func 日志构建器集成测试() {
  * 日志工厂集成测试
  * 测试LoggerFactory创建多个日志器
  */
-@When[!test]
 @Test
 func 日志工厂集成测试() {
     let builder = LoggingBuilder()

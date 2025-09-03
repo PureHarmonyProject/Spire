@@ -1,10 +1,10 @@
-package spire_extensions_logging.unittests.basic
-@When[!test]
+package spire_unnitests.logging.unittests.basic
+
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.collection.*
 import spire_extensions_logging.*
-import spire_extensions_logging.unittests.*
+import spire_unnitests.logging.unittests.*
 
 /**
  * 日志器基本功能测试

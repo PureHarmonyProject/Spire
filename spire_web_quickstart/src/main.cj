@@ -6,6 +6,7 @@ import std.collection.*
 import spire_web_quickstart.controllers.*
 import spire_web_quickstart.authentication.*
 import spire_web_quickstart.infrastructure.*
+import spire_extensions_logging.*
 //framework
 
 main(args: Array<String>): Int64 {
@@ -152,6 +153,7 @@ main(args: Array<String>): Int64 {
                 //所有的action需要授权
                 .requireAuthorization("custom")
     }
+
     host.run()
     return 0
 }
