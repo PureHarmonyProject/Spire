@@ -25,7 +25,7 @@ extend ServiceCollection <: HttpClientFactoryServiceCollectionExtensions {
         this.tryAddSingleton<IHttpClientFactory, DefaultHttpClientFactory>()
         this.tryAddTransient<HttpMessageHandlerBuilder, DefaultHttpMessageHandlerBuilder>()
         this.tryAddSingleton<HttpClient, HttpClient> {
-            sp => return sp.getOrThrow<IHttpClientFactory>().createClient(String.empty)
+            sp => sp.getOrThrow<IHttpClientFactory>().createClient(String.empty)
         }
         return this
     }

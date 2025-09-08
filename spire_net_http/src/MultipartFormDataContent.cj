@@ -20,7 +20,7 @@ public class MultipartFormDataContent <: HttpContent {
 
     public init(boundary: String) {
         _boundary = boundary
-        headers.add("content-type", "multipart/form-data; boundary=${_boundary}")
+        headers.add(HeaderNames.ContentType, "multipart/form-data; boundary=${_boundary}")
     }
 
     public func add(content: HttpContent) {
