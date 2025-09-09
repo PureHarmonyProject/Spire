@@ -48,7 +48,8 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func get(requestUri: String) {
-        return get(URL.parse(requestUri))
+        let resolvedUri = resolveRequestUri(requestUri)
+        return get(resolvedUri)
     }
 
     public func get(requestUri: URL) {
@@ -93,7 +94,8 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func post(requestUri: String, content: ?HttpContent) {
-        return post(URL.parse(requestUri), content)
+        let resolvedUri = resolveRequestUri(requestUri)
+        return post(resolvedUri, content)
     }
 
     public func post(requestUri: URL, content: ?HttpContent) {
@@ -103,7 +105,8 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func put(requestUri: String, content: ?HttpContent) {
-        return put(URL.parse(requestUri), content)
+        let resolvedUri = resolveRequestUri(requestUri)
+        return put(resolvedUri, content)
     }
 
     public func put(requestUri: URL, content: ?HttpContent) {
@@ -113,7 +116,8 @@ public class HttpClient <: HttpMessageInvoker {
     }
 
     public func delete(requestUri: String, content: ?HttpContent) {
-        return delete(URL.parse(requestUri), content)
+        let resolvedUri = resolveRequestUri(requestUri)
+        return delete(resolvedUri, content)
     }
 
     public func delete(requestUri: URL, content: ?HttpContent) {
@@ -129,23 +133,42 @@ public class HttpClient <: HttpMessageInvoker {
         return super.send(request)
     }
 
+    // 解析相对URI请求，与 baseAddress 合并返回绝对URI
+    private func resolveRequestUri(requestUri: String): URL {
+        let parsedUri = URL.parse(requestUri)
+        if (!parsedUri.isAbsoluteURL()) {
+            if (let Some(baseAddress) <- baseAddress) {
+                let baseStr = baseAddress.toString()
+                let mergedPath = if (requestUri.startsWith("/")) {
+                    baseStr + requestUri
+                } else {
+                    baseStr + "/" + requestUri
+                }
+                let resolvedUri = URL.parse(mergedPath)
+                return resolvedUri
+            } else {
+                throw IllegalArgumentException(StringResx.net_http_client_invalid_requesturi)
+            }
+        }
+        return parsedUri
+    }
+
     private func prepareRequestMessage(request: HttpRequestMessage) {
         if (baseAddress.isNone() && request.requestUri.isNone()) {
             throw IllegalArgumentException(StringResx.net_http_client_invalid_requesturi)
         }
 
         if (let Some(requestUri) <- request.requestUri) {
+            // 如果 URI 是相对路径，调用封装好的方法解析
             if (!requestUri.isAbsoluteURL()) {
-                if (let Some(baseAddress) <- baseAddress) {
-                    request.requestUri = URL.parse(URL.mergePaths(baseAddress.toString(), requestUri.toString()))
-                } else {
-                    throw IllegalArgumentException(StringResx.net_http_client_invalid_requesturi)
-                }
+                request.requestUri = resolveRequestUri(requestUri.toString())
             }
         } else {
+            // 如果 requestUri 为空，使用 baseAddress
             request.requestUri = baseAddress
         }
 
+        // 设置默认请求头
         if (let Some(defaultRequestHeaders) <- _defaultRequestHeaders) {
             for ((name, values) in defaultRequestHeaders) {
                 for (value in values) {
