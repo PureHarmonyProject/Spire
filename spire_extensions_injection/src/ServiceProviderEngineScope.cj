@@ -19,7 +19,7 @@ class ServiceProviderEngineScope <: IServiceProvider & IServiceScope & IServiceS
     private var _disposables: ?List<Object> = None
     private let _resolvedServices = HashMap<ServiceCacheKey, ?Object>()
 
-    ServiceProviderEngineScope(let rootProvder: ServiceProvider, let isRootScope!: Bool) {
+    ServiceProviderEngineScope(let rootProvider: ServiceProvider, let isRootScope!: Bool) {
     }
 
     public prop sync: Mutex {
@@ -35,12 +35,12 @@ class ServiceProviderEngineScope <: IServiceProvider & IServiceScope & IServiceS
     }
 
     public func createScope(): IServiceScope {
-        return rootProvder.createScope()
+        return rootProvider.createScope()
     }
 
     public func getOrDefault(serviceType: TypeInfo): ?Object {
         checkIsClosed()
-        rootProvder.getOrDefault(ServiceIdentifier(serviceType), this)
+        rootProvider.getOrDefault(ServiceIdentifier(serviceType), this)
     }
 
     public prop services: IServiceProvider {
@@ -111,8 +111,8 @@ class ServiceProviderEngineScope <: IServiceProvider & IServiceScope & IServiceS
             }
             _isClosed = true
 
-            if (isRootScope && !rootProvder.isClosed()) {
-                rootProvder.close()
+            if (isRootScope && !rootProvider.isClosed()) {
+                rootProvider.close()
             }
 
             return _disposables

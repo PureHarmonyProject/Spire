@@ -37,7 +37,7 @@ public class ServiceDescriptor <: ToString {
 
     public init(serviceType: TypeInfo, implementationType: TypeInfo, lifetime: ServiceLifetime) {
         if (!implementationType.isSubtypeOf(serviceType)) {
-            UnsupportedException(
+            throw UnsupportedException(
                 "The implementation type '${implementationType}' is not a subtype of the service type '${serviceType}'. ")
         }
         _serviceType = serviceType

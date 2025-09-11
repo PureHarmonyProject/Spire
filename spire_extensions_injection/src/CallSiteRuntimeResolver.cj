@@ -85,7 +85,7 @@ class CallSiteRuntimeResolver <: CallSiteVisitor<RuntimeResolverContext, ?Object
             // 表示解析链中已施工图纸的产物
             return value
         }
-        let root = context.scope.rootProvder.root
+        let root = context.scope.rootProvider.root
         let lock = callSite.lock
         // 使用图纸锁
         synchronized(lock) {
