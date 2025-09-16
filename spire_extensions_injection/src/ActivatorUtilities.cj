@@ -49,7 +49,7 @@ private struct ConstructorMatcher {
         var parameterValueIndex = 0
         for ((index, parameterInfo) in parameters |> enumerate) {
             // 用户传入参数优先
-            if (parameterValueTypes[parameterValueIndex].isSubtypeOf(parameterInfo.typeInfo)) {
+            if (parameterValueIndex < parameterValues.size && parameterValueTypes[parameterValueIndex].isSubtypeOf(parameterInfo.typeInfo)) {
                 args[index] = parameterValues[parameterValueIndex]
                 parameterValueIndex++
             } else {
