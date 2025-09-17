@@ -34,8 +34,7 @@ abstract class CallSiteVisitor<TContext, TResult> {
             case (CallSiteKind.Collection, callSite: CollectionCallSite) => visitCollection(callSite, context)
             case (CallSiteKind.Factory, callSite: FactoryCallSite) => visitFactory(callSite, context)
             case (CallSiteKind.Constructor, callSite: ConstructorCallSite) => visitConstructor(callSite, context)
-            case (CallSiteKind.ServiceProvider, callSite: ServiceProviderCallSite) => visitServiceProvider(callSite,
-                context)
+            case (CallSiteKind.ServiceProvider, callSite: ServiceProviderCallSite) => visitServiceProvider(callSite, context)
             case _ => throw UnsupportedException("Call site type ${ClassTypeInfo.of(callSite)} is not supported")
         }
     }
