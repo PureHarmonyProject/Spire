@@ -51,6 +51,10 @@
 |                | spire_identity_claims              | 可选   | 身份声明                |
 |                | spire_identity_tokens_jwt          | 可选   | JWT 令牌支持            |
 |                | spire_identity_protocols_oidc      | 可选   | OpenID Connect 协议实现 |
+| **对象序列化**| spire_serialization      | 可选   | 基于字段驱动的对象序列化工具 |
+| **ORM**        | sqlsharp      | 可选   | 轻量级ORM |
+|                        | sqlsharp-utils      | 可选   | 实体生成工具 |
+
 
 ## 发布时间线
 
