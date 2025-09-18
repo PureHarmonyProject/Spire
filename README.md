@@ -1,4 +1,4 @@
-# spire TianQing
+# spire 
 
 A modern web framework developed in the Cangjie language and inspired by the ASP.NET Core design philosophy. Developed in collaboration with the official Cangjie team, we strive to create a lightweight, high-performance, and scalable application development experience.
 
