@@ -1,66 +1,65 @@
-# spire 天擎
+# spire TianQing
 
-一个基于仓颉语言开发、借鉴 ASP.NET Core 设计哲学的现代化 Web 框架。我们与仓颉官方团队共同研发，致力于打造轻量级、高性能、可扩展的应用开发体验。
+A modern web framework developed in the Cangjie language and inspired by the ASP.NET Core design philosophy. Developed in collaboration with the official Cangjie team, we strive to create a lightweight, high-performance, and scalable application development experience.
 
-✨ **核心特性**：
+✨ **Core Features**:
 
-- **轻量化架构**：低侵入性设计，高度可配置
-- **模块化扩展**：功能组件按需组合
-- **快速集成**：通过 GitCode 配置即可快速接入
-- **微服务支持**：持续提供完善微服务组件生态
-- **AI 集成**：持续探索智能化开发方案
+- **Lightweight Architecture**: Low-intrusive design, highly configurable
+- **Modular Extensibility**: Combine functional components on demand
+- **Fast Integration**: Quickly integrate via GitCode configuration
+- **Microservice Support**: Continuously improve the microservice component ecosystem
+- **AI Integration**: Continuously explore intelligent development solutions
 
-以仓颉语言为核心，构建新一代高效开发框架。
+Building a next-generation, efficient development framework with the Cangjie language at its core.
 
-## 加入我们
+## Join Us
 
-诚邀开发者共同构建：
+Developers are sincerely invited to join us in building:
 
-- 🧩 标准化组件库
-- 🔗 统一技术生态
-- 🌐 开源协作平台
+- 🧩 Standardized component library
+- 🔗 Unified technology ecosystem
+- 🌐 Open source collaboration platform
 
-> 官方交流 QQ 群 `307564339`
+> Official communication QQ group `307564339`
 
-## 快速开始
+## Quick Start
 
-[项目文档](https://docs.cangjie-spire.com)
+[Project Documentation](https://docs.cangjie-spire.com)
 
-## 功能模块
+## Functional Modules
 
-| 模块分类       | 模块名称                            | 必要性 | 功能描述                |
+| Module Category | Module Name | Necessity | Functional Description |
 | -------------- | ----------------------------------- | ------ | ----------------------- |
-| **Web 核心**   | spire_web_http                     | 必需   | HTTP 核心接口           |
-|                | spire_web_routing                  | 必需   | 路由与终结点管理        |
-|                | spire_web_hosting                  | 必需   | Web 主机服务            |
-| **Web 中间件** | spire_web_mvc                      | 可选   | MVC 功能支持            |
-|                | spire_web_cors              | 可选   | 跨域中间件          |
-|                | spire_web_staticfiles              | 可选   | 静态文件中间件          |
-|                | spire_web_healthchecks             | 可选   | 健康检查中间件          |
-| **身份认证**   | spire_web_authorization            | 可选   | 授权中间件              |
-|                | spire_web_authentication           | 可选   | 基础认证中间件          |
-|                | spire_web_authentication_jwtbearer | 可选   | JWT 认证方案            |
-| **基础设施**   | spire_extensions_options           | 必需   | 配置选项管理            |
-|                | spire_extensions_injection         | 必需   | 依赖注入                |
-|                | spire_extensions_hosting           | 可选   | 通用主机服务            |
-|                | spire_extensions_caching           | 可选   | 分布式内存缓存          |
-|                | spire_extensions_healthchecks      | 可选   | 健康检查服务            |
-|                | spire_extensions_configuration     | 可选   | 统一配置系统            |
-|                | spire_extensions_logging           | 可选   | 日志系统                |
-| **认证设施**   | spire_identity_server              | 可选   | OAuth2.0/OIDC 认证服务  |
-|                | spire_identity_claims              | 可选   | 身份声明                |
-|                | spire_identity_tokens_jwt          | 可选   | JWT 令牌支持            |
-|                | spire_identity_protocols_oidc      | 可选   | OpenID Connect 协议实现 |
-| **对象序列化**| spire_serialization      | 可选   | 基于字段驱动的对象序列化工具 |
-| **ORM**        | sqlsharp      | 可选   | 轻量级ORM |
-|                        | sqlsharp-utils      | 可选   | 实体生成工具 |
+| **Web Core** | spire_web_http | Required | HTTP Core API |
+| | spire_web_routing | Required | Routing and Endpoint Management |
+| | spire_web_hosting | Required | Web Hosting Service |
+| **Web Middleware** | spire_web_mvc | Optional | MVC Feature Support |
+| | spire_web_cors | Optional | Cross-origin middleware |
+| | spire_web_staticfiles | Optional | Static file middleware |
+| | spire_web_healthchecks | Optional | Health check middleware |
+| **Authentication** | spire_web_authorization | Optional | Authorization middleware |
+| | spire_web_authentication | Optional | Basic authentication middleware |
+| | spire_web_authentication_jwtbearer | Optional | JWT authentication scheme |
+| **Infrastructure** | spire_extensions_options | Required | Configuration option management |
+| | spire_extensions_injection | Required | Dependency injection |
+| | spire_extensions_hosting | Optional | Generic host service |
+| | spire_extensions_caching | Optional | Distributed in-memory cache |
+| | spire_extensions_healthchecks | Optional | Health check service |
+| | spire_extensions_configuration | Optional | Unified Configuration System |
+| | spire_extensions_logging | Optional | Logging System |
+| **Authentication Infrastructure** | spire_identity_server | Optional | OAuth2.0/OIDC Authentication Service |
+| | spire_identity_claims | Optional | Identity Claims |
+| | spire_identity_tokens_jwt | Optional | JWT Token Support |
+| | spire_identity_protocols_oidc | Optional | OpenID Connect Protocol Implementation |
+| **Object Serialization** | spire_serialization | Optional | Field-Driven Object Serialization Tool |
+| **ORM** | sqlsharp | Optional | Lightweight ORM |
+| | sqlsharp-utils | Optional | Entity Generation Tool |
 
+## Release Timeline
 
-## 发布时间线
+- [x] Version 0.9.0
+- [x] Version 1.0.0 August 4, 2025 Now Available
 
-- [x] 0.9.0 版本
-- [x] 1.0.0 版本 2025年08月04日 已上线
-
-## 许可证
+## License
 
 MIT License
